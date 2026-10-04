@@ -1,0 +1,1184 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<meta name="theme-color" content="#000000">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<title>Απογραφή v2</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+:root{
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+  --ink:#ddd5c4; --dim:#8c8476; --blood:#a8291f; --veil:rgba(8,6,6,.62); --line:rgba(221,213,196,.22); --bg:#000;
+  color-scheme:dark;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){ --ink:#ddd5c4; --dim:#8c8476; --bg:#000; } }
+:root[data-theme="dark"]{ --ink:#ddd5c4; --dim:#8c8476; --bg:#000; }
+html{scroll-padding-top:env(safe-area-inset-top,0px);}
+html,body{height:100%;margin:0;background:var(--bg);overflow:hidden;}
+body{box-sizing:border-box;padding-left:env(safe-area-inset-left,0px);padding-right:env(safe-area-inset-right,0px);
+  touch-action:none;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;-webkit-tap-highlight-color:transparent;
+  font-family:'EB Garamond',Georgia,'Times New Roman',serif;color:var(--ink);}
+#wrap{width:100%;height:100%;display:flex;align-items:center;justify-content:center;}
+#stage{position:relative;overflow:hidden;background:#000;--u:2px;--ts:1;}
+#cv{position:absolute;inset:0;width:100%;height:100%;image-rendering:pixelated;image-rendering:crisp-edges;}
+button{font:inherit;color:inherit;-webkit-appearance:none;appearance:none;}
+button:focus-visible{outline:1px solid var(--ink);outline-offset:2px;}
+
+/* dialogue */
+#dlg{position:absolute;left:50%;top:calc(var(--u)*7);transform:translateX(-50%);width:min(94%,calc(66% + (var(--ts) - 1) * 46%));max-height:calc(100% - var(--u)*50);overflow-y:auto;
+  padding:calc(var(--u)*5) calc(var(--u)*8) calc(var(--u)*6);background:var(--veil);
+  border-top:1px solid var(--line);border-bottom:1px solid var(--line);text-align:center;}
+#dlg[hidden]{display:none;}
+#dlgText{margin:0;font-size:calc(var(--u)*7.4*var(--ts));line-height:1.38;font-style:italic;min-height:1.38em;text-wrap:pretty;}
+#dlgOpts{display:flex;flex-direction:column;gap:calc(var(--u)*3);margin-top:calc(var(--u)*5);}
+#dlgOpts:empty{display:none;}
+#dlgOpts button{background:none;border:0;border-top:1px solid var(--line);padding:calc(var(--u)*3) 0 0;font-size:calc(var(--u)*7*var(--ts));cursor:pointer;}
+#dlgOpts button:active{color:var(--blood);}
+#more{position:absolute;right:calc(var(--u)*5);bottom:calc(var(--u)*2);font-size:calc(var(--u)*5);color:var(--dim);animation:bob 1.2s ease-in-out infinite;}
+@keyframes bob{50%{transform:translateY(2px);}}
+
+#whisper{position:absolute;left:0;right:0;top:44%;text-align:center;font-style:italic;font-size:calc(var(--u)*10*var(--ts));color:#c43a2c;
+  opacity:0;transition:opacity 1.1s ease;pointer-events:none;text-shadow:0 0 calc(var(--u)*4) rgba(120,0,0,.9);letter-spacing:.04em;}
+#whisper.show{opacity:.92;}
+
+#hint{position:absolute;left:50%;bottom:calc(var(--u)*7);transform:translateX(-50%);max-width:calc(46% + (var(--ts) - 1) * 10%);text-align:center;
+  font-size:calc(var(--u)*6.4*var(--ts));color:var(--ink);opacity:.82;pointer-events:none;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+#tip{position:absolute;left:50%;bottom:calc(var(--u)*17);transform:translateX(-50%);width:min(80%,calc(52% + (var(--ts) - 1) * 40%));text-align:center;font-size:calc(var(--u)*5.6*var(--ts));
+  color:var(--dim);font-style:italic;pointer-events:none;transition:opacity 1s;opacity:0;}
+#tip.show{opacity:1;}
+
+/* controls */
+.ctl{position:absolute;width:calc(var(--u)*30);height:calc(var(--u)*30);border-radius:50%;
+  background:rgba(12,10,10,.34);border:1px solid var(--line);display:flex;align-items:center;justify-content:center;padding:0;touch-action:none;}
+.ctl svg{width:44%;height:44%;fill:none;stroke:var(--ink);stroke-width:2;opacity:.75;}
+.ctl.held{background:rgba(221,213,196,.16);}
+#bL{left:calc(var(--u)*6);bottom:calc(var(--u)*6);}
+#bR{left:calc(var(--u)*40);bottom:calc(var(--u)*6);}
+#bA{right:calc(var(--u)*6);bottom:calc(var(--u)*6);width:calc(var(--u)*34);height:calc(var(--u)*34);opacity:.55;transition:opacity .25s;}
+#bA.live{opacity:1;border-color:rgba(221,213,196,.5);}
+#bInv{right:calc(var(--u)*6);top:calc(var(--u)*6);width:calc(var(--u)*24);height:calc(var(--u)*24);}
+#bMenu{left:calc(var(--u)*6);top:calc(var(--u)*6);width:calc(var(--u)*20);height:calc(var(--u)*20);}
+#sel{position:absolute;right:calc(var(--u)*44);bottom:calc(var(--u)*14);width:calc(var(--u)*18);height:calc(var(--u)*18);
+  border:1px solid var(--blood);background:rgba(12,10,10,.5);padding:calc(var(--u)*2);}
+#sel[hidden]{display:none;}
+#sel canvas,.slot canvas{width:100%;height:100%;image-rendering:pixelated;display:block;}
+.ctl b{font-weight:600;font-style:normal;font-size:calc(var(--u)*12);line-height:1;opacity:.82;}
+#bB{right:calc(var(--u)*44);bottom:calc(var(--u)*24);width:calc(var(--u)*26);height:calc(var(--u)*26);}
+#bB b{font-size:calc(var(--u)*10);}
+#sel{right:calc(var(--u)*6);bottom:calc(var(--u)*46);width:auto;height:auto;max-width:42%;display:flex;align-items:center;gap:calc(var(--u)*3);
+  padding:calc(var(--u)*2) calc(var(--u)*5) calc(var(--u)*2) calc(var(--u)*2);font-size:calc(var(--u)*6*var(--ts));font-style:italic;white-space:nowrap;}
+#sel canvas{width:calc(var(--u)*14);height:calc(var(--u)*14);flex:none;}
+#sel span{overflow:hidden;text-overflow:ellipsis;}
+#sel.pop{animation:pop .25s ease;}
+@keyframes pop{0%{transform:scale(.85);opacity:.4}100%{transform:none;opacity:1}}
+
+/* inventory */
+#inv{position:absolute;left:0;right:0;top:0;padding:calc(var(--u)*7) calc(var(--u)*36) calc(var(--u)*6);
+  background:linear-gradient(rgba(6,5,5,.92),rgba(6,5,5,.8));border-bottom:1px solid var(--line);}
+#inv[hidden]{display:none;}
+#slots{display:flex;gap:calc(var(--u)*3);flex-wrap:wrap;justify-content:center;min-height:calc(var(--u)*22);}
+.slot{width:calc(var(--u)*22);height:calc(var(--u)*22);padding:calc(var(--u)*3);background:rgba(221,213,196,.05);border:1px solid var(--line);}
+.slot.on{border-color:var(--blood);background:rgba(168,41,31,.18);}
+#invBar{display:flex;align-items:center;justify-content:center;gap:calc(var(--u)*6);margin-top:calc(var(--u)*4);}
+#invCap{font-size:calc(var(--u)*6.4*var(--ts));font-style:italic;color:var(--ink);min-height:1.3em;text-align:center;}
+#invBar button{background:none;border:1px solid var(--line);padding:calc(var(--u)*1.5) calc(var(--u)*6);font-size:calc(var(--u)*6*var(--ts));}
+#invBar{flex-wrap:wrap;}
+#invBar button:disabled{opacity:.3;}
+
+/* menu */
+#menu{position:absolute;left:calc(var(--u)*6);top:calc(var(--u)*30);display:flex;flex-direction:column;gap:calc(var(--u)*2);}
+#menu[hidden]{display:none;}
+#menu button{background:var(--veil);border:1px solid var(--line);padding:calc(var(--u)*2.5) calc(var(--u)*7);font-size:calc(var(--u)*6.4*var(--ts));text-align:left;}
+
+/* title & end */
+.screen{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:flex-end;padding:0 calc(var(--u)*18) calc(var(--u)*16);
+  background:linear-gradient(90deg,rgba(0,0,0,.78) 0%,rgba(0,0,0,.35) 55%,rgba(0,0,0,0) 80%);}
+.screen[hidden]{display:none;}
+#title h1{margin:0;font-weight:400;font-style:italic;font-size:calc(var(--u)*30);line-height:.9;letter-spacing:-.01em;color:#e4dccb;}
+#title h1 span{display:block;font-style:normal;font-size:calc(var(--u)*6.4);letter-spacing:.02em;color:var(--dim);margin-top:calc(var(--u)*5);}
+#title nav{display:flex;flex-direction:column;align-items:flex-start;gap:calc(var(--u)*2);margin-top:calc(var(--u)*10);}
+#title nav button,#end button{background:none;border:0;padding:calc(var(--u)*1.5) 0;font-size:calc(var(--u)*9);cursor:pointer;}
+#title nav button:active,#end button:active{color:var(--blood);}
+#title nav button[hidden]{display:none;}
+#title small{font-size:calc(var(--u)*5.2*var(--ts));color:var(--dim);margin-top:calc(var(--u)*8);font-style:italic;}
+#end{background:#000;justify-content:center;align-items:center;text-align:center;padding:calc(var(--u)*12) calc(18% - (var(--ts) - 1) * 18%);overflow-y:auto;}
+#end h2{font-weight:400;font-style:italic;font-size:calc(var(--u)*13);margin:0 0 calc(var(--u)*8);}
+#end p{font-size:calc(var(--u)*7.2*var(--ts));line-height:1.5;margin:0 0 calc(var(--u)*4);opacity:0;animation:rise 2.2s ease forwards;}
+#end button{margin-top:calc(var(--u)*6);font-size:calc(var(--u)*7);color:var(--dim);opacity:0;animation:rise 2s ease forwards;}
+@keyframes rise{to{opacity:1;}}
+
+#settings{position:absolute;inset:0;background:rgba(4,3,3,.93);display:flex;flex-direction:column;justify-content:center;padding:0 12%;gap:calc(var(--u)*5);z-index:5;}
+#settings[hidden]{display:none;}
+#settings h3{margin:0;font-weight:400;font-style:italic;font-size:calc(var(--u)*14);}
+#settings .lab{margin:0;color:var(--dim);font-size:calc(var(--u)*6.4);}
+#tsRow{display:flex;gap:calc(var(--u)*3);}
+#lgRow{display:flex;gap:calc(var(--u)*3);}
+#tsRow button,#lgRow button{flex:1;background:none;border:1px solid var(--line);padding:calc(var(--u)*3) 0;line-height:1;}
+#tsRow button[aria-pressed="true"],#lgRow button[aria-pressed="true"]{border-color:var(--ink);background:rgba(221,213,196,.1);}
+#tsPrev{margin:0;font-style:italic;font-size:calc(var(--u)*7.4*var(--ts));line-height:1.38;min-height:2.8em;}
+#settings .row{display:flex;gap:calc(var(--u)*4);flex-wrap:wrap;}
+#settings .row button{background:none;border:1px solid var(--line);padding:calc(var(--u)*3) calc(var(--u)*8);font-size:calc(var(--u)*7);}
+#rotate{position:fixed;inset:0;background:#000;color:var(--ink);display:none;flex-direction:column;align-items:center;justify-content:center;gap:24px;
+  font-size:20px;font-style:italic;text-align:center;padding:0 12%;z-index:9;}
+#rotate i{display:block;width:34px;height:58px;border:2px solid var(--ink);border-radius:6px;animation:turn 2.4s ease-in-out infinite;}
+@keyframes turn{0%,30%{transform:rotate(0)}60%,100%{transform:rotate(-90deg)}}
+@media (orientation:portrait) and (max-width:900px){#rotate{display:flex;}}
+@media (prefers-reduced-motion:reduce){#more,#rotate i{animation:none;}}
+
+[hidden]{display:none!important;}
+</style>
+</head>
+<body>
+<div id="wrap">
+<div id="stage">
+  <canvas id="cv" width="320" height="180"></canvas>
+  <div id="whisper"></div>
+  <div id="hint"></div>
+  <div id="tip"></div>
+
+  <button class="ctl" id="bL" aria-label="Αριστερά"><svg viewBox="0 0 24 24"><path d="M15 4 7 12l8 8"/></svg></button>
+  <button class="ctl" id="bR" aria-label="Δεξιά"><svg viewBox="0 0 24 24"><path d="m9 4 8 8-8 8"/></svg></button>
+  <button class="ctl" id="bA" aria-label="A: εξέταση ή χρήση"><b>A</b></button>
+  <button class="ctl" id="bB" aria-label="B: άλλαξε αντικείμενο"><b>B</b></button>
+  <button class="ctl" id="bInv" aria-label="Αντικείμενα"><svg viewBox="0 0 24 24"><path d="M4 8h16l-1.3 12H5.3L4 8Zm4 0V6a4 4 0 0 1 8 0v2"/></svg></button>
+  <button class="ctl" id="bMenu" aria-label="Μενού"><svg viewBox="0 0 24 24"><path d="M5 8h14M5 12h14M5 16h14"/></svg></button>
+  <button id="sel" hidden aria-label="Άδεια χέρια"></button>
+
+  <div id="menu" hidden>
+    <button id="mSet" data-i18n="Ρυθμίσεις">Ρυθμίσεις</button>
+    <button id="mTitle" data-i18n="Στην αρχική">Στην αρχική</button>
+  </div>
+
+  <div id="inv" hidden>
+    <div id="slots"></div>
+    <div id="invBar">
+      <div id="invCap"></div>
+      <button id="bExam" disabled data-i18n="Εξέταση">Εξέταση</button>
+      <button id="bClose" data-i18n="Κλείσιμο">Κλείσιμο</button>
+    </div>
+  </div>
+
+  <div id="dlg" hidden><p id="dlgText"></p><div id="dlgOpts"></div><span id="more">▾</span></div>
+
+  <div class="screen" id="title">
+    <h1><b data-i18n="Απογραφή" style="font-weight:inherit">Απογραφή</b><span data-i18n="Θεσσαλονίκη, Νοέμβριος 1987">Θεσσαλονίκη, Νοέμβριος 1987</span></h1>
+    <nav>
+      <button id="tNew" data-i18n="Νέο παιχνίδι">Νέο παιχνίδι</button>
+      <button id="tCont" hidden data-i18n="Συνέχεια">Συνέχεια</button>
+      <button id="tSet" data-i18n="Ρυθμίσεις">Ρυθμίσεις</button>
+    </nav>
+    <small data-i18n="Καλύτερα με ακουστικά και το κινητό οριζόντια.">Καλύτερα με ακουστικά και το κινητό οριζόντια.</small>
+  </div>
+
+  <div id="settings" hidden role="dialog" aria-label="Ρυθμίσεις">
+    <h3 data-i18n="Ρυθμίσεις">Ρυθμίσεις</h3>
+    <p class="lab" data-i18n="Μέγεθος γραμμάτων">Μέγεθος γραμμάτων</p>
+    <div id="tsRow">
+      <button data-ts="1" style="font-size:calc(var(--u)*7)">Α</button>
+      <button data-ts="1.3" style="font-size:calc(var(--u)*9)">Α</button>
+      <button data-ts="1.6" style="font-size:calc(var(--u)*11)">Α</button>
+      <button data-ts="2" style="font-size:calc(var(--u)*13)">Α</button>
+    </div>
+    <p class="lab" data-i18n="Γλώσσα">Γλώσσα</p>
+    <div id="lgRow"><button data-lg="el" style="font-size:calc(var(--u)*7)">Ελληνικά</button><button data-lg="en" style="font-size:calc(var(--u)*7)">English</button></div>
+    <p id="tsPrev" data-i18n="Έτσι θα φαίνονται τα κείμενα: «Το ρολόι σταμάτησε στις 3:17.»">Έτσι θα φαίνονται τα κείμενα: «Το ρολόι σταμάτησε στις 3:17.»</p>
+    <div class="row">
+      <button id="sSound">Ήχος: ναι</button>
+      <button id="sFull" data-i18n="Πλήρης οθόνη">Πλήρης οθόνη</button>
+      <button id="sClose" data-i18n="Κλείσιμο">Κλείσιμο</button>
+    </div>
+  </div>
+
+  <div class="screen" id="end" hidden>
+    <h2 id="endH"></h2>
+    <div id="endT"></div>
+    <button id="endB" data-i18n="Από την αρχή">Από την αρχή</button>
+  </div>
+</div>
+</div>
+<div id="rotate"><i></i><span data-i18n="Γύρισε το κινητό οριζόντια.">Γύρισε το κινητό οριζόντια.</span></div>
+
+<script>
+'use strict';
+/* ============================================================
+   ΑΠΟΓΡΑΦΗ — side-scrolling psychological horror adventure
+   Everything (art, light, sound) is generated at runtime.
+   ============================================================ */
+const W = 320, H = 180, FLOOR = 160;
+/* ===== v2 HD layer (shared) ===== */
+const OUT=document.getElementById('cv'), octx=OUT.getContext('2d');
+const cv=document.createElement('canvas'); cv.width=320; cv.height=180; const ctx=cv.getContext('2d'); ctx.imageSmoothingEnabled=false;
+const chc=document.createElement('canvas'); chc.width=320; chc.height=180; const CG=chc.getContext('2d'); CG.imageSmoothingEnabled=false;
+const olc=document.createElement('canvas'); olc.width=320; olc.height=180; const OG=olc.getContext('2d');
+let OW=320, OH=180;
+function shadowE(g,cx,cy,rw,rh,a){ a=a||.3; cx=Math.round(cx); cy=Math.round(cy); for(let y=-rh;y<=rh;y++){ const ww=Math.round(rw*Math.sqrt(Math.max(0,1-(y*y)/((rh+.5)*(rh+.5))))); for(let x=-ww;x<=ww;x++){ const d=(x*x)/(rw*rw+.01)+(y*y)/(rh*rh+.01);
+  if(d<.5){ g.fillStyle='rgba(20,10,30,'+a+')'; g.fillRect(cx+x,cy+y,1,1); } else if(((cx+x+cy+y)&1)===0){ g.fillStyle='rgba(20,10,30,'+(a*.7)+')'; g.fillRect(cx+x,cy+y,1,1); } } } }
+function aoBand(g,x,w,y0,y1,a){ const gr=g.createLinearGradient(0,y0,0,y1); gr.addColorStop(0,'rgba(20,10,30,0)'); gr.addColorStop(1,'rgba(20,10,30,'+a+')'); g.fillStyle=gr; g.fillRect(x,y0,w,y1-y0); }
+function grainBg(g,w,y0,amt){ const h=180-y0, id=g.getImageData(0,y0,w,h), d=id.data; for(let i=0,p=0;i<d.length;i+=4,p++){ const x=p%w, y=(p/w)|0; const n=(((x*73856093)^(y*19349663))>>>0)%1000; const k=1+((n/1000)-.5)*(amt||.07); d[i]=Math.min(255,d[i]*k); d[i+1]=Math.min(255,d[i+1]*k); d[i+2]=Math.min(255,d[i+2]*k); } g.putImageData(id,0,y0); }
+function compChars(col,a){ OG.globalCompositeOperation='source-over'; OG.clearRect(0,0,320,180); OG.drawImage(chc,0,0); OG.globalCompositeOperation='source-in'; OG.fillStyle=col; OG.fillRect(0,0,320,180); OG.globalCompositeOperation='source-over';
+  ctx.save(); ctx.setTransform(1,0,0,1,0,0); ctx.globalAlpha=a||.9; ctx.drawImage(olc,1,0); ctx.drawImage(olc,-1,0); ctx.drawImage(olc,0,1); ctx.drawImage(olc,0,-1); ctx.globalAlpha=1; ctx.drawImage(chc,0,0); ctx.restore(); }
+function charLayer(cam,sx,sy){ CG.setTransform(1,0,0,1,0,0); CG.clearRect(0,0,320,180); CG.setTransform(1,0,0,1,-cam+(sx||0),sy||0); }
+function hdBase(){ octx.setTransform(1,0,0,1,0,0); octx.globalCompositeOperation='source-over'; octx.globalAlpha=1; octx.imageSmoothingEnabled=false; octx.drawImage(cv,0,0,OW,OH); const k=OW/320; octx.setTransform(k,0,0,k,0,0); octx.imageSmoothingEnabled=true; return k; }
+function hdAdd(fn){ octx.save(); octx.globalCompositeOperation='lighter'; fn(); octx.restore(); }
+function hdGlow(x,y,r,rgb,a){ if(r<=0) return; const g=octx.createRadialGradient(x,y,0,x,y,r); g.addColorStop(0,'rgba('+rgb+','+a+')'); g.addColorStop(1,'rgba('+rgb+',0)'); octx.fillStyle=g; octx.fillRect(x-r,y-r,r*2,r*2); }
+function hdBeam(pts,rgb,a0,a1,y0,y1){ octx.beginPath(); pts.forEach(([x,y],i)=>i?octx.lineTo(x,y):octx.moveTo(x,y)); octx.closePath(); const g=octx.createLinearGradient(0,y0,0,y1); g.addColorStop(0,'rgba('+rgb+','+a0+')'); g.addColorStop(1,'rgba('+rgb+','+a1+')'); octx.fillStyle=g; octx.fill(); }
+function hdSun(sx,sy,warm,rays){ const cg=Math.round(236-warm*70), cb=Math.round(190-warm*120);
+  hdAdd(()=>{ hdGlow(sx,sy,90,'255,'+cg+','+cb,.45); octx.fillStyle='rgba(255,'+(250-warm*60)+','+(220-warm*120)+',.95)'; octx.beginPath(); octx.arc(sx,sy,6,0,7); octx.fill();
+    if(rays) for(let i=0;i<4;i++){ const a=2.0+i*.24+Math.sin(T*.3+i)*.03, len=260, w2=.035+.02*Math.sin(T*.5+i*2); octx.beginPath(); octx.moveTo(sx,sy); octx.lineTo(sx+Math.cos(a-w2)*len,sy+Math.sin(a-w2)*len); octx.lineTo(sx+Math.cos(a+w2)*len,sy+Math.sin(a+w2)*len); octx.closePath();
+      const l2=octx.createLinearGradient(sx,sy,sx+Math.cos(a)*len,sy+Math.sin(a)*len); l2.addColorStop(0,'rgba(255,'+cg+','+cb+',.075)'); l2.addColorStop(1,'rgba(0,0,0,0)'); octx.fillStyle=l2; octx.fill(); } }); }
+function hdGrade(mode,rgb,a){ octx.save(); octx.globalCompositeOperation=mode; octx.fillStyle='rgba('+rgb+','+a+')'; octx.fillRect(0,0,320,180); octx.restore(); }
+function hdVignette(a,rgb){ const vg=octx.createRadialGradient(160,90,180*.42,160,90,320*.7); vg.addColorStop(0,'rgba('+(rgb||'20,8,30')+',0)'); vg.addColorStop(1,'rgba('+(rgb||'20,8,30')+','+a+')'); octx.fillStyle=vg; octx.fillRect(0,0,320,180); }
+function hdIris(cx,cy,fade,col,rim){ if(fade<=.001) return; const r=Math.max(0,(1-fade)*Math.hypot(320,180)); octx.save(); octx.beginPath(); octx.rect(0,0,320,180); octx.moveTo(cx+r,cy); octx.arc(cx,cy,r,0,Math.PI*2,true); octx.fillStyle=col; octx.fill('evenodd');
+  if(rim&&r>2){ octx.beginPath(); octx.arc(cx,cy,r,0,Math.PI*2); octx.lineWidth=1.5; octx.strokeStyle=rim; octx.stroke(); } octx.restore(); }
+const POP=[]; function popup(txt,x,y){ POP.push({x,y,t:0,txt}); }
+function hdPopups(dt,cam,fill,stroke,font){ for(let i=POP.length-1;i>=0;i--){ const p=POP[i]; p.t+=dt; if(p.t>1.4){ POP.splice(i,1); continue; } octx.save(); octx.globalAlpha=Math.min(1,(1.4-p.t)*2); octx.font=font||'700 10px sans-serif'; octx.textAlign='center'; octx.lineWidth=3; octx.strokeStyle=stroke; octx.strokeText(p.txt,p.x-cam,p.y-p.t*16); octx.fillStyle=fill; octx.fillText(p.txt,p.x-cam,p.y-p.t*16); octx.restore(); } }
+function fitHD(w){ const dpr=Math.min(2,window.devicePixelRatio||1), sc=Math.max(1,Math.min(6,Math.round(w*dpr/320))); OW=320*sc; OH=180*sc; if(OUT.width!==OW||OUT.height!==OH){ OUT.width=OW; OUT.height=OH; } }
+const PFX=[]; function puff(x,y,c,n){ for(let i=0;i<(n||3);i++) PFX.push({x:x+rand(-2,2),y:y-1,vx:rand(-9,9),vy:rand(-10,-3),t:0,max:rand(.35,.6),c,r:rand(1,2.2)}); }
+function drawPFX(g,dt){ for(let i=PFX.length-1;i>=0;i--){ const p=PFX[i]; p.t+=dt; if(p.t>=p.max){ PFX.splice(i,1); continue; } p.x+=p.vx*dt; p.y+=p.vy*dt; p.vy+=(p.g!==undefined?p.g:14)*dt; g.globalAlpha=(1-p.t/p.max)*(p.a||.8); const r=Math.max(1,Math.round(p.r*(p.grow===false?1:(1+p.t)))); g.fillStyle=p.c; g.fillRect(Math.round(p.x-r/2),Math.round(p.y-r/2),r,r); g.globalAlpha=1; } }
+
+const $ = id => document.getElementById(id);
+const stage = $('stage');
+
+/* ---------- language ---------- */
+let LANG='el';
+let lastHint='', lastLive=null;
+const EN={"Έντυπο απογραφής": "Inventory form", "Απογραφή κινητής περιουσίας. Οδός Αγίας Σοφίας 41.": "Inventory of movable property. 41 Agias Sofias Street.", "Στο τέλος, μια κενή γραμμή: «Υπογραφή εκτιμητή».": "At the bottom, an empty line: \"Appraiser's signature\".", "Παλιά κάρτα": "Old card", "Μια κάρτα με ζωγραφισμένα γεράνια. Το χαρτί έχει κιτρινίσει.": "A card with painted geraniums. The paper has gone yellow.", "«Ευτέρπη μου, το κλειδί εκεί που το άφηνες πάντα. Στο γεράνι. — Α.»": "\"Evterpi, my dear, the key is where you always left it. In the geranium. — A.\"", "Σκουριασμένο κλειδί": "Rusty key", "Βαρύ, παλιό, γεμάτο χώμα.": "Heavy, old, caked with soil.", "Κερί": "Candle", "Μισολιωμένο κερί σε τενεκεδένιο κηροπήγιο.": "A half-melted candle in a tin holder.", "Σπίρτα": "Matches", "Ένα κουτί σπίρτα. Το κουνάω. Ακούγεται μόνο ένα.": "A box of matches. I shake it. Only one rattles.", "Αναμμένο κερί": "Lit candle", "Η φλόγα γέρνει προς τα κάτω. Σαν κάτι να τη φυσάει από εκεί.": "The flame leans downward. As if something were breathing on it from below.", "Σπάγκος": "String", "Ένα κουβάρι γερός σπάγκος.": "A ball of strong string.", "Μαγνήτης": "Magnet", "Μαγνήτης-σουβενίρ: «Καβάλα 1966». Πιάνει γερά.": "A souvenir magnet: \"Kavala 1966\". It grips hard.", "Μαγνήτης σε σπάγκο": "Magnet on a string", "Ένα αυτοσχέδιο καλάμι. Ο πατέρας μου θα γελούσε.": "A makeshift fishing line. My father would have laughed.", "Ορειχάλκινο κλειδάκι": "Small brass key", "Ακόμα υγρό. Στη λαβή είναι χαραγμένο: «Γραφείο».": "Still wet. Engraved on the bow: \"Study\".", "Κλειδί κουρδίσματος": "Winding key", "Δεμένο με μια μαύρη κορδέλα.": "Tied with a black ribbon.", "Γράμμα της Ευτέρπης": "Evterpi's letter", "«Σε όποιον έρθει να με μετρήσει.»": "\"To whoever comes to count me.\"", "«Τα πράγματα εδώ μέσα δεν αξίζουν τίποτα. Μόνο το ρολόι.»": "\"Nothing in here is worth anything. Only the clock.\"", "«Αν το κούρδισες, σε παρακαλώ: σταμάτησέ το ξανά στις 3:17.»": "\"If you wound it, I beg you: stop it again at 3:17.\"", "«Μην το αφήσεις να προχωρήσει χωρίς εκείνον. — Ευτέρπη»": "\"Don't let it go on without him. — Evterpi\"", "Ανάβω το κερί με το τελευταίο σπίρτο. Η φλόγα τρεμοπαίζει, αλλά κρατάει.": "I light the candle with the last match. The flame shivers, but it holds.", "Δένω τον μαγνήτη στην άκρη του σπάγκου. Σφιχτός κόμπος.": "I tie the magnet to the end of the string. A tight knot.", "Αυτοκίνητο": "Car", "Το Φιατάκι μου. Τα τζάμια θολώνουν από μέσα.": "My little Fiat. The windows are fogging up from the inside.", "Όχι ακόμα. Πρώτα η δουλειά.": "Not yet. Work first.", "Φανοστάτης": "Street lamp", "Η λάμπα τρεμοπαίζει. Σαν να ανασαίνει.": "The lamp flickers. As if it were breathing.", "Γραμματοκιβώτιο": "Mailbox", "Λογαριασμοί της ΔΕΗ, απλήρωτοι. Διαφημιστικά.": "Electricity bills, unpaid. Flyers.", "Και στο βάθος, μια παλιά κάρτα. Την κρατάω.": "And at the very back, an old card. I keep it.", "Μόνο λογαριασμοί. Κανείς δεν θα τους πληρώσει.": "Only bills. Nobody will ever pay them.", "Εξώπορτα": "Front door", "Κλειδωμένη.": "Locked.", "Το έγγραφο του δικαστηρίου λέει πως το κλειδί «βρίσκεται εντός του ακινήτου».": "The court order says the key \"is located on the premises\".", "Πολύ βοηθητικό.": "Very helpful.", "Το κλειδί γυρνάει με κόπο. Κάτι μέσα στην κλειδαριά τρίζει σαν κόκαλο.": "The key turns with effort. Something inside the lock creaks like bone.", "Γλάστρα": "Flowerpot", "Βασιλικός. Ξερός εδώ και χρόνια.": "Basil. Dead for years.", "Γλάστρα με γεράνι": "Geranium pot", "Ένα μαραμένο γεράνι. Του πήρα ό,τι είχε.": "A withered geranium. I took all it had.", "Ένα μαραμένο γεράνι. Το χώμα είναι σκληρό σαν πέτρα.": "A withered geranium. The soil is hard as stone.", "«Στο γεράνι.»": "\"In the geranium.\"", "Σκάβω με τα δάχτυλα. Το χώμα είναι παγωμένο.": "I dig with my fingers. The soil is ice cold.", "Ένα κλειδί. Σκουριασμένο.": "A key. Rusted.", "Άδεια γλάστρα": "Empty pot", "Άδεια. Μόνο βρόχινο νερό και ένα πεσμένο φύλλο.": "Empty. Just rainwater and a fallen leaf.", "Ο δρόμος": "The street", "Ο δρόμος χάνεται στο σκοτάδι. Δεν έχω δουλειά εκεί.": "The street disappears into the dark. I have no business there.", "Πόρτα της κουζίνας": "Kitchen door", "Κρεμάστρα": "Coat stand", "Ένα ανδρικό παλτό, φαγωμένο από τον σκόρο.": "A man's coat, eaten by moths.", "Στην τσέπη: ένα κουβάρι σπάγκος. Και ένα μισοσκισμένο εισιτήριο τρένου.": "In the pocket: a ball of string. And a half-torn train ticket.", "Θεσσαλονίκη – Αθήνα. 17 Νοεμβρίου 1967.": "Thessaloniki – Athens. 17 November 1967.", "Το παλτό μυρίζει ακόμα καπνό.": "The coat still smells of tobacco.", "Πορτρέτο": "Portrait", "Ένας άντρας με στολή σιδηροδρομικού.": "A man in a railwayman's uniform.", "Κάποιος έχει ξύσει το πρόσωπο με κάτι αιχμηρό. Επίμονα.": "Someone has scratched out the face with something sharp. Over and over.", "Τραπεζάκι": "Side table", "Ένα κερί σε τενεκεδένιο κηροπήγιο. Το παίρνω.": "A candle in a tin holder. I take it.", "Σκόνη. Και ένας καθαρός κύκλος εκεί που ήταν το κερί.": "Dust. And a clean circle where the candle stood.", "Εκκρεμές ρολόι": "Grandfather clock", "Χτυπάει. Κάθε χτύπος αντηχεί μέσα στο στήθος μου.": "It's ticking. Every tick echoes inside my chest.", "Ένα ψηλό εκκρεμές ρολόι. Σταματημένο στις 3:17.": "A tall grandfather clock. Stopped at 3:17.", "Θα πιάσει καλή τιμή. Το σημειώνω.": "It'll fetch a good price. I make a note.", "Παράθυρο": "Window", "Βροχή. Ο δρόμος από εδώ μέσα μοιάζει πολύ πιο μακριά απ’ ό,τι είναι.": "Rain. From in here the street looks much farther away than it is.", "Πόρτα του γραφείου": "Study door", "Κλειδωμένη. Η κλειδαριά είναι μικρή, ορειχάλκινη.": "Locked. The lock is small, brass.", "Ταιριάζει.": "It fits.", "Σκάλα": "Stairs", "Η σκάλα είναι φραγμένη με έπιπλα κάτω από σεντόνια.": "The stairs are blocked by furniture under dust sheets.", "Από πάνω ακούγεται κάτι. Σαν κουνιστή πολυθρόνα.": "Something can be heard upstairs. Like a rocking chair.", "…Θα είναι ο αέρας.": "…It must be the wind.", "Πόρτα του υπογείου": "Cellar door", "Σκαλοπάτια που χάνονται στο απόλυτο σκοτάδι.": "Steps vanishing into total darkness.", "Έχω ένα κερί. Χρειάζομαι κάτι για να το ανάψω.": "I have a candle. I need something to light it.", "Χωρίς φως δεν κατεβαίνω.": "I'm not going down without light.", "Πρέπει πρώτα να το ανάψω.": "I need to light it first.", "Ημερολόγιο τοίχου": "Wall calendar", "Ημερολόγιο τοίχου. Νοέμβριος 1967.": "A wall calendar. November 1967.", "Η 17η είναι κυκλωμένη με κόκκινο. Κανείς δεν γύρισε τη σελίδα από τότε.": "The 17th is circled in red. Nobody has turned the page since.", "Ψυγείο": "Fridge", "Το ψυγείο είναι αποσυνδεδεμένο. Δεν τολμώ να το ανοίξω.": "The fridge is unplugged. I don't dare open it.", "Στην πόρτα, ένας μαγνήτης-σουβενίρ. Τον παίρνω.": "On the door, a souvenir magnet. I take it.", "Δεν το ανοίγω. Όχι.": "I'm not opening it. No.", "Συρτάρια": "Drawers", "Κουτάλια, ένα σπασμένο ψαλίδι… και σπίρτα.": "Spoons, a broken pair of scissors… and matches.", "Τίποτε άλλο χρήσιμο.": "Nothing else useful.", "Νεροχύτης": "Sink", "Η βρύση στάζει. Ρυθμικά. Σαν να μετράει κάτι.": "The tap drips. Rhythmically. As if it were counting something.", "Τραπέζι": "Table", "Δύο φλιτζάνια, στρωμένα αντικριστά.": "Two cups, set facing each other.", "Το ένα δεν το έπιασε ποτέ κανείς. Έχει σκόνη μέσα.": "One was never touched. There's dust inside.", "Προς το χολ": "To the hallway", "Η κουζίνα. Πιο κρύα από τον δρόμο.": "The kitchen. Colder than the street.", "Ράφια": "Shelves", "Βάζα με γλυκό του κουταλιού. Δεκάδες.": "Jars of spoon sweets. Dozens of them.", "Όλα έχουν την ίδια ετικέτα, με το ίδιο χέρι: «Για τον Α., όταν γυρίσει».": "Every one has the same label, in the same hand: \"For A., when he comes back.\"", "Στέρνα": "Cistern", "Μαύρο νερό. Δεν βλέπω πια τον πάτο. Ή μήπως εκείνος δεν βλέπει εμένα;": "Black water. I can't see the bottom anymore. Or does it no longer see me?", "Μια παλιά στέρνα. Το νερό είναι ακίνητο σαν γυαλί.": "An old cistern. The water is still as glass.", "Κάτι μεταλλικό γυαλίζει στον πάτο. Πολύ βαθιά για το χέρι μου.": "Something metal glints at the bottom. Too deep for my hand.", "Κατεβάζω τον μαγνήτη αργά…": "I lower the magnet slowly…", "Κάτι τραβάει τον σπάγκο. Μια στιγμή μόνο. Πιο δυνατά απ’ όσο θα έπρεπε.": "Something pulls on the string. Just for a moment. Harder than it should.", "Ένα μικρό ορειχάλκινο κλειδί.": "A small brass key.", "Δεν φτάνει ως κάτω. Αν το συνδύαζα με κάτι…": "It won't reach the bottom. If I combined it with something…", "Μπαούλο": "Trunk", "Ανδρικά ρούχα, διπλωμένα με προσοχή. Ναφθαλίνη.": "Men's clothes, carefully folded. Mothballs.", "Από πάνω, ένα πηλήκιο σιδηροδρομικού.": "On top, a railwayman's cap.", "…Υπάρχει κανείς εδώ κάτω;": "…Is anyone down here?", "Μόνο η σταγόνα που πέφτει στη στέρνα.": "Only the drip falling into the cistern.", "Βιβλιοθήκη": "Bookcase", "Δρομολόγια του σιδηροδρόμου, δεμένα σε τόμους. Από το 1958 ως το 1967.": "Railway timetables, bound in volumes. From 1958 to 1967.", "Μετά το 1967, τίποτα.": "After 1967, nothing.", "Φωτογραφία": "Photograph", "Ένα ζευγάρι σε παραλία. Εκείνη γελάει. Εκείνος κοιτάζει το ρολόι του.": "A couple on a beach. She is laughing. He is looking at his watch.", "Από πίσω: «Ευτέρπη και Ανδρέας, Καβάλα 1966».": "On the back: \"Evterpi and Andreas, Kavala 1966\".", "Γραφείο": "Desk", "Ένα ημερολόγιο, ανοιχτό στην τελευταία σελίδα:": "A diary, open at the last page:", "«Το ρολόι σταμάτησε τη νύχτα που ο Ανδρέας πήρε το τρένο των 3:17.»": "\"The clock stopped the night Andreas took the 3:17 train.\"", "«Δεν θα το ξανακουρδίσω. Όσο ο χρόνος δεν προχωρά, δεν έχει φύγει.»": "\"I will never wind it again. As long as time stands still, he hasn't left.\"", "Στο συρτάρι, ένα κλειδί κουρδίσματος με μαύρη κορδέλα.": "In the drawer, a winding key on a black ribbon.", "Πρέπει να ελέγξω αν το ρολόι λειτουργεί. Αλλάζει την εκτίμηση.": "I have to check whether the clock works. It changes the valuation.", "«Όσο ο χρόνος δεν προχωρά, δεν έχει φύγει.»": "\"As long as time stands still, he hasn't left.\"", "Χάρτης": "Map", "Χάρτης του σιδηροδρομικού δικτύου. Μια διαδρομή είναι σημαδεμένη με κόκκινο μελάνι, ξανά και ξανά.": "A map of the railway network. One route is marked in red ink, over and over.", "Θεσσαλονίκη – Αθήνα. Μόνο το πήγαινε.": "Thessaloniki – Athens. One way only.", "Τα τζάμια τρέμουν σε κάθε βροντή. Κι εγώ λίγο.": "The panes shake with every thunderclap. So do I, a little.", "Πόρτα": "Door", "Τικ.": "Tick.", "Πού πας, Ανδρέα;": "Where are you going, Andreas?", "Το τρένο δεν περιμένει κανέναν.": "The train waits for no one.", "Μείνε. Μόνο απόψε.": "Stay. Just tonight.", "Εικονοστάσι": "Icon shelf", "Το εικονοστάσι. Το καντήλι είναι αναμμένο.": "The icon shelf. The oil lamp is lit.", "Η Ευτέρπη πέθανε πριν από τρεις εβδομάδες.": "Evterpi died three weeks ago.", "Ποιος το άναψε;": "Who lit it?", "Κρεβάτι": "Bed", "Στρωμένο για δύο. Το ένα μαξιλάρι είναι ακόμα βαθουλωμένο.": "Made up for two. One pillow still holds the shape of a head.", "Κουνιστή πολυθρόνα": "Rocking chair", "Κουνιέται. Δεν την αγγίζει κανείς.": "It's rocking. Nobody is touching it.", "Τη σταματάω με το χέρι. Είναι ζεστή.": "I stop it with my hand. It's warm.", "Κάτω από το μαξιλάρι, ένας φάκελος: «Σε όποιον έρθει να με μετρήσει».": "Under the cushion, an envelope: \"To whoever comes to count me.\"", "Ξανακουνιέται. Την αφήνω.": "It starts rocking again. I let it.", "Από εδώ φαίνεται η στάση του τρένου. Το φως της είναι ακόμα αναμμένο.": "From here you can see the railway stop. Its light is still on.", "Συρταριέρα": "Chest of drawers", "Ένα μουσικό κουτί. Παίζει έναν σκοπό που δεν ξέρω.": "A music box. It plays a tune I don't know.", "Κι όμως, τον θυμάμαι.": "And yet I remember it.", "Γραφειάκι": "Writing desk", "Εδώ θα συμπληρώσω την απογραφή. Χρειάζομαι το έντυπο.": "I'll fill in the inventory here. I need the form.", "Ένα μικρό γραφείο με λάμπα. Εδώ θα συμπληρώσω την απογραφή.": "A small desk with a lamp. I'll fill in the inventory here.", "Πρώτα να ελέγξω όλο το δωμάτιο.": "First I should check the whole room.", "Το διαβάζω ξανά. Τα γράμματα τρέμουν προς το τέλος.": "I read it again. The handwriting trembles towards the end.", "Η πολυθρόνα κουνιέται.": "The chair is rocking.", "Το παράθυρο είναι κλειστό.": "The window is shut.", "Μέσα μυρίζει υγρασία και λεβάντα.": "Inside, it smells of damp and lavender.", "Το σπίτι είναι πιο ζεστό απ’ όσο θα έπρεπε. Σαν να το κατοικεί ακόμα κάποιος.": "The house is warmer than it should be. As if someone still lives here.", "Η λάμπα του γραφείου είναι αναμμένη.": "The desk lamp is on.", "Το ρεύμα έχει κοπεί από τον Οκτώβριο.": "The power was cut off in October.", "Βάζω το κλειδί στο καντράν. Μία, δύο, τρεις στροφές.": "I fit the key into the dial. One, two, three turns.", "Σπρώχνω το εκκρεμές.": "I give the pendulum a push.", "Τικ…": "Tick…", "Είμαι στο χολ. Το ρολόι χτυπάει κανονικά.": "I'm in the hallway. The clock is ticking normally.", "Τα σεντόνια από τη σκάλα έχουν γλιστρήσει στο πάτωμα. Σαν να τα τράβηξε κάποιος.": "The sheets have slid off the stairs onto the floor. As if someone pulled them.", "Γράφω. Καναπές. Δύο πολυθρόνες. Σερβίτσιο πορσελάνης. Βάζα με γλυκό: πενήντα δύο.": "I write. Sofa. Two armchairs. Porcelain tea set. Jars of spoon sweets: fifty-two.", "Εκκρεμές ρολόι, σε λειτουργία. Μόνο αυτό αξίζει όσο το μισό σπίτι.": "Grandfather clock, in working order. That alone is worth half the house.", "Από κάτω ακούγεται το τικ-τακ. Σαν να περιμένει τι θα γράψω.": "I can hear the ticking from downstairs. As if it's waiting to see what I write.", "Τι γράφω για το ρολόι;": "What do I write for the clock?", "«Σε λειτουργία». Υπογράφω.": "\"In working order.\" I sign.", "Κατεβαίνω να το σταματήσω στις 3:17.": "I go down and stop it at 3:17.", "Πρώτο τέλος · Η απογραφή": "First ending · The Inventory", "Το ρολόι φορτώθηκε σε ένα φορτηγάκι του Δημοσίου μαζί με άλλα διακόσια δεκατρία αντικείμενα. Χτυπούσε σε όλη τη διαδρομή.": "The clock was loaded onto a state van with two hundred and thirteen other items. It ticked the whole way.", "Τον Μάρτιο πήρα προαγωγή.": "In March I got a promotion.", "Ξυπνάω κάθε βράδυ στις 3:17 και ακούω ένα τικ-τακ στο χολ μου.": "Every night I wake at 3:17 and hear ticking in my hallway.", "Δεν έχω ρολόι στο χολ μου.": "There is no clock in my hallway.", "Δεύτερο τέλος · Τρεις και δεκαεφτά": "Second ending · Seventeen past three", "Άνοιξα το γυάλινο πορτάκι και σταμάτησα το εκκρεμές με δύο δάχτυλα. Γύρισα τους δείκτες πίσω: τρεις και δεκαεφτά.": "I opened the little glass door and stopped the pendulum with two fingers. I turned the hands back: seventeen past three.", "Η βροχή σταμάτησε. Από πάνω, η πολυθρόνα έτριξε μια τελευταία φορά, και ησύχασε.": "The rain stopped. Upstairs, the chair creaked one last time, and was still.", "Στο έντυπο έγραψα: «Εκκρεμές ρολόι, μη λειτουργικό. Άνευ αξίας.»": "On the form I wrote: \"Grandfather clock, not working. No value.\"", "Ήταν το μόνο ψέμα που έγραψα ποτέ σε απογραφή.": "It was the only lie I ever wrote on an inventory.", "Άδεια χέρια.": "Empty hands.", "Αυτά τα δύο δεν συνδυάζονται.": "These two don't go together.", "Διάλεξε ένα αντικείμενο.": "Pick an item.", "Διάλεξε ένα αντικείμενο. Πάτα δεύτερο για να τα συνδυάσεις.": "Pick an item. Tap a second one to combine them.", "Δεν βγαίνει νόημα.": "That makes no sense.", "Όχι, δεν ταιριάζει εδώ.": "No, that doesn't belong here.", "Δεν νομίζω.": "I don't think so.", "Αυτό δεν θα βοηθήσει.": "That won't help.", "Δεν υπάρχει τίποτα εδώ για να το χρησιμοποιήσω. (B για άδεια χέρια)": "There's nothing here to use it on. (B for empty hands)", "Ήχος: ": "Sound: ", "ναι": "on", "όχι": "off", "Θεσσαλονίκη, Νοέμβριος 1987.": "Thessaloniki, November 1987.", "Με λένε Λευτέρη Σταθάκη. Είμαι εκτιμητής του Πρωτοδικείου.": "My name is Lefteris Stathakis. I'm an appraiser for the Court of First Instance.", "Η δουλειά μου είναι να μετράω τι αφήνουν πίσω τους οι άνθρωποι.": "My job is to count what people leave behind.", "Ευτέρπη Λάμπρου, ογδόντα ενός ετών. Χωρίς κληρονόμους. Το σπίτι περνάει στο Δημόσιο.": "Evterpi Lambrou, eighty-one. No heirs. The house passes to the state.", "Μία απογραφή. Μία υπογραφή. Και μετά σπίτι μου.": "One inventory. One signature. Then home.", "Βέλη για κίνηση. A εξετάζει ή χρησιμοποιεί. B αλλάζει το αντικείμενο που κρατάς. Στην τσάντα συνδυάζεις.": "Arrows to move. A examines or uses. B switches the item you're holding. Combine items in the bag.", " · A για χρήση": " · A to use", "Απογραφή": "Inventory", "Θεσσαλονίκη, Νοέμβριος 1987": "Thessaloniki, November 1987", "Νέο παιχνίδι": "New game", "Συνέχεια": "Continue", "Ρυθμίσεις": "Settings", "Καλύτερα με ακουστικά και το κινητό οριζόντια.": "Best with headphones and your phone held sideways.", "Στην αρχική": "Back to title", "Μέγεθος γραμμάτων": "Text size", "Γλώσσα": "Language", "Έτσι θα φαίνονται τα κείμενα: «Το ρολόι σταμάτησε στις 3:17.»": "This is how text will look: \"The clock stopped at 3:17.\"", "Πλήρης οθόνη": "Full screen", "Κλείσιμο": "Close", "Εξέταση": "Examine", "Από την αρχή": "Start over", "Γύρισε το κινητό οριζόντια.": "Turn your phone sideways."};
+const tr = t => (LANG==='en' && EN[t]!==undefined) ? EN[t] : t;
+
+/* ---------- small helpers ---------- */
+function rng(seed){ let s = seed >>> 0; return () => { s = (s * 1664525 + 1013904223) >>> 0; return s / 4294967296; }; }
+function R(g,x,y,w,h,c){ g.fillStyle = c; g.fillRect(Math.round(x),Math.round(y),Math.round(w),Math.round(h)); }
+function hex(c){ return [1,3,5].map(i => parseInt(c.slice(i,i+2),16)); }
+function mix(a,b,k){ const A = hex(a), B = hex(b); return 'rgb(' + A.map((v,i) => Math.round(v + (B[i]-v)*k)).join(',') + ')'; }
+function disc(g,cx,cy,r,c){ g.fillStyle = c; for(let dy=-r; dy<=r; dy++){ const dx = Math.floor(Math.sqrt(r*r - dy*dy + r*.6)); g.fillRect(cx-dx, cy+dy, dx*2+1, 1); } }
+function line(g,x0,y0,x1,y1,c){ g.fillStyle = c; x0=Math.round(x0); y0=Math.round(y0); x1=Math.round(x1); y1=Math.round(y1);
+  const dx=Math.abs(x1-x0), dy=-Math.abs(y1-y0), sx=x0<x1?1:-1, sy=y0<y1?1:-1; let e=dx+dy;
+  for(let i=0;i<800;i++){ g.fillRect(x0,y0,1,1); if(x0===x1&&y0===y1) break; const e2=2*e; if(e2>=dy){e+=dy;x0+=sx;} if(e2<=dx){e+=dx;y0+=sy;} } }
+function speck(g,x,y,w,h,n,cols,r){ for(let i=0;i<n;i++) R(g, x+r()*w, y+r()*h, 1, 1, cols[(r()*cols.length)|0]); }
+const clamp = (v,a,b) => Math.max(a, Math.min(b, v));
+const rand = (a,b) => a + Math.random()*(b-a);
+
+/* ---------- shared set pieces ---------- */
+function room(g,w,o){
+  const r = rng(o.seed||1);
+  R(g,0,0,w,H,'#000');
+  R(g,0,0,w,12,o.ceil||'#141110'); R(g,0,12,w,2,'#0b0908');
+  R(g,0,14,w,104,o.wall);
+  for(let x=0;x<w;x+=8) R(g,x,14,1,104,o.wall2);
+  for(let y=24, row=0; y<112; y+=12, row++) for(let x=4+(row%2)*4; x<w; x+=8){ R(g,x,y,1,1,o.motif); R(g,x-1,y+1,3,1,o.motif); R(g,x,y+2,1,1,o.motif); }
+  for(let i=0;i<w/30;i++){ const sx=r()*w, sy=18+r()*80, sw=6+r()*22, sh=8+r()*34; g.globalAlpha=.22; for(let k=0;k<sw*sh*.45;k++) R(g,sx+r()*sw,sy+r()*sh,1,1,'#000'); g.globalAlpha=1; }
+  for(let i=0;i<w/45;i++){ const sx=r()*w; g.globalAlpha=.35; R(g,sx,14,1,10+r()*50,'#120f0c'); g.globalAlpha=1; }
+  for(let i=0;i<w/90;i++){ const sx=r()*w, sy=20+r()*60; R(g,sx,sy,3+r()*6,5+r()*10,o.wall2); R(g,sx,sy,1,4,'#6a6252'); }
+  R(g,0,118,w,32,o.wains); R(g,0,118,w,2,o.wainsL);
+  for(let x=6;x<w;x+=28){ R(g,x,124,22,20,o.wainsD); R(g,x+1,125,20,18,o.wains); R(g,x+1,125,20,1,o.wainsL); }
+  R(g,0,147,w,3,'#0d0a08');
+  for(let y=150, k=0; y<H; y+=3, k++){ R(g,0,y,w,3,k%2?o.floor:o.floor2); for(let x=(r()*22)|0; x<w; x+=18+((r()*24)|0)) R(g,x,y,1,3,'#0f0b09'); }
+  let gr=g.createLinearGradient(0,150,0,176); gr.addColorStop(0,'rgba(0,0,0,.65)'); gr.addColorStop(1,'rgba(0,0,0,0)'); g.fillStyle=gr; g.fillRect(0,150,w,26);
+  gr=g.createLinearGradient(0,14,0,52); gr.addColorStop(0,'rgba(0,0,0,.6)'); gr.addColorStop(1,'rgba(0,0,0,0)'); g.fillStyle=gr; g.fillRect(0,14,w,38);
+}
+function door(g,x,o={}){
+  const l = x-12;
+  R(g,l-3,97,30,53,'#0f0c0a'); R(g,l-2,98,28,52,o.frame||'#3a2a1f'); R(g,l,101,24,49,o.col||'#2a1d15');
+  if(o.dark){ R(g,l,101,24,49,'#040303'); return; }
+  const p = o.pan||'#21170f';
+  R(g,l+3,104,8,19,p); R(g,l+13,104,8,19,p); R(g,l+3,127,8,19,p); R(g,l+13,127,8,19,p);
+  R(g,l+3,104,8,1,'#120c08'); R(g,l+13,104,8,1,'#120c08'); R(g,l+3,127,8,1,'#120c08'); R(g,l+13,127,8,1,'#120c08');
+  if(!o.noKnob){ R(g,l+20,126,2,2,'#9a844a'); R(g,l+20,129,2,3,'#0a0705'); }
+}
+function frame(g,x,y,w,h,inner){ R(g,x-2,y-2,w+4,h+4,'#5e4f28'); R(g,x-1,y-1,w+2,h+2,'#33291a'); R(g,x,y,w,h,'#262420'); if(inner) inner(g,x,y,w,h); }
+function windowFrame(g,x,y,w,h,curtain){
+  R(g,x-2,y-2,w+4,h+4,'#271c15'); R(g,x,y,w,h,'#0a0e16');
+  R(g,x+(w>>1),y,1,h,'#271c15'); R(g,x,y+(h>>1),w,1,'#271c15'); R(g,x-4,y+h+2,w+8,3,'#3b2c21');
+  if(curtain){ R(g,x-7,y-5,8,h+12,curtain); R(g,x+w-1,y-5,8,h+12,curtain); for(let i=0;i<4;i++){ R(g,x-6+i*2,y-5,1,h+12,'rgba(0,0,0,.25)'); R(g,x+w+i*2,y-5,1,h+12,'rgba(0,0,0,.25)'); } R(g,x-9,y-7,w+18,2,'#1d140e'); }
+}
+function glass(g,x,y,w,h){ // dynamic window pane: rain streaks + lightning
+  const f = S.flash;
+  R(g,x,y,w,h, f>0.05 ? mix('#0a0e16','#9aa6bc',f*.85) : '#0a0e16');
+  g.fillStyle='rgba(150,165,190,.22)';
+  for(let i=0;i<w*.6;i++){ const sx = x + ((i*7.3 + T*3) % w), sy = y + ((i*13.7 + T*40*(.6+(i%3)*.3)) % h); g.fillRect(sx|0, sy|0, 1, 2); }
+  R(g,x+(w>>1),y,1,h,'#271c15'); R(g,x,y+(h>>1),w,1,'#271c15');
+}
+function clockFace(g,cx,cy,r,hr,mn,col){
+  disc(g,cx,cy,r+1,'#2a2016'); disc(g,cx,cy,r,col||'#c4bba2');
+  for(let i=0;i<12;i++){ const a=i/12*Math.PI*2; R(g,cx+Math.sin(a)*(r-1),cy-Math.cos(a)*(r-1),1,1,'#4a4236'); }
+  const ah=(hr%12 + mn/60)/12*Math.PI*2, am=mn/60*Math.PI*2;
+  line(g,cx,cy,cx+Math.sin(ah)*r*.5,cy-Math.cos(ah)*r*.5,'#120e0a');
+  line(g,cx,cy,cx+Math.sin(am)*r*.85,cy-Math.cos(am)*r*.85,'#120e0a');
+}
+
+/* ---------- backgrounds (pre-rendered once) ---------- */
+function bgStreet(g,w){
+  const r = rng(11);
+  for(let y=0;y<150;y++) R(g,0,y,w,1,mix('#06080d','#1a202b',y/150));
+  let x=-10;
+  while(x<w){ const bw=18+((r()*36)|0), top=38+((r()*55)|0); R(g,x,top,bw,150-top,'#0c0f16');
+    for(let wy=top+5; wy<140; wy+=8) for(let wx=x+3; wx<x+bw-3; wx+=6) if(r()<.09) R(g,wx,wy,2,3,r()<.6?'#4a3e25':'#2b2925');
+    if(r()<.4) R(g,x+(bw>>1),top-8,1,8,'#0c0f16'); x+=bw+1; }
+  // neighbour block
+  R(g,0,26,276,124,'#1e2024'); speck(g,0,26,276,124,1400,['#191b1e','#25272b','#1b1c20'],r); R(g,0,24,276,3,'#2b2d31');
+  for(let wx=12; wx<260; wx+=34){ for(const wy of [34,70]){ R(g,wx,wy,14,20,'#0a0c11'); R(g,wx+7,wy,1,20,'#1b1c20'); R(g,wx-1,wy+20,16,2,'#2c2e32'); if(r()<.12) R(g,wx+1,wy+1,6,18,'#33291b'); } }
+  R(g,0,62,276,2,'#2b2d31'); R(g,0,54,276,1,'#121316'); for(let bx=0;bx<276;bx+=3) R(g,bx,55,1,7,'#121316');
+  R(g,108,100,84,50,'#151619'); for(let sy=104; sy<150; sy+=3) R(g,110,sy,80,1,'#26272b'); R(g,104,91,92,9,'#331715'); R(g,106,93,88,1,'#4a2420'); R(g,104,99,92,1,'#1d0d0b');
+  R(g,20,104,40,46,'#17181b'); door(g,40,{col:'#141518',pan:'#101114',frame:'#26272a'});
+  line(g,206,120,222,112,'#3a3d44'); line(g,214,128,232,118,'#3a3d44'); line(g,222,112,232,118,'#3a3d44');
+  // lamp post
+  R(g,199,42,2,108,'#0e0f11'); R(g,197,146,6,4,'#0e0f11'); R(g,196,40,8,2,'#0e0f11'); R(g,196,30,8,2,'#0e0f11'); R(g,199,27,2,3,'#0e0f11');
+  // mansion
+  R(g,276,22,206,128,'#4a4435'); speck(g,276,22,206,128,2200,['#433e30','#524b3b','#3e392c'],r);
+  for(let i=0;i<70;i++){ g.globalAlpha=.25; R(g,276+r()*206,112+r()*10,1,26+r()*10,'#14120e'); g.globalAlpha=1; }
+  R(g,272,22,214,4,'#5d5644'); R(g,274,26,210,2,'#29251d');
+  for(let i=0;i<16;i++){ const hw=50-i*3.1; R(g,379-hw,21-i,hw*2,1,i===0?'#5d5644':'#534c3c'); }
+  R(g,376,4,6,3,'#5d5644'); R(g,328,18,4,4,'#5d5644'); R(g,426,18,4,4,'#5d5644');
+  R(g,276,88,206,3,'#5d5644'); R(g,276,91,206,1,'#29251d');
+  for(const px of [280,474]){ R(g,px,28,6,118,'#544d3d'); R(g,px+5,28,1,118,'#332e27'); }
+  const nWin=(cx,y,h,sh,lit)=>{ R(g,cx-9,y-4,18,3,'#5d5644'); R(g,cx-7,y,14,h,lit||'#090b0f'); R(g,cx,y,1,h,'#29251d'); R(g,cx-7,y+(h>>1),14,1,'#29251d'); R(g,cx-8,y+h,16,2,'#5d5644');
+    if(sh){ R(g,cx-14,y,6,h,'#2b352f'); R(g,cx+8,y,6,h,'#2b352f'); for(let yy=y+2; yy<y+h; yy+=2){ R(g,cx-14,yy,6,1,'#212823'); R(g,cx+8,yy,6,1,'#212823'); } } };
+  nWin(306,42,36,true); nWin(452,42,36,true); nWin(306,98,38,true); nWin(452,98,38,false);
+  R(g,370,42,18,42,'#090b0f'); R(g,378,42,1,42,'#29251d'); R(g,368,39,22,3,'#5d5644');
+  R(g,360,82,38,3,'#5d5644'); R(g,360,85,38,1,'#29251d'); R(g,361,72,36,1,'#15140f'); for(let bx=362; bx<397; bx+=3) R(g,bx,73,1,9,'#15140f');
+  R(g,276,138,206,12,'#3a3529'); R(g,276,138,206,1,'#4f4839');
+  R(g,366,94,26,6,'#090b0f'); for(let i=0;i<5;i++) R(g,368+i*5,94,1,6,'#29251d'); R(g,364,92,30,2,'#5d5644');
+  R(g,367,100,24,46,'#2a2018'); R(g,369,103,9,18,'#1f1710'); R(g,380,103,9,18,'#1f1710'); R(g,369,125,9,19,'#1f1710'); R(g,380,125,9,19,'#1f1710'); R(g,378,100,1,46,'#140e09'); R(g,385,124,2,2,'#8a7a46');
+  R(g,362,146,34,2,'#5a5446'); R(g,358,148,42,2,'#625b4c');
+  // fence
+  R(g,272,118,90,1,'#101010'); R(g,396,118,90,1,'#101010'); R(g,272,143,90,1,'#101010'); R(g,396,143,90,1,'#101010');
+  for(let fx=274; fx<480; fx+=5){ if(fx>356 && fx<400) continue; R(g,fx,116,1,34,'#101010'); R(g,fx-1,115,3,1,'#101010'); R(g,fx,113,1,2,'#101010'); }
+  for(const px of [356,396]){ R(g,px,108,7,42,'#4a4538'); R(g,px-1,106,9,3,'#5a5444'); R(g,px+6,108,1,42,'#2e2a22'); }
+  line(g,363,116,371,120,'#101010'); line(g,363,144,371,146,'#101010'); for(let k=0;k<4;k++) R(g,364+k*2,117+k,1,28,'#101010');
+  R(g,338,122,12,11,'#24302a'); R(g,338,122,12,1,'#344238'); R(g,340,125,8,1,'#0a0d0b'); R(g,343,133,2,6,'#1a1a1a');
+  // sidewalk + road
+  R(g,0,150,w,15,'#28292b'); for(let sx=0; sx<w; sx+=18) R(g,sx,150,1,15,'#1c1d1f'); R(g,0,157,w,1,'#1f2022');
+  speck(g,0,150,w,15,500,['#2f3133','#222325'],r);
+  R(g,0,164,w,2,'#3c3e40'); R(g,0,166,w,14,'#0f1114');
+  for(let i=0;i<26;i++) R(g,r()*w,167+r()*12,8+r()*30,1,'#1a1d22');
+  // pots
+  const pot=(px)=>{ R(g,px-5,146,11,2,'#6e4029'); R(g,px-4,148,9,6,'#5e3523'); R(g,px-3,154,7,2,'#4c2b1c'); R(g,px-4,148,1,6,'#7a4a31'); };
+  pot(400); for(let i=0;i<6;i++) R(g,398+i*.8,138+((i*3)%5),1,8,'#4a4630');
+  pot(418); R(g,413,139,10,7,'#34321f'); R(g,414,137,3,3,'#5e2620'); R(g,419,136,3,3,'#55211b'); R(g,416,141,2,2,'#4c1d18');
+  pot(436); R(g,432,146,8,1,'#0d1218');
+}
+function bgHall(g,w){
+  room(g,w,{seed:3,wall:'#39362d',wall2:'#33302a',motif:'#46423a',wains:'#2b2018',wainsL:'#3a2b20',wainsD:'#20170f',floor:'#292019',floor2:'#241b15'});
+  const r = rng(31);
+  door(g,34);
+  R(g,87,68,2,82,'#1e150e'); R(g,83,148,10,2,'#1e150e'); R(g,81,70,14,2,'#1e150e');
+  R(g,78,72,10,44,'#2c3127'); R(g,78,72,2,44,'#20241c'); R(g,83,72,5,7,'#373e31'); R(g,80,112,8,4,'#252a20');
+  R(g,90,72,7,4,'#191919'); R(g,89,76,9,2,'#191919');
+  door(g,150,{col:'#2b1f16'}); R(g,139,90,22,5,'#121822'); R(g,149,90,1,5,'#2a1f17');
+  R(g,166,134,9,16,'#36362f'); R(g,166,134,9,1,'#4a4a40'); R(g,168,118,1,16,'#121212'); R(g,171,116,1,18,'#1c1212'); R(g,170,115,3,2,'#1c1212');
+  R(g,259,12,1,18,'#0e0e0e'); R(g,256,30,7,3,'#2a2620');
+  frame(g,199,42,22,30,(g,x,y,w,h)=>{ R(g,x,y,w,h,'#28282a'); R(g,x+6,y+17,10,13,'#1c2330'); R(g,x+5,y+20,12,10,'#1c2330');
+    R(g,x+8,y+7,6,9,'#8c7a63'); R(g,x+7,y+4,8,3,'#131822'); R(g,x+6,y+6,10,1,'#131822'); R(g,x+10,y+5,2,1,'#9a844a');
+    for(let i=0;i<22;i++) R(g,x+7+r()*8,y+7+r()*9,1,1,i%3?'#d6cebd':'#6a1c16');
+    line(g,x+7,y+8,x+14,y+15,'#cfc6b4'); line(g,x+14,y+8,x+8,y+15,'#cfc6b4');
+    R(g,x+11,y+19,1,1,'#9a844a'); R(g,x+11,y+23,1,1,'#9a844a'); R(g,x+11,y+27,1,1,'#9a844a'); });
+  R(g,238,126,22,3,'#3a2a1e'); R(g,239,129,20,4,'#2d2118'); R(g,240,133,2,17,'#281c14'); R(g,256,133,2,17,'#281c14');
+  R(g,288,58,24,4,'#3a281b'); R(g,290,55,20,3,'#2a1c13'); R(g,298,52,4,3,'#2a1c13');
+  R(g,290,62,20,22,'#2f2119'); R(g,290,62,1,22,'#3e2c1f');
+  R(g,291,84,18,46,'#2a1c14'); R(g,292,88,16,38,'#0c0907'); R(g,291,84,1,46,'#3c2a1d');
+  R(g,289,130,22,20,'#2f2119'); R(g,288,148,24,2,'#1d130d'); R(g,293,134,14,12,'#261a12');
+  frame(g,330,54,10,12,(g,x,y,w,h)=>{ R(g,x,y,w,h,'#38382f'); R(g,x+3,y+3,4,7,'#22221d'); R(g,x+4,y+2,2,2,'#7a6a58'); });
+  windowFrame(g,349,32,24,70,'#3a1d1a');
+  door(g,430,{col:'#241912'});
+  for(let i=0;i<13;i++){ const sx=482+i*6, sy=150-i*9; R(g,sx,sy-9,w-sx,9,i%2?'#2a1f17':'#2f231a'); R(g,sx,sy-9,w-sx,1,'#3c2d21'); }
+  for(let i=0;i<12;i++){ const bx=489+i*6, by=118-i*9; R(g,bx,by,1,150-i*9-by-9+9,'#1c130d'); }
+  line(g,486,116,560,8,'#1a120c'); line(g,486,117,560,9,'#3a2a1e');
+  R(g,481,112,6,38,'#2a1d14'); R(g,480,109,8,3,'#3a2a1e'); R(g,482,106,4,3,'#3a2a1e');
+  R(g,18,156,470,5,'#381712'); R(g,18,156,470,1,'#4a2219'); for(let i=0;i<60;i++) R(g,18+r()*470,158+r()*3,1,1,'#2a0f0b');
+}
+function bgKitchen(g,w){
+  const r = rng(5);
+  R(g,0,0,w,H,'#000'); R(g,0,0,w,12,'#151412'); R(g,0,12,w,2,'#0b0a09');
+  R(g,0,14,w,136,'#4a4942');
+  for(let y=14,k=0; y<150; y+=8,k++){ R(g,0,y,w,1,'#3a3934'); for(let x=(k%2)*4; x<w; x+=8) R(g,x,y,1,8,'#3a3934'); }
+  for(let i=0;i<14;i++){ const sx=r()*w, sy=70+r()*70; g.globalAlpha=.25; for(let k=0;k<200;k++) R(g,sx+r()*30,sy+r()*24,1,1,'#14120e'); g.globalAlpha=1; }
+  for(let i=0;i<8;i++){ g.globalAlpha=.4; R(g,r()*w,14,1,8+r()*40,'#2a2620'); g.globalAlpha=1; }
+  R(g,0,147,w,3,'#0d0b09');
+  for(let y=150,k=0; y<H; y+=5,k++) for(let x=(k%2)*8; x<w; x+=16){ R(g,x,y,8,5,'#33312c'); R(g,x+8,y,8,5,'#25231f'); }
+  let gr=g.createLinearGradient(0,150,0,176); gr.addColorStop(0,'rgba(0,0,0,.7)'); gr.addColorStop(1,'rgba(0,0,0,0)'); g.fillStyle=gr; g.fillRect(0,150,w,26);
+  gr=g.createLinearGradient(0,14,0,52); gr.addColorStop(0,'rgba(0,0,0,.6)'); gr.addColorStop(1,'rgba(0,0,0,0)'); g.fillStyle=gr; g.fillRect(0,14,w,38);
+  door(g,24,{col:'#1d1814',pan:'#17120e'}); R(g,30,118,7,2,'#55554d'); R(g,35,116,2,6,'#55554d');
+  R(g,54,54,14,18,'#c4bcaa'); R(g,54,54,14,4,'#5c1812'); for(let yy=60; yy<70; yy+=2) for(let xx=56; xx<66; xx+=2) R(g,xx,yy,1,1,'#6e6658'); R(g,62,64,3,3,'#8a1c14'); R(g,63,65,1,1,'#c4bcaa');
+  R(g,86,82,26,68,'#79776c'); R(g,86,82,26,2,'#8c8a7e'); R(g,86,106,26,1,'#57554e'); R(g,107,90,2,13,'#9a988a'); R(g,107,112,2,18,'#9a988a'); R(g,111,82,1,68,'#55534c');
+  speck(g,86,84,26,66,60,['#6a5a44','#5e5c54'],r); R(g,88,146,22,4,'#3d3b36');
+  R(g,128,40,64,28,'#36291e'); R(g,159,40,2,28,'#22180f'); R(g,128,66,64,2,'#22180f'); R(g,152,52,1,6,'#7a6a44'); R(g,166,52,1,6,'#7a6a44');
+  R(g,128,122,98,28,'#36291e'); R(g,126,119,102,3,'#57514a'); R(g,126,122,102,1,'#2b2620');
+  for(const dx of [130,152,174]){ R(g,dx,125,18,8,'#2b2017'); R(g,dx+7,128,4,1,'#86764c'); R(g,dx,136,18,12,'#2b2017'); }
+  R(g,198,116,24,4,'#2a2a28'); R(g,200,117,20,2,'#111'); R(g,213,104,2,12,'#8a8a82'); R(g,209,104,6,2,'#8a8a82'); R(g,209,106,1,2,'#8a8a82');
+  windowFrame(g,197,38,28,40,null);
+  R(g,179,12,1,22,'#0e0e0e');
+  R(g,246,127,36,3,'#3a291e'); R(g,247,130,2,20,'#2a1d15'); R(g,279,130,2,20,'#2a1d15');
+  R(g,236,112,2,38,'#2a1d15'); R(g,236,134,10,2,'#2a1d15'); R(g,244,136,2,14,'#2a1d15');
+  R(g,290,112,2,38,'#2a1d15'); R(g,282,134,10,2,'#2a1d15'); R(g,282,136,2,14,'#2a1d15');
+  R(g,253,123,4,4,'#c4bcaa'); R(g,257,124,1,2,'#c4bcaa'); R(g,271,123,4,4,'#a8a090'); R(g,275,124,1,2,'#a8a090'); R(g,272,123,2,1,'#4a4438');
+  door(g,336);
+}
+function bgBase(g,w){
+  const r = rng(9);
+  R(g,0,0,w,H,'#1b1915');
+  for(let y=8,k=0; y<150; y+=6,k++){ const off=(k%2)*7; for(let x=-off; x<w; x+=14) R(g,x,y,13,5, mix('#2a2620','#39332a',r())); }
+  for(let i=0;i<30;i++){ g.globalAlpha=.3; R(g,r()*w,8+r()*20,1,20+r()*60,'#0e1210'); g.globalAlpha=1; }
+  R(g,0,0,w,8,'#100e0c'); for(let bx=20; bx<w; bx+=70) R(g,bx,0,7,16,'#1d160f');
+  R(g,0,22,w,3,'#26221d'); R(g,0,25,w,1,'#0d0b09');
+  R(g,0,150,w,30,'#1c1814'); speck(g,0,150,w,30,700,['#2a251e','#14110e','#241f19'],r);
+  for(let i=0;i<10;i++){ R(g,0,58+i*9,58-i*5,9,i%2?'#2b2219':'#30261c'); R(g,0,58+i*9,58-i*5,1,'#3d3124'); }
+  R(g,0,40,4,110,'#0d0b09');
+  R(g,96,62,2,88,'#2a1f15'); R(g,144,62,2,88,'#2a1f15');
+  const jar=['#6a4a1c','#5a2020','#4a4a2a','#6e5a26','#3e2a1a'];
+  for(const sy of [86,110,134]){ R(g,94,sy,54,3,'#33261a'); for(let jx=98; jx<142; jx+=7){ const c=jar[(r()*jar.length)|0]; R(g,jx,sy-8,5,8,c); R(g,jx,sy-9,5,1,'#5a5448'); R(g,jx+1,sy-6,1,4,'rgba(255,240,200,.18)'); R(g,jx+1,sy-4,3,2,'#c4bcaa'); } }
+  R(g,238,131,48,3,'#4a453c'); R(g,240,134,44,16,'#38342d'); for(let sx=242; sx<284; sx+=8) R(g,sx,134,1,16,'#26231e'); R(g,240,141,44,1,'#26231e'); R(g,242,131,40,1,'#060606');
+  R(g,345,131,32,5,'#4a301c'); R(g,346,136,30,14,'#3a2616'); R(g,352,131,2,19,'#5a5040'); R(g,368,131,2,19,'#5a5040'); R(g,359,138,4,3,'#7a6a40');
+  line(g,0,8,18,28,'#3a3630'); line(g,6,8,6,20,'#3a3630'); line(g,0,16,14,18,'#3a3630');
+  line(g,w-1,8,w-20,30,'#3a3630'); line(g,w-10,8,w-10,22,'#3a3630');
+}
+function bgStudy(g,w){
+  room(g,w,{seed:8,wall:'#2b3428',wall2:'#262e23',motif:'#35402f',wains:'#29190f',wainsL:'#38251a',wainsD:'#1d120b',floor:'#291e16',floor2:'#231a13'});
+  const r = rng(44);
+  door(g,30);
+  R(g,64,28,52,122,'#26180f'); R(g,66,30,48,118,'#120c08');
+  const bc=['#4a1f1a','#2a3a2a','#3a3020','#22283a','#5a4a2a','#3a1f2a','#6a5a3a'];
+  for(let sy=50; sy<150; sy+=24){ R(g,64,sy,52,3,'#30200f'); let bx=67; while(bx<112){ const bw=2+((r()*3)|0), bh=12+((r()*9)|0); R(g,bx,sy-bh,bw,bh,bc[(r()*bc.length)|0]); if(r()<.3) R(g,bx,sy-bh+3,bw,1,'#a08a4a'); bx+=bw+(r()<.1?3:0); } }
+  frame(g,152,48,18,14,(g,x,y,w,h)=>{ R(g,x,y,w,6,'#8a8a80'); R(g,x,y+6,w,3,'#5a6a6e'); R(g,x,y+9,w,5,'#a89a7a'); R(g,x+6,y+6,2,6,'#2a2420'); R(g,x+10,y+6,2,6,'#2a2420'); R(g,x+6,y+5,2,1,'#c4b090'); R(g,x+10,y+5,2,1,'#c4b090'); });
+  frame(g,276,44,28,22,(g,x,y,w,h)=>{ R(g,x,y,w,h,'#b4a888'); line(g,x+2,y+18,x+12,y+8,'#3a2a1a'); line(g,x+12,y+8,x+26,y+4,'#3a2a1a'); line(g,x+12,y+8,x+16,y+20,'#3a2a1a'); R(g,x+11,y+7,3,3,'#7a1a14'); R(g,x+25,y+3,2,2,'#7a1a14'); });
+  R(g,206,122,54,4,'#3a281b'); R(g,206,126,54,1,'#1f150e'); R(g,208,127,16,23,'#2e2016'); R(g,242,127,16,23,'#2e2016'); R(g,212,132,8,1,'#7a6a40'); R(g,246,132,8,1,'#7a6a40');
+  R(g,230,116,14,6,'#c8c0a8'); R(g,232,115,10,1,'#d8d0b8'); R(g,236,117,6,1,'#5a5248'); R(g,236,119,5,1,'#5a5248');
+  R(g,219,120,6,2,'#2a2a28'); R(g,221,110,2,10,'#2a2a28'); R(g,216,104,12,6,'#2b4632'); R(g,216,109,12,1,'#1a2a1e');
+  R(g,262,112,2,38,'#2a1c13'); R(g,262,132,10,2,'#2a1c13'); R(g,270,134,2,16,'#2a1c13');
+  windowFrame(g,310,34,22,64,'#1f2a22');
+}
+function bgDream(g,w){
+  room(g,w,{seed:13,wall:'#2a0d0b',wall2:'#210908',motif:'#3a1210',wains:'#160606',wainsL:'#230a09',wainsD:'#0e0303',floor:'#140606',floor2:'#100404',ceil:'#090202'});
+  const r = rng(77);
+  for(let i=0;i<w/14;i++){ g.globalAlpha=.55; R(g,r()*w,14,1,20+r()*90,'#4a0c08'); g.globalAlpha=1; }
+  for(let x=60; x<w-80; x+=46){ const cy=36+((r()*60)|0), cr=3+((r()*6)|0); const sev=r()<.4; clockFace(g,x+((r()*16)|0),cy,cr,sev?3:((r()*12)|0),sev?17:((r()*60)|0),'#8a7a66'); }
+  for(const dx of [140,290,440,590,740,890]) door(g,dx,{col:'#1a0807',pan:'#120505',frame:'#2a0c0a',noKnob:true});
+  for(const fx of [212,362,512,662,812]) frame(g,fx,46,16,22,(g,x,y,w,h)=>{ R(g,x,y,w,h,'#1a1412'); R(g,x+5,y+5,6,8,'#8a7a66'); R(g,x+4,y+13,8,9,'#121010'); });
+  R(g,w-36,96,32,54,'#0a0303'); R(g,w-34,98,28,52,'#2a0c0a'); R(g,w-32,101,24,49,'#1a0807');
+}
+function bgBed(g,w){
+  room(g,w,{seed:21,wall:'#433638',wall2:'#3b2f31',motif:'#504247',wains:'#2b1f19',wainsL:'#3a2a22',wainsD:'#1f1611',floor:'#2a1f18',floor2:'#241b15'});
+  const r = rng(52);
+  R(g,8,92,34,58,'#0d0a08'); R(g,10,95,30,55,'#050404'); for(let i=0;i<6;i++) R(g,12+i*4,150-i*8,28-i*4,2,'#1c140e'); line(g,10,96,40,150,'#2a1d14');
+  R(g,52,62,16,2,'#3a281b'); R(g,54,50,5,11,'#a08a4a'); R(g,55,51,3,9,'#5a3a2a'); R(g,61,52,5,9,'#a08a4a'); R(g,62,53,3,7,'#2a3a5a'); R(g,59,64,1,4,'#2a1f14');
+  R(g,80,100,62,40,'#2a1a12'); R(g,82,102,58,4,'#3a2618'); for(let i=0;i<6;i++) R(g,86+i*9,108,4,24,'#22150e');
+  R(g,78,96,4,54,'#2a1a12'); R(g,140,96,4,54,'#2a1a12'); R(g,77,94,6,3,'#3a2618'); R(g,139,94,6,3,'#3a2618');
+  R(g,82,132,76,12,'#8e887e'); R(g,82,136,76,10,'#523634'); R(g,82,136,76,1,'#6a4644'); R(g,156,132,3,18,'#2a1a12');
+  R(g,86,127,16,6,'#b0aa9e'); R(g,104,128,16,5,'#a09a8e'); R(g,108,128,6,2,'#8e887e');
+  windowFrame(g,224,36,24,62,'#7d7466');
+  R(g,253,118,34,32,'#2e1f16'); R(g,252,116,36,3,'#3e2a1d'); for(const dy of [122,132,142]){ R(g,255,dy,30,7,'#24180f'); R(g,268,dy+3,4,1,'#8a7a46'); }
+  R(g,258,56,20,32,'#2a1c13'); R(g,260,58,16,28,'#141a1e'); R(g,262,60,3,10,'#2a3438');
+  R(g,318,124,36,3,'#3a281b'); R(g,320,127,2,23,'#2a1c13'); R(g,350,127,2,23,'#2a1c13');
+  R(g,342,120,6,4,'#2a2a28'); R(g,344,112,2,8,'#2a2a28'); R(g,339,106,12,6,'#7a5a3a'); R(g,339,111,12,1,'#4a3424');
+  R(g,324,121,12,3,'#c8c0a8');
+}
+
+/* ---------- items ---------- */
+const ITEMS = {
+  form:{n:'Έντυπο απογραφής', d:['Απογραφή κινητής περιουσίας. Οδός Αγίας Σοφίας 41.','Στο τέλος, μια κενή γραμμή: «Υπογραφή εκτιμητή».']},
+  card:{n:'Παλιά κάρτα', d:['Μια κάρτα με ζωγραφισμένα γεράνια. Το χαρτί έχει κιτρινίσει.','«Ευτέρπη μου, το κλειδί εκεί που το άφηνες πάντα. Στο γεράνι. — Α.»']},
+  key_front:{n:'Σκουριασμένο κλειδί', d:['Βαρύ, παλιό, γεμάτο χώμα.']},
+  candle:{n:'Κερί', d:['Μισολιωμένο κερί σε τενεκεδένιο κηροπήγιο.']},
+  matches:{n:'Σπίρτα', d:['Ένα κουτί σπίρτα. Το κουνάω. Ακούγεται μόνο ένα.']},
+  candle_lit:{n:'Αναμμένο κερί', d:['Η φλόγα γέρνει προς τα κάτω. Σαν κάτι να τη φυσάει από εκεί.']},
+  string:{n:'Σπάγκος', d:['Ένα κουβάρι γερός σπάγκος.']},
+  magnet:{n:'Μαγνήτης', d:['Μαγνήτης-σουβενίρ: «Καβάλα 1966». Πιάνει γερά.']},
+  fishing:{n:'Μαγνήτης σε σπάγκο', d:['Ένα αυτοσχέδιο καλάμι. Ο πατέρας μου θα γελούσε.']},
+  key_study:{n:'Ορειχάλκινο κλειδάκι', d:['Ακόμα υγρό. Στη λαβή είναι χαραγμένο: «Γραφείο».']},
+  wind_key:{n:'Κλειδί κουρδίσματος', d:['Δεμένο με μια μαύρη κορδέλα.']},
+  letter:{n:'Γράμμα της Ευτέρπης', d:['«Σε όποιον έρθει να με μετρήσει.»','«Τα πράγματα εδώ μέσα δεν αξίζουν τίποτα. Μόνο το ρολόι.»','«Αν το κούρδισες, σε παρακαλώ: σταμάτησέ το ξανά στις 3:17.»','«Μην το αφήσεις να προχωρήσει χωρίς εκείνον. — Ευτέρπη»']},
+};
+const ICON = {
+  form:g=>{ R(g,2,1,8,10,'#d8d0bc'); for(let y=3;y<9;y+=2) R(g,3,y,6,1,'#7a7262'); R(g,5,9,4,1,'#2a2a6a'); },
+  card:g=>{ R(g,1,3,10,7,'#cfc3a6'); R(g,3,5,2,2,'#8a2a24'); R(g,4,4,1,1,'#a83a30'); R(g,4,7,1,2,'#3a5a30'); R(g,7,5,3,1,'#7a7262'); R(g,7,7,3,1,'#7a7262'); },
+  key_front:g=>{ disc(g,3,6,2,'#7e4a28'); g.clearRect(3,6,1,1); R(g,5,6,6,1,'#7e4a28'); R(g,9,7,1,2,'#7e4a28'); R(g,7,7,1,1,'#7e4a28'); },
+  candle:g=>{ R(g,3,9,7,2,'#6a6a62'); R(g,5,3,3,6,'#d8d0b8'); R(g,6,2,1,1,'#222'); },
+  candle_lit:g=>{ R(g,3,9,7,2,'#6a6a62'); R(g,5,4,3,5,'#d8d0b8'); R(g,6,3,1,1,'#222'); R(g,6,0,1,3,'#f2c25a'); R(g,5,1,3,1,'#e0903a'); R(g,6,1,1,1,'#fff3c0'); },
+  matches:g=>{ R(g,2,4,8,5,'#8a2a20'); R(g,3,5,6,3,'#c8b890'); R(g,4,6,4,1,'#3a2a1a'); },
+  string:g=>{ disc(g,6,6,4,'#b8a57a'); line(g,3,5,9,7,'#8a7a55'); line(g,4,8,8,3,'#8a7a55'); R(g,10,9,2,1,'#b8a57a'); },
+  magnet:g=>{ R(g,2,3,8,6,'#4a6a8a'); R(g,3,4,6,4,'#c8b070'); R(g,4,5,2,2,'#6a8aa0'); },
+  fishing:g=>{ R(g,6,0,1,6,'#b8a57a'); R(g,3,6,7,5,'#4a6a8a'); R(g,4,7,5,3,'#c8b070'); },
+  key_study:g=>{ disc(g,3,5,2,'#c0a050'); g.clearRect(3,5,1,1); R(g,5,5,6,1,'#c0a050'); R(g,9,6,1,2,'#c0a050'); R(g,7,6,1,1,'#c0a050'); },
+  wind_key:g=>{ R(g,1,1,4,4,'#a08a4a'); R(g,7,1,4,4,'#a08a4a'); R(g,5,2,2,2,'#a08a4a'); R(g,5,4,2,6,'#a08a4a'); R(g,4,10,4,1,'#a08a4a'); R(g,10,6,1,5,'#141414'); R(g,9,5,2,1,'#141414'); },
+  letter:g=>{ R(g,1,3,10,7,'#d8cfb8'); line(g,1,3,6,7,'#9a907a'); line(g,10,3,6,7,'#9a907a'); R(g,5,6,2,2,'#7a1a14'); },
+};
+const RECIPES = {
+  'candle+matches':['candle_lit','Ανάβω το κερί με το τελευταίο σπίρτο. Η φλόγα τρεμοπαίζει, αλλά κρατάει.'],
+  'magnet+string':['fishing','Δένω τον μαγνήτη στην άκρη του σπάγκου. Σφιχτός κόμπος.'],
+};
+const rkey = (a,b) => [a,b].sort().join('+');
+function iconCanvas(id){ const c=document.createElement('canvas'); c.width=12; c.height=12; ICON[id](c.getContext('2d')); return c; }
+
+/* ---------- state ---------- */
+let T = 0;
+const S = { mode:'title', scene:'street', x:120, face:1, moving:false, phase:0, cam:0, inv:[], sel:null,
+  flash:0, lt:6, shk:0, shkA:0, fade:1, fadeFrom:1, fadeTo:1, fadeT:0, fadeDur:0, fadeCb:null, trans:0, lock:0,
+  near:null, ghost:null, clockRun:0, lampI:1, flick:1, tickT:0, heartT:0, creakT:0 };
+let F = {};
+const has = i => S.inv.includes(i);
+function give(i){ if(!has(i)) S.inv.push(i); renderInv(); }
+function take(i){ S.inv = S.inv.filter(x => x !== i); if(S.sel === i) setSel(null); renderInv(); }
+const timers = [];
+const after = (s,fn) => timers.push({t:s, fn});
+function shake(d,a){ S.shk = d; S.shkA = a; }
+
+/* ---------- scenes ---------- */
+const SC = {};
+SC.street = { w:480, dark:.5, rain:true, storm:true, outdoor:true, bg:bgStreet, minX:96,
+  lights(){ return [{x:200,y:36,r:88,i:.95*S.lampI,c:[255,196,120]},{x:379,y:96,r:22,i:.35,c:[255,180,110]}]; },
+  dyn(g){ const k=S.lampI; R(g,197,32,6,8,k>.5?mix('#3a3020','#f2d690',k):'#2a2418');
+    g.globalAlpha=.28*k; R(g,196,167,8,12,'#d8b070'); R(g,198,167,4,13,'#f0d090'); g.globalAlpha=1;
+    if(Math.sin(T*.37)>.985){ R(g,446,44,4,10,'#050505'); R(g,447,42,2,2,'#050505'); } },
+  fore(g){ drawCar(g,22); },
+  hs:[
+    {x:104,r:10,n:'Αυτοκίνητο',my:128,act(){ say(['Το Φιατάκι μου. Τα τζάμια θολώνουν από μέσα.','Όχι ακόμα. Πρώτα η δουλειά.']); }},
+    {x:200,r:9,n:'Φανοστάτης',my:62,act(){ say(['Η λάμπα τρεμοπαίζει. Σαν να ανασαίνει.']); }},
+    {x:344,r:9,n:'Γραμματοκιβώτιο',my:114,act(){ if(!F.card){ F.card=1; give('card'); sfx('pick'); say(['Λογαριασμοί της ΔΕΗ, απλήρωτοι. Διαφημιστικά.','Και στο βάθος, μια παλιά κάρτα. Την κρατάω.']); } else say(['Μόνο λογαριασμοί. Κανείς δεν θα τους πληρώσει.']); }},
+    {x:379,r:9,n:'Εξώπορτα',my:92,act(){ if(F.doorOpen){ sfx('door'); go('hall',150); } else say(['Κλειδωμένη.','Το έγγραφο του δικαστηρίου λέει πως το κλειδί «βρίσκεται εντός του ακινήτου».','Πολύ βοηθητικό.']); },
+      use(i){ if(i==='key_front'){ take('key_front'); F.doorOpen=1; sfx('unlock'); say(['Το κλειδί γυρνάει με κόπο. Κάτι μέσα στην κλειδαριά τρίζει σαν κόκαλο.'],()=>{ sfx('door'); go('hall',150); }); return true; } }},
+    {x:400,r:7,n:'Γλάστρα',my:132,act(){ say(['Βασιλικός. Ξερός εδώ και χρόνια.']); }},
+    {x:418,r:7,n:'Γλάστρα με γεράνι',my:130,act(){
+      if(F.geranium) return say(['Ένα μαραμένο γεράνι. Του πήρα ό,τι είχε.']);
+      if(!F.card) return say(['Ένα μαραμένο γεράνι. Το χώμα είναι σκληρό σαν πέτρα.']);
+      F.geranium=1; give('key_front'); sfx('pick'); say(['«Στο γεράνι.»','Σκάβω με τα δάχτυλα. Το χώμα είναι παγωμένο.','Ένα κλειδί. Σκουριασμένο.']); }},
+    {x:436,r:7,n:'Άδεια γλάστρα',my:134,act(){ say(['Άδεια. Μόνο βρόχινο νερό και ένα πεσμένο φύλλο.']); }},
+    {x:466,r:12,n:'Ο δρόμος',my:110,act(){ say(['Ο δρόμος χάνεται στο σκοτάδι. Δεν έχω δουλειά εκεί.']); }},
+  ]};
+SC.hall = { w:560, dark:.8, storm:true, bg:bgHall,
+  lights(){ return [{x:259,y:34,r:96,i:.8*S.flick,c:[255,190,120]},{x:361,y:66,r:52,i:.42,c:[150,170,210]}]; },
+  dyn(g){ glass(g,349,32,24,70);
+    R(g,256,32,7,4, S.flick>.6?'#e8c880':'#5a4a30');
+    if(!F.candle){ R(g,246,123,6,3,'#5a5a52'); R(g,248,116,2,7,'#d0c8b0'); }
+    const run = S.clockRun;
+    const hr = run ? 3 + T*.02 : 3, mn = run ? (17 + T*1.4) % 60 : 17;
+    clockFace(g,300,73,6,hr,mn);
+    const a = run ? Math.sin(T*Math.PI)*.2 : 0, px=300+Math.sin(a)*30, py=89+Math.cos(a)*30;
+    line(g,300,89,px,py-2,'#8a7440'); disc(g,Math.round(px),Math.round(py),2,'#b09450');
+    if(!F.clockDone){ R(g,500,116,40,34,'#86857c'); R(g,498,122,6,28,'#76756c'); R(g,520,108,26,14,'#8e8d84'); R(g,524,104,14,6,'#7e7d74'); R(g,500,116,40,1,'#a2a198'); for(let i=0;i<5;i++) R(g,503+i*8,118,1,32,'#6a6962'); }
+    else { R(g,494,147,52,3,'#76756c'); R(g,500,145,30,2,'#86857c'); } },
+  hs:[
+    {x:34,r:10,n:'Πόρτα της κουζίνας',my:92,act(){ sfx('door'); go('kitchen',336); }},
+    {x:86,r:11,n:'Κρεμάστρα',my:64,act(){ if(!F.string){ F.string=1; give('string'); sfx('pick'); say(['Ένα ανδρικό παλτό, φαγωμένο από τον σκόρο.','Στην τσέπη: ένα κουβάρι σπάγκος. Και ένα μισοσκισμένο εισιτήριο τρένου.','Θεσσαλονίκη – Αθήνα. 17 Νοεμβρίου 1967.']); } else say(['Το παλτό μυρίζει ακόμα καπνό.']); }},
+    {x:150,r:9,n:'Εξώπορτα',my:88,act(){ sfx('door'); go('street',379); }},
+    {x:210,r:10,n:'Πορτρέτο',my:36,act(){ say(['Ένας άντρας με στολή σιδηροδρομικού.','Κάποιος έχει ξύσει το πρόσωπο με κάτι αιχμηρό. Επίμονα.']); }},
+    {x:249,r:8,n:'Τραπεζάκι',my:110,act(){ if(!F.candle){ F.candle=1; give('candle'); sfx('pick'); say(['Ένα κερί σε τενεκεδένιο κηροπήγιο. Το παίρνω.']); } else say(['Σκόνη. Και ένας καθαρός κύκλος εκεί που ήταν το κερί.']); }},
+    {x:300,r:10,n:'Εκκρεμές ρολόι',my:48,act(){ if(F.clockDone) say(['Χτυπάει. Κάθε χτύπος αντηχεί μέσα στο στήθος μου.']); else say(['Ένα ψηλό εκκρεμές ρολόι. Σταματημένο στις 3:17.','Θα πιάσει καλή τιμή. Το σημειώνω.']); },
+      use(i){ if(i==='wind_key' && !F.clockDone){ take('wind_key'); clockEvent(); return true; } }},
+    {x:361,r:11,n:'Παράθυρο',my:24,act(){ say(['Βροχή. Ο δρόμος από εδώ μέσα μοιάζει πολύ πιο μακριά απ’ ό,τι είναι.']); }},
+    {x:430,r:10,n:'Πόρτα του γραφείου',my:92,act(){ if(F.studyOpen){ sfx('door'); go('study',30); } else say(['Κλειδωμένη. Η κλειδαριά είναι μικρή, ορειχάλκινη.']); },
+      use(i){ if(i==='key_study'){ take('key_study'); F.studyOpen=1; sfx('unlock'); say(['Ταιριάζει.'],()=>{ sfx('door'); go('study',30); }); return true; } }},
+    {x:520,r:16,n:'Σκάλα',my:96,act(){ if(F.clockDone){ sfx('door'); go('bedroom',30); } else say(['Η σκάλα είναι φραγμένη με έπιπλα κάτω από σεντόνια.','Από πάνω ακούγεται κάτι. Σαν κουνιστή πολυθρόνα.','…Θα είναι ο αέρας.']); }},
+  ]};
+SC.kitchen = { w:360, dark:.86, storm:true, bg:bgKitchen,
+  lights(){ return [{x:211,y:58,r:58,i:.48,c:[150,170,210]},{x:180,y:37,r:74,i:.55*S.flick,c:[230,220,170]}]; },
+  dyn(g){ glass(g,197,38,28,40);
+    R(g,177,34,5,5, S.flick>.6?'#d8d4a0':'#4a4838');
+    if(!F.magnet){ R(g,94,94,5,4,'#a04030'); R(g,95,95,3,2,'#c8b070'); }
+    const p=(T*.7)%1; if(p<.6) R(g,214,109+p*14,1,2,'#9ab0c8'); },
+  hs:[
+    {x:24,r:10,n:'Πόρτα του υπογείου',my:92,act(){
+      if(has('candle_lit')){ sfx('door'); go('basement',40); }
+      else if(has('candle')) say(['Σκαλοπάτια που χάνονται στο απόλυτο σκοτάδι.','Έχω ένα κερί. Χρειάζομαι κάτι για να το ανάψω.']);
+      else say(['Σκαλοπάτια που χάνονται στο απόλυτο σκοτάδι.','Χωρίς φως δεν κατεβαίνω.']); },
+      use(i){ if(i==='candle_lit'){ sfx('door'); go('basement',40); return true; } if(i==='candle'){ say(['Πρέπει πρώτα να το ανάψω.']); return true; } }},
+    {x:60,r:8,n:'Ημερολόγιο τοίχου',my:46,act(){ say(['Ημερολόγιο τοίχου. Νοέμβριος 1967.','Η 17η είναι κυκλωμένη με κόκκινο. Κανείς δεν γύρισε τη σελίδα από τότε.']); }},
+    {x:99,r:12,n:'Ψυγείο',my:74,act(){ if(!F.magnet){ F.magnet=1; give('magnet'); sfx('pick'); say(['Το ψυγείο είναι αποσυνδεδεμένο. Δεν τολμώ να το ανοίξω.','Στην πόρτα, ένας μαγνήτης-σουβενίρ. Τον παίρνω.']); } else say(['Δεν το ανοίγω. Όχι.']); }},
+    {x:160,r:12,n:'Συρτάρια',my:112,act(){ if(!F.matches){ F.matches=1; give('matches'); sfx('pick'); say(['Κουτάλια, ένα σπασμένο ψαλίδι… και σπίρτα.']); } else say(['Τίποτε άλλο χρήσιμο.']); }},
+    {x:211,r:9,n:'Νεροχύτης',my:96,act(){ say(['Η βρύση στάζει. Ρυθμικά. Σαν να μετράει κάτι.']); }},
+    {x:264,r:13,n:'Τραπέζι',my:112,act(){ say(['Δύο φλιτζάνια, στρωμένα αντικριστά.','Το ένα δεν το έπιασε ποτέ κανείς. Έχει σκόνη μέσα.']); }},
+    {x:336,r:10,n:'Προς το χολ',my:92,act(){ sfx('door'); go('hall',34); }},
+  ],
+  onEnter(){ if(!F.kSeen){ F.kSeen=1; say(['Η κουζίνα. Πιο κρύα από τον δρόμο.']); } } };
+SC.basement = { w:420, dark:.975, bg:bgBase, minX:30,
+  lights(){ const L=[]; if(!F.keyStudy) L.push({x:262,y:130,r:9,i:.5+.3*Math.sin(T*3)}); return L; },
+  dyn(g){ if(!F.keyStudy && Math.sin(T*2.1)>.3) R(g,262,129,1,1,'#e8dca0');
+    const p=(T*.45)%1; if(p<.5) R(g,270,40+p*180,1,2,'#7a8a9a'); },
+  hs:[
+    {x:34,r:14,n:'Σκάλα',my:60,act(){ sfx('door'); go('kitchen',24); }},
+    {x:120,r:16,n:'Ράφια',my:56,act(){ say(['Βάζα με γλυκό του κουταλιού. Δεκάδες.','Όλα έχουν την ίδια ετικέτα, με το ίδιο χέρι: «Για τον Α., όταν γυρίσει».']); }},
+    {x:262,r:20,n:'Στέρνα',my:116,act(){ if(F.keyStudy) say(['Μαύρο νερό. Δεν βλέπω πια τον πάτο. Ή μήπως εκείνος δεν βλέπει εμένα;']); else say(['Μια παλιά στέρνα. Το νερό είναι ακίνητο σαν γυαλί.','Κάτι μεταλλικό γυαλίζει στον πάτο. Πολύ βαθιά για το χέρι μου.']); },
+      use(i){ if(F.keyStudy) return false;
+        if(i==='fishing'){ F.keyStudy=1; take('fishing'); give('key_study'); sfx('pick'); shake(.4,1); say(['Κατεβάζω τον μαγνήτη αργά…','Κάτι τραβάει τον σπάγκο. Μια στιγμή μόνο. Πιο δυνατά απ’ όσο θα έπρεπε.','Ένα μικρό ορειχάλκινο κλειδί.']); return true; }
+        if(i==='magnet'||i==='string'){ say(['Δεν φτάνει ως κάτω. Αν το συνδύαζα με κάτι…']); return true; } }},
+    {x:361,r:14,n:'Μπαούλο',my:116,act(){ say(['Ανδρικά ρούχα, διπλωμένα με προσοχή. Ναφθαλίνη.','Από πάνω, ένα πηλήκιο σιδηροδρομικού.']); }},
+  ],
+  onEnter(){ if(!F.bSeen){ F.bSeen=1; after(1.6,()=>{ S.ghost={x:402,t:.55}; sfx('sting'); }); after(2.6,()=>say(['…Υπάρχει κανείς εδώ κάτω;','Μόνο η σταγόνα που πέφτει στη στέρνα.'])); } } };
+SC.study = { w:380, dark:.86, storm:true, bg:bgStudy,
+  lights(){ return [{x:222,y:113,r:84,i:.95,c:[255,200,130]},{x:321,y:66,r:46,i:.36,c:[150,170,210]}]; },
+  dyn(g){ glass(g,310,34,22,64); R(g,217,110,10,1,'#f6dca0'); },
+  hs:[
+    {x:30,r:10,n:'Προς το χολ',my:92,act(){ sfx('door'); go('hall',430); }},
+    {x:90,r:18,n:'Βιβλιοθήκη',my:22,act(){ say(['Δρομολόγια του σιδηροδρόμου, δεμένα σε τόμους. Από το 1958 ως το 1967.','Μετά το 1967, τίποτα.']); }},
+    {x:161,r:9,n:'Φωτογραφία',my:40,act(){ say(['Ένα ζευγάρι σε παραλία. Εκείνη γελάει. Εκείνος κοιτάζει το ρολόι του.','Από πίσω: «Ευτέρπη και Ανδρέας, Καβάλα 1966».']); }},
+    {x:232,r:14,n:'Γραφείο',my:100,act(){ if(!F.diary){ F.diary=1; give('wind_key'); sfx('pick'); say(['Ένα ημερολόγιο, ανοιχτό στην τελευταία σελίδα:','«Το ρολόι σταμάτησε τη νύχτα που ο Ανδρέας πήρε το τρένο των 3:17.»','«Δεν θα το ξανακουρδίσω. Όσο ο χρόνος δεν προχωρά, δεν έχει φύγει.»','Στο συρτάρι, ένα κλειδί κουρδίσματος με μαύρη κορδέλα.','Πρέπει να ελέγξω αν το ρολόι λειτουργεί. Αλλάζει την εκτίμηση.']); } else say(['«Όσο ο χρόνος δεν προχωρά, δεν έχει φύγει.»']); }},
+    {x:290,r:10,n:'Χάρτης',my:38,act(){ say(['Χάρτης του σιδηροδρομικού δικτύου. Μια διαδρομή είναι σημαδεμένη με κόκκινο μελάνι, ξανά και ξανά.','Θεσσαλονίκη – Αθήνα. Μόνο το πήγαινε.']); }},
+    {x:321,r:10,n:'Παράθυρο',my:26,act(){ say(['Τα τζάμια τρέμουν σε κάθε βροντή. Κι εγώ λίγο.']); }},
+  ]};
+SC.dream = { w:1000, dark:.9, bg:bgDream, dream:true, minX:24,
+  lights(){ const L=[{x:964,y:146,r:62,i:.85,c:[255,80,50]},{x:S.x,y:132,r:46,i:.5}]; if(!F.dwFig) L.push({x:760,y:120,r:44,i:.55,c:[200,40,30]}); return L; },
+  dyn(g){ R(g,953,149,22,1, Math.sin(T*6)>0?'#ff5a3a':'#c83a28'); },
+  hs:[ {x:964,r:12,n:'Πόρτα',my:90,act(){ wake(); }} ],
+  update(dt){
+    const lines=[[140,'Τικ.'],[300,'Πού πας, Ανδρέα;'],[470,'Το τρένο δεν περιμένει κανέναν.'],[600,'Μείνε. Μόνο απόψε.'],[860,'3:17']];
+    for(const [x,t] of lines) if(S.x>x && !F['dw'+x]){ F['dw'+x]=1; whisper(t); }
+    if(!F.dwFig && S.x>672){ F.dwFig=1; S.flash=.9; sfx('sting'); shake(.7,3); }
+    S.heartT-=dt; if(S.heartT<=0){ S.heartT=.9; sfx('heart'); }
+    S.tickT-=dt; if(S.tickT<=0){ S.tickT=.45; sfx('tickLoud'); } },
+  onEnter(){ S.face=1; } };
+SC.bedroom = { w:380, dark:.8, storm:true, bg:bgBed,
+  lights(){ return [{x:345,y:112,r:66,i:.85,c:[255,190,120]},{x:57,y:66,r:28,i:.7*(.8+.2*Math.sin(T*9)),c:[255,60,40]},{x:236,y:66,r:48,i:.34,c:[150,170,210]}]; },
+  dyn(g){ glass(g,224,36,24,62); R(g,56,64,3,3, Math.sin(T*9)>-.4?'#ff6a3a':'#a8301c'); R(g,341,111,8,1,'#f6d8a0');
+    drawChair(g,200,150,Math.sin(T*1.5)*.13); },
+  hs:[
+    {x:28,r:12,n:'Σκάλα',my:84,act(){ sfx('door'); go('hall',520); }},
+    {x:58,r:8,n:'Εικονοστάσι',my:40,act(){ say(['Το εικονοστάσι. Το καντήλι είναι αναμμένο.','Η Ευτέρπη πέθανε πριν από τρεις εβδομάδες.','Ποιος το άναψε;']); }},
+    {x:112,r:22,n:'Κρεβάτι',my:104,act(){ say(['Στρωμένο για δύο. Το ένα μαξιλάρι είναι ακόμα βαθουλωμένο.']); }},
+    {x:200,r:12,n:'Κουνιστή πολυθρόνα',my:100,act(){ if(!F.letter){ F.letter=1; give('letter'); sfx('pick'); say(['Κουνιέται. Δεν την αγγίζει κανείς.','Τη σταματάω με το χέρι. Είναι ζεστή.','Κάτω από το μαξιλάρι, ένας φάκελος: «Σε όποιον έρθει να με μετρήσει».']); } else say(['Ξανακουνιέται. Την αφήνω.']); }},
+    {x:236,r:9,n:'Παράθυρο',my:24,act(){ say(['Από εδώ φαίνεται η στάση του τρένου. Το φως της είναι ακόμα αναμμένο.']); }},
+    {x:268,r:12,n:'Συρταριέρα',my:46,act(){ sfx('musicbox'); say(['Ένα μουσικό κουτί. Παίζει έναν σκοπό που δεν ξέρω.','Κι όμως, τον θυμάμαι.']); }},
+    {x:336,r:14,n:'Γραφειάκι',my:96,act(){ say(F.letter?['Εδώ θα συμπληρώσω την απογραφή. Χρειάζομαι το έντυπο.']:['Ένα μικρό γραφείο με λάμπα. Εδώ θα συμπληρώσω την απογραφή.','Πρώτα να ελέγξω όλο το δωμάτιο.']); },
+      use(i){ if(i==='form'){ if(!F.letter){ say(['Πρώτα να ελέγξω όλο το δωμάτιο.']); return true; } finalChoice(); return true; } if(i==='letter'){ say(['Το διαβάζω ξανά. Τα γράμματα τρέμουν προς το τέλος.']); return true; } }},
+  ],
+  onEnter(){ if(!F.bdSeen){ F.bdSeen=1; say(['Η πολυθρόνα κουνιέται.','Το παράθυρο είναι κλειστό.']); } } };
+SC.hall.onEnter = function(){ if(!F.hSeen){ F.hSeen=1; say(['Μέσα μυρίζει υγρασία και λεβάντα.','Το σπίτι είναι πιο ζεστό απ’ όσο θα έπρεπε. Σαν να το κατοικεί ακόμα κάποιος.']); } };
+SC.study.onEnter = function(){ if(!F.sSeen){ F.sSeen=1; say(['Η λάμπα του γραφείου είναι αναμμένη.','Το ρεύμα έχει κοπεί από τον Οκτώβριο.']); } };
+
+for(const k in SC){ const s=SC[k]; const c=document.createElement('canvas'); c.width=s.w; c.height=H; const g=c.getContext('2d'); s.bg(g,s.w); aoBand(g,0,s.w,138,150,.25); grainBg(g,s.w,0,.09); s.img=c; }
+SC.hall.beams=[[[349,32],[373,32],[332,152],[296,152]]]; SC.kitchen.beams=[[[197,38],[225,38],[214,152],[172,152]]]; SC.study.beams=[[[310,34],[332,34],[312,152],[272,152]]]; SC.bedroom.beams=[[[224,36],[248,36],[236,152],[196,152]]];
+const hdl=document.createElement('canvas'), hdg=hdl.getContext('2d');
+const noise2=[0,1,2].map(()=>{ const c=document.createElement('canvas'); c.width=640; c.height=360; const g=c.getContext('2d'); const id=g.createImageData(640,360); for(let i=0;i<id.data.length;i+=4){ const v=Math.random()<.5?0:255; id.data[i]=id.data[i+1]=id.data[i+2]=v; id.data[i+3]=Math.random()<.5?(8+Math.random()*16):0; } g.putImageData(id,0,0); return c; });
+const lens=[]; for(let i=0;i<9;i++) lens.push({x:Math.random()*320,y:Math.random()*180,r:2+Math.random()*4,v:2+Math.random()*6});
+function compositeA(dt,s,cam,L,dark){
+  const k=hdBase();
+  if(hdl.width!==OW||hdl.height!==OH){ hdl.width=OW; hdl.height=OH; }
+  hdg.setTransform(1,0,0,1,0,0); hdg.globalCompositeOperation='source-over'; hdg.clearRect(0,0,OW,OH); hdg.fillStyle='rgba(3,2,6,'+dark+')'; hdg.fillRect(0,0,OW,OH);
+  hdg.setTransform(k,0,0,k,0,0); hdg.globalCompositeOperation='destination-out';
+  for(const l of L){ const x=l.x-cam, y=l.y; if(x<-l.r||x>320+l.r) continue; const g=hdg.createRadialGradient(x,y,0,x,y,l.r); g.addColorStop(0,'rgba(0,0,0,'+l.i+')'); g.addColorStop(.4,'rgba(0,0,0,'+(l.i*.7)+')'); g.addColorStop(.75,'rgba(0,0,0,'+(l.i*.22)+')'); g.addColorStop(1,'rgba(0,0,0,0)'); hdg.fillStyle=g; hdg.fillRect(x-l.r,y-l.r,l.r*2,l.r*2); }
+  octx.save(); octx.setTransform(1,0,0,1,0,0); octx.drawImage(hdl,0,0); octx.restore();
+  hdAdd(()=>{ for(const l of L){ if(!l.c) continue; const x=l.x-cam; hdGlow(x,l.y,l.r*.9,l.c.join(','),.2*l.i); hdGlow(x,l.y,Math.max(4,l.r*.18),l.c.join(','),.35*l.i); }
+    if(s.beams) for(const b of s.beams) hdBeam(b.map(([x,y])=>[x-cam,y]),'150,170,225',.06+S.flash*.35,.0,30,150);
+    if(s===SC.street){ octx.save(); octx.translate(200-cam,174); octx.scale(1,3); hdGlow(0,0,9,'255,200,120',.3*S.lampI); octx.restore(); }
+    if(s===SC.street||s.dream) for(let i=0;i<6;i++){ const x=((i*90+T*(4+i))%460)-70, y=150+Math.sin(T*.3+i)*6; hdGlow(x,y,60,s.dream?'150,20,20':'150,160,190',.06); } });
+  if(s.rain||S.mode==='title'){ const dc=cam-(compositeA.lc||cam); compositeA.lc=cam; octx.strokeStyle='rgba(175,190,215,.42)'; octx.lineWidth=.45; octx.beginPath();
+    for(const d of drops){ d.y+=d.v*dt; d.x-=d.v*dt*.16+dc; if(d.y>d.gy){ splashes.push({x:d.x,y:d.gy,t:.18}); d.y=-rand(4,40); d.x=Math.random()*(340); d.gy=150+Math.random()*30; } if(d.x<-6) d.x+=332; if(d.x>326) d.x-=332; octx.moveTo(d.x,d.y); octx.lineTo(d.x+1.1,d.y-d.l*1.6); }
+    octx.stroke(); octx.strokeStyle='rgba(190,200,220,.5)'; octx.lineWidth=.35;
+    for(let i=splashes.length-1;i>=0;i--){ const p=splashes[i]; p.t-=dt; p.x-=dc; if(p.t<=0){ splashes.splice(i,1); continue; } const r=(.18-p.t)*14; octx.beginPath(); octx.ellipse(p.x,p.y,r,r*.3,0,Math.PI,0); octx.stroke(); }
+    if(s===SC.street||S.mode==='title') for(const d of lens){ d.y+=d.v*dt; if(d.y>190){ d.y=-10; d.x=Math.random()*320; } const g=octx.createRadialGradient(d.x-d.r*.3,d.y-d.r*.3,0,d.x,d.y,d.r); g.addColorStop(0,'rgba(255,255,255,.22)'); g.addColorStop(.7,'rgba(200,210,230,.06)'); g.addColorStop(1,'rgba(255,255,255,.18)'); octx.fillStyle=g; octx.beginPath(); octx.arc(d.x,d.y,d.r,0,7); octx.fill(); } }
+  if(S.flash>0){ const g=octx.createLinearGradient(0,0,0,180); g.addColorStop(0,'rgba(210,220,245,'+(S.flash*(s.outdoor?.55:.2))+')'); g.addColorStop(1,'rgba(210,220,245,'+(S.flash*(s.outdoor?.2:.06))+')'); octx.fillStyle=g; octx.fillRect(0,0,320,180); }
+  if(s.dream){ hdVignette(.55+.2*Math.sin(T*2.2),'110,0,0'); hdAdd(()=>{ octx.globalAlpha=.12; octx.drawImage(OUT,0,0,OW,OH,-1.5,0,320,180); }); }
+  octx.save(); octx.setTransform(1,0,0,1,0,0); octx.drawImage(noise2[Math.abs(Math.floor(T*24))%3],0,0,OW,OH); octx.restore();
+  hdVignette(.85,'0,0,0');
+  if(Math.random()<.04){ octx.fillStyle='rgba(255,240,220,.03)'; octx.fillRect(0,0,320,180); }
+  if(Math.random()<.01){ octx.fillStyle='rgba(220,210,190,.18)'; octx.fillRect(Math.random()*320,0,.5,180); }
+  if(S.fade>0){ octx.fillStyle='rgba(0,0,0,'+S.fade+')'; octx.fillRect(0,0,320,180); }
+}
+
+/* ---------- characters ---------- */
+function drawCar(g,x){
+  const y=182;
+  R(g,x+4,y-30,92,22,'#14191b'); R(g,x+20,y-46,52,17,'#111517'); R(g,x+24,y-43,20,13,'#06080a'); R(g,x+48,y-43,20,13,'#06080a');
+  R(g,x+26,y-42,2,11,'rgba(160,180,200,.25)'); R(g,x+50,y-42,2,11,'rgba(160,180,200,.2)');
+  R(g,x+4,y-30,92,1,'#232a2d'); R(g,x+2,y-14,96,3,'#2a2c2c'); R(g,x+94,y-27,4,4,'#4a4636'); R(g,x+4,y-27,3,4,'#3a1210');
+  disc(g,x+22,y-8,8,'#050505'); disc(g,x+78,y-8,8,'#050505'); disc(g,x+22,y-8,3,'#2a2a2a'); disc(g,x+78,y-8,3,'#2a2a2a');
+  g.fillStyle='rgba(170,185,205,.35)'; for(let i=0;i<14;i++) g.fillRect(x+22+((i*11.3)%48), y-44+((i*5.7+T*6)%14), 1, 1);
+}
+function drawPlayer(g,x,y){
+  const C={hair:'#1d1916',skin:'#c6b298',skinD:'#97856d',coat:'#564f41',coatD:'#3d382e',coatL:'#6a6250',sh:'#c4bdab',tie:'#6a1913',tr:'#222127',tr2:'#2a2930',shoe:'#0d0c0c',gl:'#0a0a0a'};
+  const mv=S.moving, sw=mv?Math.sin(S.phase):0, l1=Math.round(sw*2.6), bob=mv?Math.round(Math.abs(Math.cos(S.phase))):0;
+  const candle = has('candle_lit') && SC[S.scene].dark>=.8;
+  g.save(); g.translate(Math.round(x),y); if(S.face<0) g.scale(-1,1);
+  g.fillStyle='rgba(0,0,0,.5)'; g.fillRect(-7,0,14,1);
+  R(g,-1-l1,-12,3,11,C.tr); R(g,-1-l1+(S.face>0?0:0),-1,4,1,C.shoe);
+  R(g,-3+Math.round(sw*1.6),-24-bob,2,10,C.coatD); R(g,-3+Math.round(sw*1.6),-14-bob,2,2,C.skinD);
+  R(g,-1+l1,-12,3,11,C.tr2); R(g,-1+l1,-1,4,1,C.shoe);
+  const yb=-bob;
+  R(g,-4,-25+yb,9,15,C.coat); R(g,-4,-25+yb,2,15,C.coatD); R(g,-4,-11+yb,9,1,C.coatD); R(g,4,-25+yb,1,14,C.coatD);
+  R(g,1,-25+yb,3,4,C.sh); R(g,2,-24+yb,1,6,C.tie); R(g,0,-25+yb,1,7,C.coatL); R(g,3,-21+yb,1,1,C.coatL);
+  R(g,0,-27+yb,2,2,C.skinD);
+  R(g,-3,-34+yb,7,7,C.skin); R(g,-3,-35+yb,7,2,C.hair); R(g,-4,-34+yb,3,5,C.hair); R(g,-3,-32+yb,1,1,C.hair);
+  R(g,-1,-31+yb,1,2,C.skinD); R(g,1,-31+yb,4,1,C.gl); R(g,2,-30+yb,2,1,'#6d7a80'); R(g,4,-29+yb,1,1,C.skinD); R(g,2,-28+yb,2,1,C.skinD);
+  if(candle){ R(g,0,-24+yb,2,6,C.coatL); R(g,1,-19+yb,5,2,C.coatL); R(g,5,-20+yb,2,2,C.skin); R(g,4,-18+yb,4,1,'#5a5a52'); R(g,5,-23+yb,2,5,'#d6ceb6'); }
+  else { const ax=Math.round(-sw*1.6); R(g,1+ax,-24+yb,2,10,C.coatL); R(g,1+ax,-14+yb,2,2,C.skin); }
+  g.restore();
+  return candle ? {x:Math.round(x)+6*S.face, y:y-24+yb} : null;
+}
+function drawChair(g,cx,cy,a){
+  g.save(); g.translate(cx,cy); g.rotate(a);
+  R(g,-12,-1,24,2,'#2a1a10'); R(g,-10,-12,2,11,'#2a1a10'); R(g,7,-12,2,11,'#2a1a10');
+  R(g,-11,-14,20,3,'#4a2e22'); R(g,-11,-15,18,2,'#5e3a2c');
+  R(g,-12,-40,3,28,'#2a1a10'); R(g,-11,-38,2,24,'#4a2e22'); for(let i=0;i<4;i++) R(g,-9,-36+i*6,2,4,'#3a2418');
+  R(g,6,-24,2,12,'#2a1a10'); R(g,-10,-24,18,2,'#2a1a10');
+  g.restore();
+}
+function drawFigure(g,x,y,a,eyes){
+  g.globalAlpha=a; const c='#030202';
+  R(g,x-4,y-34,8,24,c); R(g,x-3,y-40,6,6,c); R(g,x-4,y-41,8,2,c); R(g,x-5,y-39,10,1,c);
+  R(g,x-3,y-10,2,10,c); R(g,x+1,y-10,2,10,c); R(g,x-6,y-32,2,18,c); R(g,x+4,y-32,2,18,c);
+  if(eyes){ R(g,x-2,y-37,1,1,'#d8d0b8'); R(g,x+1,y-37,1,1,'#d8d0b8'); }
+  g.globalAlpha=1;
+}
+
+/* ---------- post-processing buffers ---------- */
+const lc=document.createElement('canvas'); lc.width=W; lc.height=H; const lg=lc.getContext('2d');
+const tmp=document.createElement('canvas'); tmp.width=W; tmp.height=H; const tg=tmp.getContext('2d');
+const noise=[0,1,2,3].map(()=>{ const c=document.createElement('canvas'); c.width=W; c.height=H; const g=c.getContext('2d'); const id=g.createImageData(W,H);
+  for(let i=0;i<id.data.length;i+=4){ const v=Math.random()<.5?0:255; id.data[i]=id.data[i+1]=id.data[i+2]=v; id.data[i+3]=Math.random()<.55?(6+Math.random()*11):0; } g.putImageData(id,0,0); return c; });
+const vig=document.createElement('canvas'); vig.width=W; vig.height=H; (()=>{ const g=vig.getContext('2d'); const gr=g.createRadialGradient(W/2,H/2,H*.32,W/2,H/2,W*.62); gr.addColorStop(0,'rgba(0,0,0,0)'); gr.addColorStop(.7,'rgba(0,0,0,.45)'); gr.addColorStop(1,'rgba(0,0,0,.9)'); g.fillStyle=gr; g.fillRect(0,0,W,H); g.fillStyle='rgba(0,0,0,.08)'; for(let y=0;y<H;y+=2) g.fillRect(0,y,W,1); })();
+const drops=[]; for(let i=0;i<150;i++) drops.push({x:Math.random()*W,y:Math.random()*H,v:200+Math.random()*130,l:3+((Math.random()*4)|0),gy:150+Math.random()*30});
+const splashes=[];
+const motes=[]; for(let i=0;i<36;i++) motes.push({x:Math.random(),y:20+Math.random()*125,vx:(Math.random()-.5)*3,vy:(Math.random()-.5)*2,p:Math.random()*6});
+
+/* ---------- audio (all synthesised) ---------- */
+const A = { c:null, m:null, on:true,
+  init(){ if(this.c){ if(this.c.state==='suspended') this.c.resume(); return; }
+    try{ this.c = new (window.AudioContext||window.webkitAudioContext)(); }catch(e){ return; }
+    const c=this.c; this.m=c.createGain(); this.m.gain.value=this.on?.9:0; this.m.connect(c.destination);
+    const b=c.createBuffer(1,c.sampleRate*3,c.sampleRate), d=b.getChannelData(0); for(let i=0;i<d.length;i++) d[i]=Math.random()*2-1; this.nb=b;
+    const s=c.createBufferSource(); s.buffer=b; s.loop=true; this.rf=c.createBiquadFilter(); this.rf.type='lowpass'; this.rf.frequency.value=1800; this.rg=c.createGain(); this.rg.gain.value=0;
+    s.connect(this.rf); this.rf.connect(this.rg); this.rg.connect(this.m); s.start();
+    this.dl=c.createBiquadFilter(); this.dl.type='lowpass'; this.dl.frequency.value=170; this.dl.Q.value=5; this.dg=c.createGain(); this.dg.gain.value=0;
+    [55,55.5,82.6].forEach(f=>{ const o=c.createOscillator(); o.type='sawtooth'; o.frequency.value=f; o.connect(this.dl); o.start(); });
+    const lfo=c.createOscillator(), lgn=c.createGain(); lfo.frequency.value=.06; lgn.gain.value=80; lfo.connect(lgn); lgn.connect(this.dl.frequency); lfo.start();
+    this.dl.connect(this.dg); this.dg.connect(this.m); this.amb(); },
+  amb(){ if(!this.c) return; const s=SC[S.scene], t=this.c.currentTime;
+    const rain = S.mode==='title'||s.outdoor ? .085 : s.storm ? .03 : .004, cut = s.outdoor||S.mode==='title' ? 2400 : 480;
+    this.rg.gain.setTargetAtTime(s.dream?0:rain,t,.6); this.rf.frequency.setTargetAtTime(cut,t,.6);
+    this.dg.gain.setTargetAtTime(s.dream?.11:s.id==='basement'?.08:.045,t,1); this.dl.frequency.setTargetAtTime(s.dream?110:170,t,1); },
+  setOn(v){ this.on=v; if(this.m) this.m.gain.setTargetAtTime(v?.9:0,this.c.currentTime,.05); },
+  tone(f,dur,o={}){ const c=this.c; if(!c) return; const t=c.currentTime+(o.at||0), osc=c.createOscillator(), g=c.createGain();
+    osc.type=o.type||'sine'; osc.frequency.setValueAtTime(f,t); if(o.f2) osc.frequency.exponentialRampToValueAtTime(o.f2,t+dur);
+    g.gain.setValueAtTime(.0001,t); g.gain.exponentialRampToValueAtTime(o.vol||.1,t+(o.att||.005)); g.gain.exponentialRampToValueAtTime(.0001,t+dur);
+    osc.connect(g); g.connect(this.m); osc.start(t); osc.stop(t+dur+.05); },
+  noise(dur,o={}){ const c=this.c; if(!c) return; const t=c.currentTime+(o.at||0), s=c.createBufferSource(), f=c.createBiquadFilter(), g=c.createGain();
+    s.buffer=this.nb; f.type=o.ft||'lowpass'; f.frequency.setValueAtTime(o.ff||1000,t); if(o.ff2) f.frequency.exponentialRampToValueAtTime(o.ff2,t+dur); f.Q.value=o.q||1;
+    g.gain.setValueAtTime(.0001,t); g.gain.exponentialRampToValueAtTime(o.vol||.1,t+(o.att||.003)); g.gain.exponentialRampToValueAtTime(.0001,t+dur);
+    s.connect(f); f.connect(g); g.connect(this.m); s.start(t, Math.random()*Math.max(0,2.8-dur)); s.stop(t+dur+.05); }
+};
+function sfx(n){ if(!A.c||!A.on) return;
+  switch(n){
+    case 'step': SC[S.scene].outdoor ? A.noise(.09,{ff:1400,vol:.07,ft:'bandpass',q:.8}) : A.noise(.07,{ff:420,vol:.11,ft:'bandpass',q:1.2}); break;
+    case 'pick': A.tone(523,.35,{vol:.05,type:'triangle'}); A.tone(784,.6,{vol:.04,type:'triangle',at:.09}); break;
+    case 'unlock': A.noise(.05,{ff:3000,ft:'highpass',vol:.2}); A.tone(90,.25,{vol:.15,at:.06}); A.noise(.06,{ff:2400,ft:'highpass',vol:.15,at:.18}); break;
+    case 'door': A.tone(140,.7,{type:'sawtooth',f2:70,vol:.025,att:.1}); A.noise(.6,{ft:'bandpass',ff:700,ff2:300,q:6,vol:.06,att:.1}); break;
+    case 'tick': A.noise(.03,{ft:'highpass',ff:3500,vol:.06}); A.tone(1900,.04,{vol:.025}); break;
+    case 'tickLoud': A.noise(.04,{ft:'highpass',ff:2500,vol:.14}); A.tone(1500,.06,{vol:.05}); break;
+    case 'heart': A.tone(58,.18,{vol:.35,f2:40}); A.tone(52,.2,{vol:.28,f2:38,at:.22}); break;
+    case 'sting': [61,65,92,98].forEach((f,i)=>A.tone(f*4,1.6,{type:'sawtooth',vol:.025,att:.01,f2:f*3.6})); A.noise(1.2,{ff:3000,ff2:200,vol:.12}); A.tone(45,1.4,{vol:.3,f2:30}); break;
+    case 'thunder': A.noise(2.6,{ff:380,ff2:60,vol:.35,att:.08}); A.noise(.4,{ff:1200,vol:.08}); break;
+    case 'creak': A.tone(210,.5,{type:'sawtooth',f2:160,vol:.012,att:.15}); A.noise(.4,{ft:'bandpass',ff:900,q:9,vol:.03,att:.15}); break;
+    case 'musicbox': [76,79,83,81,79,76,74,76,71].forEach((m,i)=>A.tone(440*Math.pow(2,(m-69)/12),.9,{type:'triangle',vol:.05,at:i*.36})); break;
+  } }
+
+/* ---------- dialogue ---------- */
+const D = { q:[], cb:null, text:'', shown:0, active:false, opts:null };
+const dlgEl=$('dlg'), dlgText=$('dlgText'), dlgOpts=$('dlgOpts'), moreEl=$('more');
+function say(lines,cb){ if(typeof lines==='string') lines=[lines]; D.q=lines.map(tr); D.cb=cb||null; D.active=true; D.opts=null; nextLine(); }
+function nextLine(){ if(!D.q.length){ D.active=false; dlgEl.hidden=true; const cb=D.cb; D.cb=null; if(cb) cb(); return; }
+  D.text=D.q.shift(); D.shown=0; dlgText.textContent=''; dlgOpts.innerHTML=''; dlgEl.hidden=false; moreEl.style.visibility='hidden'; }
+function advance(){ if(!D.active||D.opts) return; if(D.shown<D.text.length){ D.shown=D.text.length; dlgText.textContent=D.text; } else nextLine(); }
+function choose(prompt,opts){ prompt=tr(prompt); D.active=true; D.text=prompt; D.shown=prompt.length; D.opts=opts; D.q=[]; dlgText.textContent=prompt; dlgOpts.innerHTML=''; dlgEl.hidden=false; moreEl.style.visibility='hidden';
+  opts.forEach(o=>{ const b=document.createElement('button'); b.textContent=tr(o.t); b.addEventListener('click',e=>{ e.stopPropagation(); D.opts=null; D.active=false; dlgEl.hidden=true; dlgOpts.innerHTML=''; o.f(); }); dlgOpts.appendChild(b); }); }
+let whT=0;
+function whisper(t){ const el=$('whisper'); el.textContent=tr(t); el.classList.add('show'); clearTimeout(whT); whT=setTimeout(()=>el.classList.remove('show'),2400); }
+let tipT=0;
+function tip(t,ms){ const el=$('tip'); el.textContent=tr(t); el.classList.add('show'); clearTimeout(tipT); tipT=setTimeout(()=>el.classList.remove('show'),ms||6000); }
+
+/* ---------- scene flow ---------- */
+function fadeTo(v,d,cb){ S.fadeFrom=S.fade; S.fadeTo=v; S.fadeDur=d; S.fadeT=0; S.fadeCb=cb||null; }
+function enter(id,x){ S.scene=id; S.x=x; const s=SC[id]; S.cam=clamp(x-W/2,0,s.w-W); S.ghost=null; A.amb(); if(id!=='dream') save(); }
+function go(id,x,cb){ if(S.trans) return; S.trans=1; closeInv();
+  fadeTo(1,.45,()=>{ enter(id,x); fadeTo(0,.55,()=>{ S.trans=0; const s=SC[id]; if(s.onEnter) s.onEnter(); if(cb) cb(); }); }); }
+function clockEvent(){
+  say(['Βάζω το κλειδί στο καντράν. Μία, δύο, τρεις στροφές.','Σπρώχνω το εκκρεμές.','Τικ.'],()=>{
+    S.clockRun=1; S.lock=1; sfx('tickLoud'); shake(1,2);
+    after(.8,()=>{ sfx('tickLoud'); shake(.6,3); });
+    after(1.5,()=>{ sfx('sting'); S.flash=1; shake(1,4); });
+    after(2.3,()=>{ S.lock=0; go('dream',40,()=>after(.6,()=>whisper('Τικ…'))); });
+  });
+}
+function wake(){ F.clockDone=1; S.lock=1; S.flash=1; sfx('sting');
+  after(.4,()=>{ S.lock=0; go('hall',300,()=>say(['…','Είμαι στο χολ. Το ρολόι χτυπάει κανονικά.','Τα σεντόνια από τη σκάλα έχουν γλιστρήσει στο πάτωμα. Σαν να τα τράβηξε κάποιος.'])); }); }
+function finalChoice(){
+  say(['Γράφω. Καναπές. Δύο πολυθρόνες. Σερβίτσιο πορσελάνης. Βάζα με γλυκό: πενήντα δύο.','Εκκρεμές ρολόι, σε λειτουργία. Μόνο αυτό αξίζει όσο το μισό σπίτι.','Από κάτω ακούγεται το τικ-τακ. Σαν να περιμένει τι θα γράψω.'],()=>
+    choose('Τι γράφω για το ρολόι;',[
+      {t:'«Σε λειτουργία». Υπογράφω.', f:()=>ending('a')},
+      {t:'Κατεβαίνω να το σταματήσω στις 3:17.', f:()=>ending('b')},
+    ]));
+}
+const ENDINGS = {
+  a:{h:'Πρώτο τέλος · Η απογραφή', p:['Το ρολόι φορτώθηκε σε ένα φορτηγάκι του Δημοσίου μαζί με άλλα διακόσια δεκατρία αντικείμενα. Χτυπούσε σε όλη τη διαδρομή.','Τον Μάρτιο πήρα προαγωγή.','Ξυπνάω κάθε βράδυ στις 3:17 και ακούω ένα τικ-τακ στο χολ μου.','Δεν έχω ρολόι στο χολ μου.']},
+  b:{h:'Δεύτερο τέλος · Τρεις και δεκαεφτά', p:['Άνοιξα το γυάλινο πορτάκι και σταμάτησα το εκκρεμές με δύο δάχτυλα. Γύρισα τους δείκτες πίσω: τρεις και δεκαεφτά.','Η βροχή σταμάτησε. Από πάνω, η πολυθρόνα έτριξε μια τελευταία φορά, και ησύχασε.','Στο έντυπο έγραψα: «Εκκρεμές ρολόι, μη λειτουργικό. Άνευ αξίας.»','Ήταν το μόνο ψέμα που έγραψα ποτέ σε απογραφή.']},
+};
+function ending(k){
+  S.lock=1; if(k==='b'){ S.clockRun=0; sfx('creak'); }
+  fadeTo(1,1.6,()=>{ S.mode='end'; const e=ENDINGS[k]; $('endH').textContent=tr(e.h); const box=$('endT'); box.innerHTML='';
+    e.p.forEach((t,i)=>{ const p=document.createElement('p'); p.textContent=tr(t); p.style.animationDelay=(.6+i*1.8)+'s'; box.appendChild(p); });
+    $('endB').style.animationDelay=(1+e.p.length*1.8)+'s'; $('end').hidden=false; setUI(false); clearSave(); A.amb(); });
+}
+
+/* ---------- save ---------- */
+const KEY='apografi2-save-v1';
+function save(){ if(S.mode!=='play') return; try{ localStorage.setItem(KEY, JSON.stringify({scene:S.scene,x:S.x,inv:S.inv,F,clockRun:S.clockRun})); }catch(e){} }
+function load(){ try{ const v=localStorage.getItem(KEY); return v?JSON.parse(v):null; }catch(e){ return null; } }
+function clearSave(){ try{ localStorage.removeItem(KEY); }catch(e){} }
+
+/* ---------- inventory UI ---------- */
+const invEl=$('inv'), slotsEl=$('slots'), capEl=$('invCap'), selEl=$('sel');
+function renderInv(){ slotsEl.innerHTML='';
+  S.inv.forEach(id=>{ const b=document.createElement('button'); b.className='slot'+(S.sel===id?' on':''); b.setAttribute('aria-label',tr(ITEMS[id].n)); b.appendChild(iconCanvas(id)); b.addEventListener('click',e=>{ e.stopPropagation(); invTap(id); }); slotsEl.appendChild(b); });
+  $('bExam').disabled = !S.sel; }
+function setSel(id){ S.sel=id; selEl.innerHTML=''; if(id && S.mode==='play'){ selEl.appendChild(iconCanvas(id)); const sp=document.createElement('span'); sp.textContent=tr(ITEMS[id].n); selEl.appendChild(sp); selEl.hidden=false; selEl.classList.remove('pop'); void selEl.offsetWidth; selEl.classList.add('pop'); } else selEl.hidden=true; }
+function cycleItem(){ A.init(); if(D.active||S.mode!=='play'||S.trans) return; closeInv(); if(!S.inv.length) return;
+  const i=S.sel?S.inv.indexOf(S.sel):-1; const n=i+1; const id=n>=S.inv.length?null:S.inv[n]; setSel(id); sfx(id?'tick':'step');
+  if(!id) tip('Άδεια χέρια.',1200); }
+function invTap(id){ A.init();
+  if(S.sel && S.sel!==id){ const r=RECIPES[rkey(S.sel,id)];
+    if(r){ const a=S.sel; take(a); take(id); give(r[0]); setSel(null); sfx('pick'); closeInv(); say([r[1]]); }
+    else { setSel(null); capEl.textContent=tr('Αυτά τα δύο δεν συνδυάζονται.'); }
+    renderInv(); return; }
+  if(S.sel===id){ setSel(null); capEl.textContent=tr('Διάλεξε ένα αντικείμενο.'); }
+  else { setSel(id); capEl.textContent=tr(ITEMS[id].n); }
+  renderInv(); }
+function openInv(){ if(S.mode!=='play'||D.active||S.trans) return; renderInv(); capEl.textContent=tr(S.sel?ITEMS[S.sel].n:'Διάλεξε ένα αντικείμενο. Πάτα δεύτερο για να τα συνδυάσεις.'); invEl.hidden=false; }
+function closeInv(){ invEl.hidden=true; }
+$('bInv').addEventListener('click',e=>{ e.stopPropagation(); A.init(); invEl.hidden?openInv():closeInv(); });
+$('bClose').addEventListener('click',e=>{ e.stopPropagation(); closeInv(); });
+$('bExam').addEventListener('click',e=>{ e.stopPropagation(); if(!S.sel) return; const it=ITEMS[S.sel]; closeInv(); say(it.d); });
+selEl.addEventListener('click',e=>{ e.stopPropagation(); setSel(null); });
+
+/* ---------- input ---------- */
+const keys={l:0,r:0}, held={l:0,r:0};
+function holdBtn(el,k){
+  const on=e=>{ e.preventDefault(); A.init(); held[k]=1; el.classList.add('held'); try{ el.setPointerCapture(e.pointerId); }catch(_){} };
+  const off=()=>{ held[k]=0; el.classList.remove('held'); };
+  el.addEventListener('pointerdown',on); el.addEventListener('pointerup',off); el.addEventListener('pointercancel',off); el.addEventListener('lostpointercapture',off);
+}
+holdBtn($('bL'),'l'); holdBtn($('bR'),'r');
+$('bA').addEventListener('pointerdown',e=>{ e.preventDefault(); e.stopPropagation(); action(); });
+$('bB').addEventListener('pointerdown',e=>{ e.preventDefault(); e.stopPropagation(); cycleItem(); });
+stage.addEventListener('pointerdown',e=>{ A.init(); if(e.target.closest('button')||e.target.closest('#inv')) return; if(!$('menu').hidden){ $('menu').hidden=true; return; } if(D.active&&!D.opts) advance(); });
+addEventListener('keydown',e=>{ const k=e.key;
+  if(k==='ArrowLeft'||k==='a'||k==='A') keys.l=1;
+  else if(k==='ArrowRight'||k==='d'||k==='D') keys.r=1;
+  else if(k===' '||k==='Enter'||k==='e'||k==='E'){ e.preventDefault(); action(); }
+  else if(k==='q'||k==='Q'||k==='b'||k==='B'||k==='Tab'){ e.preventDefault(); cycleItem(); }
+  else if(k==='i'||k==='I'){ invEl.hidden?openInv():closeInv(); }
+  else if(k==='Escape'){ closeInv(); setSel(null); } });
+addEventListener('keyup',e=>{ const k=e.key; if(k==='ArrowLeft'||k==='a'||k==='A') keys.l=0; if(k==='ArrowRight'||k==='d'||k==='D') keys.r=0; });
+const NOPE=['Δεν βγαίνει νόημα.','Όχι, δεν ταιριάζει εδώ.','Δεν νομίζω.','Αυτό δεν θα βοηθήσει.'];
+function action(){ A.init(); if(!$('settings').hidden) return;
+  if(D.active){ advance(); return; }
+  if(S.mode!=='play'||S.lock||S.trans) return;
+  closeInv();
+  const h=S.near;
+  if(S.sel){ const it=S.sel;
+    if(!h){ say(['Δεν υπάρχει τίποτα εδώ για να το χρησιμοποιήσω. (B για άδεια χέρια)']); return; }
+    if(!(h.use && h.use(it))) say([NOPE[(Math.random()*NOPE.length)|0]]);
+    return; }
+  if(h) h.act();
+}
+
+/* menu */
+$('bMenu').addEventListener('click',e=>{ e.stopPropagation(); A.init(); $('menu').hidden=!$('menu').hidden; });
+const PREF='apografi2-prefs-v1';
+function loadPrefs(){ try{ return JSON.parse(localStorage.getItem(PREF))||{}; }catch(e){ return {}; } }
+function savePrefs(){ try{ localStorage.setItem(PREF,JSON.stringify({ts:TS,sound:A.on,lang:LANG})); }catch(e){} }
+function setLang(l){ LANG=l; document.documentElement.lang=l; document.title=tr('Απογραφή');
+  document.querySelectorAll('[data-i18n]').forEach(el=>el.textContent=tr(el.dataset.i18n));
+  document.querySelectorAll('#lgRow button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.lg===l)));
+  $('sSound').textContent=tr('Ήχος: ')+tr(A.on?'ναι':'όχι'); if(S.sel) setSel(S.sel); lastHint=null; savePrefs(); }
+let TS=1;
+function setTS(v){ TS=v; stage.style.setProperty('--ts',v); document.querySelectorAll('#tsRow button').forEach(b=>b.setAttribute('aria-pressed',String(+b.dataset.ts===v))); savePrefs(); }
+function openSettings(){ closeInv(); $('menu').hidden=true; $('sSound').textContent=tr('Ήχος: ')+tr(A.on?'ναι':'όχι'); $('settings').hidden=false; }
+document.querySelectorAll('#tsRow button').forEach(b=>b.addEventListener('click',e=>{ e.stopPropagation(); setTS(+b.dataset.ts); }));
+document.querySelectorAll('#lgRow button').forEach(b=>b.addEventListener('click',e=>{ e.stopPropagation(); setLang(b.dataset.lg); }));
+$('mSet').addEventListener('click',e=>{ e.stopPropagation(); openSettings(); });
+$('tSet').addEventListener('click',e=>{ e.stopPropagation(); openSettings(); });
+$('sSound').addEventListener('click',e=>{ e.stopPropagation(); A.init(); A.setOn(!A.on); $('sSound').textContent=tr('Ήχος: ')+tr(A.on?'ναι':'όχι'); savePrefs(); });
+$('sFull').addEventListener('click',e=>{ e.stopPropagation(); goFull(); });
+$('sClose').addEventListener('click',e=>{ e.stopPropagation(); $('settings').hidden=true; });
+$('settings').addEventListener('pointerdown',e=>e.stopPropagation());
+(()=>{ const pr=loadPrefs(); if(pr.sound===false) A.on=false; setTS([1,1.3,1.6,2].includes(pr.ts)?pr.ts:1.3); setLang(pr.lang==='en'?'en':'el'); })();
+$('mTitle').addEventListener('click',e=>{ e.stopPropagation(); $('menu').hidden=true; toTitle(); });
+function goFull(){ const el=document.documentElement; try{ const p=(el.requestFullscreen||el.webkitRequestFullscreen||function(){}).call(el); if(p&&p.then) p.then(()=>{ try{ screen.orientation.lock('landscape').catch(()=>{}); }catch(_){} }).catch(()=>{}); }catch(_){} }
+
+/* title / end */
+function setUI(on){ ['bL','bR','bA','bB','bInv','bMenu'].forEach(id=>$(id).style.display=on?'':'none'); if(!on){ selEl.hidden=true; $('hint').textContent=''; } }
+function toTitle(){ S.mode='title'; closeInv(); D.active=false; D.opts=null; dlgEl.hidden=true; $('end').hidden=true; $('title').hidden=false; setUI(false);
+  $('tCont').hidden=!load(); enter('street',200); S.fade=0; S.lock=0; S.trans=0; A.amb(); }
+function startGame(data){ A.init(); $('title').hidden=true; setUI(true);
+  S.fade=1; S.mode='play'; S.lock=0; timers.length=0;
+  if(data){ F=data.F||{}; S.inv=data.inv||['form']; S.clockRun=data.clockRun||0; enter(data.scene,data.x); }
+  else { F={}; S.inv=['form']; S.clockRun=0; enter('street',122); S.face=1; }
+  setSel(null); renderInv();
+  if(!data){ say(['Θεσσαλονίκη, Νοέμβριος 1987.','Με λένε Λευτέρη Σταθάκη. Είμαι εκτιμητής του Πρωτοδικείου.','Η δουλειά μου είναι να μετράω τι αφήνουν πίσω τους οι άνθρωποι.','Ευτέρπη Λάμπρου, ογδόντα ενός ετών. Χωρίς κληρονόμους. Το σπίτι περνάει στο Δημόσιο.','Μία απογραφή. Μία υπογραφή. Και μετά σπίτι μου.'],
+      ()=>tip('Βέλη για κίνηση. A εξετάζει ή χρησιμοποιεί. B αλλάζει το αντικείμενο που κρατάς. Στην τσάντα συνδυάζεις.',8000)); }
+  fadeTo(0,1.2);
+}
+$('tNew').addEventListener('click',e=>{ e.stopPropagation(); startGame(null); });
+$('tCont').addEventListener('click',e=>{ e.stopPropagation(); startGame(load()); });
+$('endB').addEventListener('click',e=>{ e.stopPropagation(); toTitle(); });
+
+/* ---------- update ---------- */
+function update(dt){
+  for(let i=timers.length-1;i>=0;i--){ timers[i].t-=dt; if(timers[i].t<=0){ const f=timers[i].fn; timers.splice(i,1); f(); } }
+  if(S.fadeDur){ S.fadeT+=dt; const k=Math.min(1,S.fadeT/S.fadeDur); S.fade=S.fadeFrom+(S.fadeTo-S.fadeFrom)*k; if(k>=1){ S.fadeDur=0; const cb=S.fadeCb; S.fadeCb=null; if(cb) cb(); } }
+  if(D.active && !D.opts && D.shown<D.text.length){ D.shown=Math.min(D.text.length,D.shown+dt*46); dlgText.textContent=D.text.slice(0,Math.floor(D.shown)); }
+  moreEl.style.visibility = D.active && !D.opts && D.shown>=D.text.length ? 'visible' : 'hidden';
+  const s=SC[S.scene];
+  S.lampI = Math.random()<.04 ? rand(.15,.5) : Math.min(1,S.lampI+dt*3);
+  S.flick = Math.random()<.025 ? rand(.2,.6) : Math.min(1,S.flick+dt*4);
+  if(s.storm && S.mode!=='end'){ S.lt-=dt; if(S.lt<=0){ S.lt=rand(8,17); S.flash=1; after(rand(.5,1.4),()=>sfx('thunder')); after(.12,()=>{ S.flash=Math.max(S.flash,.7); }); } }
+  S.flash=Math.max(0,S.flash-dt*2.4); S.shk=Math.max(0,S.shk-dt);
+  if(S.ghost){ S.ghost.t-=dt; if(S.ghost.t<=0) S.ghost=null; }
+
+  S.moving=false;
+  if(S.mode==='play' && !D.active && !S.lock && !S.trans && $('settings').hidden){
+    const dir=(keys.r||held.r)-(keys.l||held.l);
+    if(dir){ const sp=s.dream?30:40; const nx=clamp(S.x+dir*sp*dt,s.minX||14,s.w-14);
+      if(nx!==S.x){ S.moving=true; const before=Math.floor(S.phase/Math.PI); S.phase+=dt*sp*.24; if(Math.floor(S.phase/Math.PI)!==before) sfx('step'); }
+      S.x=nx; S.face=dir; }
+    if(s.update) s.update(dt);
+    if(S.scene==='hall' && S.clockRun){ S.tickT-=dt; if(S.tickT<=0){ S.tickT=1; sfx('tick'); } }
+    if(S.scene==='bedroom'){ S.creakT-=dt; if(S.creakT<=0){ S.creakT=rand(2.2,4); sfx('creak'); } }
+  }
+  if(S.mode==='title'){ S.cam=170+Math.sin(T*.08)*60; }
+  else { const tx=clamp(S.x-W/2,0,s.w-W); S.cam+= (tx-S.cam)*Math.min(1,dt*5); }
+
+  let near=null, nd=1e9;
+  if(S.mode==='play' && !S.trans) for(const h of s.hs){ const d=Math.abs(S.x-h.x); if(d<=h.r && d<nd){ nd=d; near=h; } }
+  S.near=near;
+  const hint = S.mode!=='play'||D.active ? '' : near ? (S.sel ? tr(near.n)+tr(' · A για χρήση') : tr(near.n)) : '';
+  if(hint!==lastHint){ $('hint').textContent=hint; lastHint=hint; }
+  const live=!!(near||D.active);
+  if(live!==lastLive){ $('bA').classList.toggle('live',live); lastLive=live; }
+}
+
+/* ---------- render ---------- */
+let lastCam=0;
+function render(dt){
+  const s=SC[S.scene];
+  const sx = S.shk>0 ? Math.round((Math.random()-.5)*2*S.shkA) : 0, sy = S.shk>0 ? Math.round((Math.random()-.5)*S.shkA) : 0;
+  const cam=Math.round(S.cam);
+  ctx.save(); ctx.fillStyle='#000'; ctx.fillRect(0,0,W,H); ctx.translate(-cam+sx,sy);
+  ctx.drawImage(s.img,0,0);
+  if(s.dyn) s.dyn(ctx);
+  if(!s.outdoor){ ctx.fillStyle='#e6dcc4'; for(const m of motes){ m.x+=m.vx*dt/s.w; m.y+=m.vy*dt+Math.sin(T+m.p)*.02; if(m.x<0)m.x+=1; if(m.x>1)m.x-=1; if(m.y<18)m.y=140; if(m.y>146)m.y=20; ctx.globalAlpha=.25+.2*Math.sin(T*1.3+m.p); ctx.fillRect(Math.round(m.x*s.w),Math.round(m.y),1,1); } ctx.globalAlpha=1; }
+  let flame=null;
+  if(S.mode!=='title') flame=drawPlayer(ctx,S.x,FLOOR);
+  if(s.dream && !F.dwFig) drawFigure(ctx,760,FLOOR,.95,false);
+  if(s.fore) s.fore(ctx);
+  ctx.restore();
+
+  // lighting (drawn smooth in HD)
+  const L=s.lights().slice();
+  if(flame){ const fl=.9+Math.random()*.1; L.push({x:flame.x,y:flame.y,r:64*fl,i:.97,c:[255,170,90]}); }
+  const dark=s.dark*(1-S.flash*(s.outdoor?.75:.45));
+  if(flame){ const fx=flame.x-cam+sx, fy=flame.y+sy, w=Math.random()<.5?0:1; R(ctx,fx,fy-4-w,1,3+w,'#f4c868'); R(ctx,fx,fy-2,1,1,'#fff6d0'); R(ctx,fx-1,fy-2,1,1,'#e0903a'); }
+  if(S.near && !D.active && S.mode==='play'){ const h=S.near, mx=h.x-cam+sx, my=(h.my||108)+Math.round(Math.sin(T*4))+sy; ctx.fillStyle='rgba(230,222,200,.9)'; ctx.fillRect(mx,my-1,1,3); ctx.fillRect(mx-1,my,3,1); }
+  if(s.dream){ tg.drawImage(cv,0,0); ctx.fillStyle='#000'; ctx.fillRect(0,0,W,H);
+    for(let y=0;y<H;y+=2){ const o=Math.sin(y*.08+T*2.4)*1.8; ctx.drawImage(tmp,0,y,W,2,o,y,W,2); }
+    ctx.globalAlpha=.22; ctx.drawImage(tmp,2,0); ctx.globalAlpha=1; ctx.fillStyle='rgba(110,0,0,.16)'; ctx.fillRect(0,0,W,H); }
+  compositeA(dt,s,cam,L,dark);
+  if(S.ghost){ const k=OW/320; octx.save(); octx.setTransform(k,0,0,k,0,0); octx.imageSmoothingEnabled=false; tg.clearRect(0,0,W,H); drawFigure(tg,S.ghost.x-cam,FLOOR,1,true); octx.drawImage(tmp,0,0); octx.restore(); }
+}
+
+/* ---------- loop & layout ---------- */
+let last=performance.now();
+function loop(now){ const dt=clamp((now-last)/1000,0,.05); last=now; T+=dt; update(dt); render(dt); requestAnimationFrame(loop); }
+function fit(){ const wr=$('wrap'); const vw=wr.clientWidth, vh=wr.clientHeight; const k=Math.min(vw/W,vh/H); const w=Math.floor(W*k), h=Math.floor(H*k);
+  stage.style.width=w+'px'; stage.style.height=h+'px'; stage.style.setProperty('--u',(h/180)+'px'); fitHD(w); }
+addEventListener('resize',fit); if(window.visualViewport) visualViewport.addEventListener('resize',fit);
+addEventListener('orientationchange',()=>setTimeout(fit,250));
+document.addEventListener('visibilitychange',()=>{ if(document.hidden){ keys.l=keys.r=held.l=held.r=0; if(A.c) A.c.suspend(); } else if(A.c) A.c.resume(); });
+fit(); toTitle(); requestAnimationFrame(loop);
+</script>
+
+
+
+
+<script id="cine">
+/* ================= CINE — engine-independent cutscene player =================
+   Same cutscenes in every version of a game (v1 / v2 / pseudo-3D): it overlays #stage, draws its own pixel-art
+   shots at 320×180 plus smooth HD light, letterbox bars, subtitles (LANG el/en), music pad, skip & tap-to-advance.
+   Hooks: intro = before "New game", mid = first time a scene/flag is reached, ending = before the end screen. */
+const CINE=(()=>{
+  const W2=320,H2=180, OX=160, OY=120, wb=document.createElement('canvas'); wb.width=640; wb.height=640; const lg=wb.getContext('2d'); lg.imageSmoothingEnabled=false;
+  const low=document.createElement('canvas'); low.width=W2; low.height=H2; const l2=low.getContext('2d'); l2.imageSmoothingEnabled=false;
+  let el,cv2,o,cap,skipB,shots=null,i=0,t=0,done=null,raf=0,last=0,k=1,fade=1,bars=0,ac=null,mus=null,prevGain=null,busy=false,T2=0;
+  const prev=document.createElement('canvas'), pg2=prev.getContext('2d'); let xf=0;
+  const grain=[0,1,2].map(()=>{ const c=document.createElement('canvas'); c.width=160; c.height=90; const x=c.getContext('2d'), id=x.createImageData(160,90); for(let j=0;j<id.data.length;j+=4){ const v=Math.random()*255; id.data[j]=id.data[j+1]=id.data[j+2]=v; id.data[j+3]=Math.random()<.5?22:0; } x.putImageData(id,0,0); return c; });
+  const ease=p=>p<.5?2*p*p:1-Math.pow(-2*p+2,2)/2;
+  const L=a=>(typeof LANG!=='undefined'&&LANG==='en')?a[1]:a[0];
+  function build(){ const st=document.getElementById('stage')||document.body; el=document.createElement('div'); el.id='cine';
+    el.style.cssText='position:absolute;inset:0;z-index:80;background:#000;display:none;touch-action:none;overflow:hidden;';
+    cv2=document.createElement('canvas'); cv2.style.cssText='position:absolute;inset:0;width:100%;height:100%;'; el.appendChild(cv2); o=cv2.getContext('2d');
+    cap=document.createElement('div'); cap.style.cssText='position:absolute;left:8%;right:8%;bottom:3%;text-align:center;color:#fff;font-size:calc(var(--u,2px)*7*var(--ts,1));line-height:1.35;text-shadow:0 0 calc(var(--u,2px)*3) #000,0 0 calc(var(--u,2px)*1) #000;opacity:0;transition:opacity .5s;pointer-events:none;';
+    el.appendChild(cap); skipB=document.createElement('button'); skipB.style.cssText='position:absolute;right:2%;top:3%;background:rgba(0,0,0,.45);color:#fff;border:1px solid rgba(255,255,255,.5);border-radius:99px;padding:calc(var(--u,2px)*1.6) calc(var(--u,2px)*5);font:inherit;font-size:calc(var(--u,2px)*5.2);cursor:pointer;';
+    el.appendChild(skipB); st.appendChild(el);
+    skipB.addEventListener('pointerdown',e=>{ e.stopPropagation(); e.preventDefault(); finish(); });
+    el.addEventListener('pointerdown',e=>{ e.stopPropagation(); e.preventDefault(); next(); });
+    ['click','pointerup','touchstart'].forEach(ev=>el.addEventListener(ev,e=>e.stopPropagation()));
+    addEventListener('keydown',e=>{ if(!busy) return; e.stopImmediatePropagation(); e.preventDefault(); if(e.key==='Escape') finish(); else if(e.key===' '||e.key==='Enter'||e.key==='ArrowRight') next(); },true);
+    addEventListener('resize',fit); }
+  function fit(){ if(!el) return; const r=el.getBoundingClientRect(), d=Math.min(2,devicePixelRatio||1); cv2.width=Math.max(320,Math.round(r.width*d)); cv2.height=Math.max(180,Math.round(r.height*d)); k=cv2.width/W2; prev.width=cv2.width; prev.height=cv2.height; }
+  function snap(){ pg2.clearRect(0,0,prev.width,prev.height); pg2.drawImage(cv2,0,0); xf=1; }
+  function audio(mood){ try{ ac=(typeof A!=='undefined'&&A.c)?A.c:(ac||new (window.AudioContext||window.webkitAudioContext)()); if(ac.state==='suspended') ac.resume(); }catch(e){ ac=null; return; }
+    if(typeof A!=='undefined'&&A.m&&A.c){ prevGain=A.on; A.m.gain.setTargetAtTime(0,A.c.currentTime,.2); }
+    const g=ac.createGain(); g.gain.value=0; g.gain.setTargetAtTime(.9,ac.currentTime,.8); g.connect(ac.destination); mus={g,nodes:[],mood,next:0,step:0}; }
+  const MOODS={sea:[[57,64,69,76],[55,62,67,74],[53,60,65,72],[52,59,64,71]],horror:[[45,52,55,60],[44,51,55,59],[45,52,57,60],[46,53,56,61]],sunny:[[60,64,67,72],[65,69,72,77],[62,65,69,74],[67,71,74,79]],
+    police:[[55,62,67,70],[53,60,65,69],[51,58,63,67],[50,57,62,65]],tale:[[60,64,67,72],[57,60,64,69],[65,69,72,77],[67,71,74,79]],dark:[[38,45,50,53],[37,44,49,52],[38,45,50,53],[41,48,53,56]],hope:[[60,67,72,76],[57,64,69,72],[65,72,77,81],[67,74,79,83]]};
+  const mf=m=>440*Math.pow(2,(m-69)/12);
+  function tone(f,at,dur,type,vol){ if(!ac||!mus) return; const os=ac.createOscillator(), g=ac.createGain(); os.type=type; os.frequency.value=f; g.gain.setValueAtTime(0,at); g.gain.linearRampToValueAtTime(vol,at+Math.min(.6,dur*.3)); g.gain.exponentialRampToValueAtTime(.0001,at+dur); os.connect(g); g.connect(mus.g); os.start(at); os.stop(at+dur+.05); }
+  function musicTick(){ if(!ac||!mus) return; const now=ac.currentTime; if(now<mus.next-.1) return; const ch=MOODS[mus.mood]||MOODS.hope, c=ch[mus.step%ch.length], dur=2.6;
+    c.forEach((m,j)=>tone(mf(m),now+.02,dur+.6,j?'sine':'triangle',j?.018:.03)); for(let j=0;j<4;j++) tone(mf(c[(j+1)%4]+12),now+.3+j*.6,.7,'sine',.012); mus.next=now+dur; mus.step++; }
+  function stopAudio(){ if(mus&&ac){ const g=mus.g; g.gain.setTargetAtTime(0,ac.currentTime,.3); setTimeout(()=>{ try{ g.disconnect(); }catch(e){} },1500); } mus=null; if(typeof A!=='undefined'&&A.m&&A.c&&prevGain!==null){ A.setOn(A.on); } prevGain=null; }
+  function play(list,cb,mood){ if(!el) build(); if(busy){ cb&&cb(); return; } shots=list; i=0; t=0; xf=0; done=cb; busy=true; bars=0; fade=1; el.style.display='block'; fit(); skipB.textContent=L(['Παράλειψη ▸▸','Skip ▸▸']); setCap(); try{ audio(mood||'hope'); }catch(e){} last=performance.now(); cancelAnimationFrame(raf); raf=requestAnimationFrame(loop); }
+  function setCap(){ const s=shots[i]; cap.style.opacity=0; setTimeout(()=>{ if(!shots||shots[i]!==s) return; cap.innerHTML=''; if(s.who){ const b=document.createElement('b'); b.textContent=L(s.who)+' '; b.style.color=s.whoCol||'#ffe066'; cap.appendChild(b); } cap.appendChild(document.createTextNode(s.cap?L(s.cap):'')); cap.style.opacity=s.cap?1:0; },250); }
+  function next(){ if(!busy) return; if(t<.35) return; snap(); i++; t=0; if(i>=shots.length) return finish(); setCap(); }
+  function finish(){ if(!busy) return; busy=false; cancelAnimationFrame(raf); stopAudio(); let a=1; const out=()=>{ a-=.06; el.style.opacity=a; if(a>0) requestAnimationFrame(out); else { el.style.display='none'; el.style.opacity=1; shots=null; const cb=done; done=null; cb&&cb(); } }; out(); }
+  function loop(now){ if(!busy) return; const dt=Math.max(0,Math.min(.05,(now-last)/1000)); last=now; t+=dt; T2+=dt; const s=shots[i]; if(t>=s.d){ snap(); i++; t=0; if(i>=shots.length) return finish(); setCap(); }
+    const sh=shots[i], p=Math.min(1,t/sh.d); musicTick(); bars=Math.min(1,bars+dt*1.5);
+    let cx=160,cy=90,cz=1; if(sh.cam){ const e=ease(p), a=sh.cam[0], b=sh.cam[1]||a; cx=a[0]+(b[0]-a[0])*e; cy=a[1]+(b[1]-a[1])*e; cz=a[2]+(b[2]-a[2])*e; if(!sh.free){ cx=Math.max(160/cz,Math.min(320-160/cz,cx)); cy=Math.max(90/cz,Math.min(180-90/cz,cy)); } } let sx=0,sy=0; if(sh.shake){ const m=typeof sh.shake==='function'?sh.shake(t,p):sh.shake; sx=(Math.random()-.5)*m; sy=(Math.random()-.5)*m; }
+    lg.setTransform(1,0,0,1,0,0); lg.globalAlpha=1; lg.globalCompositeOperation='source-over'; lg.fillStyle='#000'; lg.fillRect(0,0,640,640); lg.setTransform(1,0,0,1,OX,OY); try{ sh.low&&sh.low(lg,t,p); }catch(e){ console.error(e); } lg.setTransform(1,0,0,1,0,0); lg.globalAlpha=1;
+    const sw=W2/cz, shh=H2/cz; l2.fillStyle='#000'; l2.fillRect(0,0,W2,H2); l2.drawImage(wb,OX+cx-sw/2-sx/cz,OY+cy-shh/2-sy/cz,sw,shh,0,0,W2,H2);
+    o.setTransform(1,0,0,1,0,0); o.imageSmoothingEnabled=false; o.globalAlpha=1; o.globalCompositeOperation='source-over'; o.drawImage(low,0,0,cv2.width,cv2.height); o.setTransform(k*cz,0,0,k*cz,k*(160-cx*cz+sx),k*(90-cy*cz+sy)); o.imageSmoothingEnabled=true;
+    try{ sh.hd&&sh.hd(o,t,p); }catch(e){ console.error(e); } o.setTransform(k,0,0,k,0,0); o.globalAlpha=1; o.globalCompositeOperation='source-over';
+    try{ sh.ui&&sh.ui(o,t,p); }catch(e){ console.error(e); }
+    if(sh.grade){ o.save(); o.globalCompositeOperation=sh.grade[2]||'soft-light'; o.fillStyle='rgba('+sh.grade[0]+','+sh.grade[1]+')'; o.fillRect(0,0,W2,H2); o.restore(); }
+    if(sh.vig!==0) CK.vign(o,sh.vig||.42); if(sh.grain!==0){ o.save(); o.globalAlpha=.55; o.drawImage(grain[Math.floor(T2*24)%3],0,0,W2,H2); o.restore(); }
+    if(xf>0){ const tr=sh.tr||'cross'; if(tr==='cross'){ o.setTransform(1,0,0,1,0,0); o.globalAlpha=xf; o.drawImage(prev,0,0); o.globalAlpha=1; o.setTransform(k,0,0,k,0,0); } xf=Math.max(0,xf-dt*(1/(sh.xd||.9))); if(tr==='flash') CK.flash(o,xf); }
+    const fi=sh.fi===undefined?(i===0?.8:0):sh.fi, fo=sh.fo===undefined?(i===shots.length-1?.8:0):sh.fo, a=Math.max(t<fi?1-t/fi:0, t>sh.d-fo?(t-(sh.d-fo))/fo:0); if(a>0){ o.globalCompositeOperation='source-over'; o.fillStyle='rgba(0,0,0,'+Math.min(1,a)+')'; o.fillRect(0,0,W2,H2); }
+    o.fillStyle='#000'; const bh=18*bars; o.fillRect(0,0,W2,bh); o.fillRect(0,H2-bh,W2,bh);
+    raf=requestAnimationFrame(loop); }
+  return {play,busy:()=>busy,L};
+})();
+
+/* ---------- drawing kit (low-res 320×180, integer pixels) ---------- */
+const CK={
+  R:(g,x,y,w,h,c)=>{ g.fillStyle=c; g.fillRect(Math.round(x),Math.round(y),Math.round(w),Math.round(h)); },
+  disc(g,x,y,r,c){ g.fillStyle=c; for(let dy=-r;dy<=r;dy++){ const w=Math.round(Math.sqrt(r*r-dy*dy)); g.fillRect(Math.round(x-w),Math.round(y+dy),w*2+1,1); } },
+  ell(g,x,y,rx,ry,c){ g.fillStyle=c; for(let dy=-ry;dy<=ry;dy++){ const w=Math.round(rx*Math.sqrt(1-(dy*dy)/(ry*ry||1))); g.fillRect(Math.round(x-w),Math.round(y+dy),w*2+1,1); } },
+  sky(g,y0,y1,cols){ const n=cols.length-1; for(let y=y0;y<y1;y++){ const f=(y-y0)/(y1-y0)*n, i=Math.min(n-1,Math.floor(f)), u=f-i; const a=CK.hex(cols[i]), b=CK.hex(cols[i+1]); g.fillStyle='rgb('+Math.round(a[0]+(b[0]-a[0])*u)+','+Math.round(a[1]+(b[1]-a[1])*u)+','+Math.round(a[2]+(b[2]-a[2])*u)+')'; g.fillRect(0,y,320,1); } },
+  hex:h=>[parseInt(h.slice(1,3),16),parseInt(h.slice(3,5),16),parseInt(h.slice(5,7),16)],
+  hills(g,base,amp,fr,col,ph,w){ g.fillStyle=col; for(let x=0;x<(w||320);x++){ const h=amp*(.6+.4*Math.sin(x*fr+ph)+.25*Math.sin(x*fr*3.1+ph*2)); g.fillRect(x,Math.round(base-h),1,Math.round(h)+200); } },
+  rnd(seed){ let s=seed>>>0||1; return ()=>((s=(s*1664525+1013904223)>>>0)/4294967296); },
+  skyline(g,base,seed,col,win,off){ const r=CK.rnd(seed); let x=-((off||0)%40); while(x<330){ const w=12+r()*22, h=20+r()*50; CK.R(g,x,base-h,w,h+200,col); if(win) for(let yy=base-h+4;yy<base-4;yy+=6) for(let xx=x+3;xx<x+w-3;xx+=5) if(r()<.35) CK.R(g,xx,yy,2,3,win); x+=w+1; } },
+  stars(g,n,t,seed){ const r=CK.rnd(seed||7); for(let i=0;i<n;i++){ const x=r()*320, y=r()*90, a=.5+.5*Math.sin(t*2+i); g.globalAlpha=a; CK.R(g,x,y,1,1,'#fff'); } g.globalAlpha=1; },
+  sea(g,y0,cols,t,glit){ CK.sky(g,y0,180,cols); if(glit){ for(let i=0;i<60;i++){ const x=(i*53+t*20*(i%3+1))%330, y=y0+3+(i*17)%(180-y0-4); CK.R(g,x,y,3+(i%3),1,glit); } } },
+  rain(g,t,n,col){ g.fillStyle=col||'rgba(180,200,230,.6)'; for(let i=0;i<(n||120);i++){ const x=(i*37+t*60)%340-10, y=(i*91+t*420)%200-10; g.fillRect(Math.round(x),Math.round(y),1,4); } },
+  fig(g,x,y,h,col,o={}){ const hw=Math.max(2,Math.round(h*.12)); CK.R(g,x-hw,y-h*.62,hw*2,h*.42,col); CK.R(g,x-hw+1,y-h*.22,hw-1,h*.22,col); CK.R(g,x+1,y-h*.22,hw-1,h*.22,col); CK.disc(g,x,y-h*.75,Math.max(2,Math.round(h*.11)),o.head||col); if(o.hair) CK.R(g,x-hw,y-h*.88,hw*2,Math.max(2,h*.08),o.hair); if(o.long) CK.R(g,x-hw-1,y-h*.82,3,h*.4,o.hair||col); },
+  face(g,x,y,s,o){ const S=v=>Math.round(v*s); CK.R(g,x-S(9),y-S(11),S(18),S(22),o.skin); CK.R(g,x-S(9),y-S(11),S(3),S(22),o.skinD||o.skin); if(o.hair){ CK.R(g,x-S(11),y-S(15),S(22),S(7),o.hair); if(o.long){ CK.R(g,x-S(13),y-S(11),S(4),S(26),o.hair); CK.R(g,x+S(9),y-S(11),S(4),S(26),o.hair); } }
+    const bl=o.blink; CK.R(g,x-S(5),y-S(2),S(3),bl?1:S(3),o.eye||'#1a1a2a'); CK.R(g,x+S(2),y-S(2),S(3),bl?1:S(3),o.eye||'#1a1a2a'); if(!bl){ CK.R(g,x-S(5),y-S(2),1,1,'#fff'); CK.R(g,x+S(2),y-S(2),1,1,'#fff'); } if(o.beard) CK.R(g,x-S(8),y+S(4),S(16),S(9),o.beard); CK.R(g,x-S(3),y+S(6),S(6),1,o.mouth||'#8a3a3a'); if(o.tear) CK.R(g,x-S(5),y+S(1)+((o.tear*20)%S(8)),1,2,'#bfe8ff'); },
+  title(o,txt,y,size,col,a){ o.save(); o.globalAlpha=a===undefined?1:a; o.textAlign='center'; o.font='700 '+size+'px "EB Garamond", "Comfortaa", serif'; o.lineWidth=size/5; o.strokeStyle='rgba(0,0,0,.8)'; o.strokeText(txt,160,y); o.fillStyle=col||'#fff'; o.fillText(txt,160,y); o.restore(); },
+  glow(o,x,y,r,rgb,a){ const gr=o.createRadialGradient(x,y,0,x,y,r); gr.addColorStop(0,'rgba('+rgb+','+a+')'); gr.addColorStop(1,'rgba('+rgb+',0)'); o.save(); o.globalCompositeOperation='lighter'; o.fillStyle=gr; o.fillRect(x-r,y-r,r*2,r*2); o.restore(); },
+  beams(o,t,rgb,a,n){ o.save(); o.globalCompositeOperation='lighter'; for(let i=0;i<(n||6);i++){ const x=i*60-20+Math.sin(t*.5+i)*14, w=14+6*Math.sin(t+i); const gr=o.createLinearGradient(0,0,0,180); gr.addColorStop(0,'rgba('+rgb+','+a+')'); gr.addColorStop(1,'rgba('+rgb+',0)'); o.fillStyle=gr; o.beginPath(); o.moveTo(x,0); o.lineTo(x+w,0); o.lineTo(x+w+60,180); o.lineTo(x+30,180); o.fill(); } o.restore(); },
+  vign(o,a,rgb){ const gr=o.createRadialGradient(160,90,60,160,90,200); gr.addColorStop(0,'rgba('+(rgb||'0,0,0')+',0)'); gr.addColorStop(1,'rgba('+(rgb||'0,0,0')+','+a+')'); o.fillStyle=gr; o.fillRect(0,0,320,180); },
+  tint(o,rgb,a,mode){ o.save(); o.globalCompositeOperation=mode||'soft-light'; o.fillStyle='rgba('+rgb+','+a+')'; o.fillRect(0,0,320,180); o.restore(); },
+  flash(o,a){ if(a>0){ o.fillStyle='rgba(255,255,255,'+a+')'; o.fillRect(0,0,320,180); } },
+  portrait(g,id,x,y,s,talk,blink){ if(typeof PTD==='undefined'||!PTD[id]) return false; const c=CK._pc||(CK._pc=document.createElement('canvas')); c.width=42; c.height=42; const x2=c.getContext('2d'); x2.imageSmoothingEnabled=false; try{ PTD[id](x2,!!talk,!!blink); }catch(e){ return false; } g.imageSmoothingEnabled=false; g.drawImage(c,Math.round(x-21*s),Math.round(y-21*s),Math.round(42*s),Math.round(42*s)); return true; },
+  bokeh(o,t,n,rgb,a,seed){ const r=CK.rnd(seed||5); o.save(); o.globalCompositeOperation='lighter'; for(let i=0;i<n;i++){ const x=(r()*360+t*(4+r()*10))%360-20, y=r()*180+Math.sin(t*.7+i)*6, rr=3+r()*9; const gr=o.createRadialGradient(x,y,0,x,y,rr); gr.addColorStop(0,'rgba('+rgb+','+(a*(.5+.5*Math.sin(t*1.3+i)))+')'); gr.addColorStop(.7,'rgba('+rgb+','+(a*.3)+')'); gr.addColorStop(1,'rgba('+rgb+',0)'); o.fillStyle=gr; o.fillRect(x-rr,y-rr,rr*2,rr*2); } o.restore(); },
+  rim(o,x,y,w,h,rgb,a){ o.save(); o.globalCompositeOperation='lighter'; const gr=o.createLinearGradient(x,y,x+w,y); gr.addColorStop(0,'rgba('+rgb+','+a+')'); gr.addColorStop(.25,'rgba('+rgb+',0)'); o.fillStyle=gr; o.fillRect(x,y,w,h); o.restore(); },
+  card(o,txt,y,size,col,a,glow){ o.save(); o.globalAlpha=a===undefined?1:a; o.textAlign='center'; o.font='700 '+size+'px "EB Garamond","Comfortaa",serif'; if(glow){ o.shadowColor='rgba('+glow+',.9)'; o.shadowBlur=size*.8; } o.fillStyle=col||'#fff'; o.fillText(txt,160,y); o.shadowBlur=0; o.restore(); },
+};
+
+/* ---------- hooks: intro before New game · mid at a key point · ending before the end screen ---------- */
+function cineInstall(cfg){ const $$=id=>document.getElementById(id); let bypass=false;
+  document.addEventListener('click',e=>{ const b=e.target.closest&&e.target.closest('#tNew'); if(!b||bypass||CINE.busy()) return; e.stopImmediatePropagation(); e.preventDefault(); try{ if(typeof A!=='undefined'&&A.init) A.init(); }catch(_){}
+    CINE.play(cfg.intro,()=>{ bypass=true; b.click(); bypass=false; },cfg.introMood); },true);
+  setInterval(()=>{ if(CINE.busy()||typeof S==='undefined'||S.mode!=='play'||typeof F==='undefined'||!F||F.__cm) return; if(cfg.midWhen()){ F.__cm=1; CINE.play(cfg.mid,()=>{},cfg.midMood); } },300);
+  const end=$$('end'); if(end) new MutationObserver(()=>{ if(end.hidden||end.dataset.cine==='1'||end.classList.contains('over')) return; end.dataset.cine='1'; end.style.visibility='hidden';
+    CINE.play(cfg.ending(),()=>{ end.style.visibility=''; },cfg.endMood); }).observe(end,{attributes:true,attributeFilter:['hidden']});
+  const tn=$$('tNew'); if(tn) tn.addEventListener('click',()=>{ if(end) end.dataset.cine='0'; }); }
+
+(()=>{
+/* ===== cutscenes · Απογραφή · Λουκουμάς · Περιπολικό 7 · Κοκκινοσκουφίτσα ===== */
+const C=CK;
+function tower(g,x,base,h,col){ C.R(g,x-7,base-h,14,h,col); C.R(g,x-8,base-h-3,16,3,col); for(let i=0;i<3;i++) C.R(g,x-5+i*4,base-h+8,2,3,'#ffd890'); }
+function whiteHouses(g,base,seed,day){ const r=C.rnd(seed); for(let i=0;i<14;i++){ const x=150+i*12+r()*6, y=base-i%4*6-r()*10, w=10+r()*6; C.R(g,x,y-10,w,12,day?'#f4f0e8':'#c8c0c8'); C.R(g,x+2,y-7,2,3,day?'#3a7ad8':'#ffd890'); if(i%4===0) { C.disc(g,x+w/2,y-12,3,'#3a7ad8'); } } }
+function lightning(o,t,period){ const ph=t%period; return ph<.08||(ph>.18&&ph<.24)?.55:0; }
+function carSide(g,x,y,col,lights){ C.R(g,x,y-8,40,8,col); C.R(g,x+8,y-14,22,7,col); C.R(g,x+10,y-13,8,5,'#9ad0f0'); C.R(g,x+20,y-13,8,5,'#9ad0f0'); C.disc(g,x+8,y,4,'#1a1a1a'); C.disc(g,x+32,y,4,'#1a1a1a'); if(lights){ C.R(g,x+14,y-16,4,2,lights[0]); C.R(g,x+20,y-16,4,2,lights[1]); } }
+
+function CS_apografi(){ const rainSky=['#05070e','#0c1220','#141c30'];
+  return { introMood:'horror', midMood:'horror', endMood:'horror', midWhen:()=>S.scene==='dream',
+  intro:[
+    {d:6.5,cap:['Θεσσαλονίκη, 1987. Βρέχει τρεις μέρες χωρίς σταματημό.','Thessaloniki, 1987. It has rained for three days without stopping.'],
+     low(g,t){ C.sky(g,0,130,rainSky); C.skyline(g,128,3,'#0a0e18','#5a4a2a'); tower(g,60,128,44,'#0e1220'); C.sea(g,128,['#0a1222','#04070e'],t,'#2a3448'); C.rain(g,t,160); },
+     hd(o,t,p){ C.flash(o,lightning(o,t,3.2)); C.title(o,CINE.L(['ΑΠΟΓΡΑΦΗ','INVENTORY']),70,26,'#e8d8b8',Math.min(1,t/1.5)); C.vign(o,.6); }},
+    {d:5.5,cap:['Ο Λευτέρης Σταθάκης, δικαστικός εκτιμητής, είχε μια τελευταία δουλειά για σήμερα.','Lefteris Stathakis, a court appraiser, had one last job for the day.'],
+     low(g,t,p){ C.sky(g,0,100,rainSky); C.R(g,200,30,90,80,'#14121a'); C.R(g,236,70,18,40,'#0a080e'); for(const x of [212,268]) C.R(g,x,50,12,14,'#2a2418'); C.R(g,0,110,320,70,'#0c0e14'); for(let i=0;i<20;i++) C.R(g,i*17,140,10,1,'#2a3040'); const x=20+p*150; C.fig(g,x,150,34,'#08080c'); C.R(g,x-10,112,20,3,'#101018'); C.R(g,x,112,1,6,'#101018'); C.R(g,60,60,3,60,'#1a1a22'); C.rain(g,t,140); },
+     hd(o,t,p){ C.glow(o,61,62,40,'255,210,140',.4); C.glow(o,218,57,10,'255,200,120',.25); C.flash(o,lightning(o,t+1.3,4)); C.vign(o,.6); }},
+    {d:5.5,cap:['«Εντολή απογραφής. Οικία Σταθάκη.» Το ίδιο επώνυμο με το δικό του. Σύμπτωση, σκέφτηκε.','"Inventory order. Stathakis residence." The same surname as his own. A coincidence, he thought.'],
+     low(g,t,p){ C.R(g,0,0,320,180,'#1a140e'); const s=1+p*.12; g.save(); g.translate(160,90); g.scale(s,s); g.translate(-160,-90); C.R(g,90,30,140,120,'#e8dcc0'); C.R(g,90,30,140,14,'#d8c8a0'); for(let i=0;i<9;i++) C.R(g,102,56+i*9,90-(i%3)*20,2,'#6a5a4a'); C.R(g,180,128,40,10,'#8a2a2a'); C.R(g,70,120,40,30,'#c8a080'); g.restore(); },
+     hd(o){ C.glow(o,160,80,120,'255,220,160',.18); C.vign(o,.7); }},
+    {d:6,cap:['Μέσα, όλα ήταν σκεπασμένα με σεντόνια. Μόνο ένα πράγμα δεν είχε σκεπάσει κανείς: το ρολόι. Σταματημένο στις 3:17.','Inside, everything was covered in sheets. Only one thing had been left uncovered: the clock. Stopped at 3:17.'],
+     low(g,t,p){ C.R(g,0,0,320,180,'#0a0806'); const s=1+p*.35; g.save(); g.translate(160,80); g.scale(s,s); C.R(g,-26,-70,52,150,'#3a2414'); C.disc(g,0,-36,22,'#e8dcc0'); C.disc(g,0,-36,2,'#1a1a1a'); g.strokeStyle='#1a1a1a'; g.lineWidth=2; g.beginPath(); g.moveTo(0,-36); g.lineTo(0,-36-14); g.moveTo(0,-36); g.lineTo(Math.cos(1.5)*10,-36+Math.sin(1.5)*10*-.2+8); g.stroke(); for(let i=0;i<12;i++){ const a=i/12*6.28; C.R(g,Math.cos(a)*18-1,-36+Math.sin(a)*18-1,2,2,'#3a2a1a'); } C.R(g,-2,-8,4,40,'#a88040'); C.disc(g,0,34,7,'#c8a050'); g.restore(); },
+     hd(o,t){ C.glow(o,160,44,60,'255,200,120',.2); C.vign(o,.8); }},
+  ],
+  mid:[
+    {d:4.5,cap:['Το ρολόι χτυπάει. Μία… δύο… τρεις…','The clock strikes. One… two… three…'],low(g,t){ C.R(g,0,0,320,180,'#140404'); const a=Math.sin(t*3)*.6; g.save(); g.translate(160,10); g.rotate(a); C.R(g,-2,0,4,120,'#a88040'); C.disc(g,0,124,14,'#c8a050'); g.restore(); },hd(o,t){ C.tint(o,'200,20,20',.5,'multiply'); C.glow(o,160,120,80,'255,60,40',.25+.15*Math.sin(t*6)); C.vign(o,.85); }},
+    {d:4.5,cap:['Οι τοίχοι τεντώνονται. Ο διάδρομος δεν τελειώνει.','The walls stretch. The corridor never ends.'],low(g,t,p){ C.R(g,0,0,320,180,'#1a0606'); for(let i=0;i<14;i++){ const k=((i/14)+(t*.25))%1, s=Math.pow(k,2.2), w=320*s, h=180*s; g.strokeStyle=i%2?'#4a1010':'#2a0808'; g.lineWidth=Math.max(1,s*4); g.strokeRect(160-w/2,90-h/2,w,h); } },hd(o){ C.tint(o,'160,0,0',.35,'multiply'); C.vign(o,.9); }},
+    {d:4.5,cap:['Στο βάθος, κάποιος κρατάει ένα κερί. Τον περίμενε.','At the far end, someone holds a candle. Waiting for him.'],low(g,t){ C.R(g,0,0,320,180,'#0a0202'); C.fig(g,160,130,30,'#000'); },hd(o,t){ C.glow(o,163,96,30+4*Math.sin(t*9),'255,170,90',.6); C.vign(o,.9); }},
+  ],
+  ending:()=>[
+    {d:5.5,cap:['Το πρωί, η βροχή σταμάτησε. Για πρώτη φορά μετά από μέρες, ο ουρανός ρόδισε.','In the morning, the rain stopped. For the first time in days, the sky turned pink.'],low(g,t,p){ C.sky(g,0,130,['#3a3a6a','#c87a8a','#ffc8a0']); C.skyline(g,128,3,'#2a2030','#ffd890'); tower(g,60,128,44,'#2a2030'); C.sea(g,128,['#c88a9a','#4a3a5a'],t,'#ffe0c0'); },hd(o,t,p){ C.glow(o,250,124,90,'255,200,150',.4*p); }},
+    {d:5,cap:['Ο Λευτέρης κλείδωσε την πόρτα πίσω του. Η απογραφή είχε τελειώσει.','Lefteris locked the door behind him. The inventory was done.'],low(g,t,p){ C.sky(g,0,100,['#8a7aa8','#e8b8a8']); C.R(g,200,30,90,80,'#3a3040'); C.R(g,236,70,18,40,p>.3?'#1a141a':'#5a4a3a'); C.R(g,0,110,320,70,'#4a4450'); C.fig(g,236-p*160,150,34,'#1a1620'); }},
+    {d:6,cap:['Κάποια πράγματα δεν απογράφονται. Τα κουβαλάς μαζί σου.','Some things can\'t be inventoried. You carry them with you.'],low(g,t){ C.R(g,0,0,320,180,'#0a0806'); g.save(); g.translate(160,80); C.disc(g,0,0,40,'#e8dcc0'); g.strokeStyle='#1a1a1a'; g.lineWidth=3; const a=-1.57+t*.6; g.beginPath(); g.moveTo(0,0); g.lineTo(Math.cos(a)*30,Math.sin(a)*30); g.moveTo(0,0); g.lineTo(Math.cos(1.6)*18,Math.sin(1.6)*18); g.stroke(); g.restore(); },hd(o,t){ C.glow(o,160,80,90,'255,220,160',.25); C.title(o,CINE.L(['Τέλος','The End']),160,14,'#e8d8b8',Math.min(1,t/3)); C.vign(o,.7); }},
+  ]}; }
+
+function CS_loukoumas(){ return { introMood:'sunny', midMood:'sunny', endMood:'sunny', midWhen:()=>S.scene==='disco',
+  intro:[
+    {d:6,cap:['Αιγαίο, καλοκαίρι 1988.','The Aegean, summer 1988.'],low(g,t,p){ C.sky(g,0,100,['#3a98ff','#b2e2ff']); C.hills(g,100,26,.02,'#c8b890',1); whiteHouses(g,92,5,true); C.sea(g,100,['#2b8de8','#1a5ab8'],t,'#ffffff'); const x=-60+p*150; C.R(g,x,112,70,10,'#f4f4f4'); C.R(g,x+8,104,40,8,'#f4f4f4'); C.R(g,x+30,96,8,8,'#e8463a'); C.R(g,x,120,70,3,'#1a3a8a'); for(let i=0;i<3;i++){ const bx=60+i*70+Math.sin(t*2+i)*10, by=40+i*8+Math.sin(t*3+i)*4; C.R(g,bx-4,by,4,1,'#fff'); C.R(g,bx+1,by,4,1,'#fff'); } },
+     hd(o,t){ C.glow(o,262,26,50,'255,240,180',.6); C.title(o,CINE.L(['Ο Λουκουμάς στο Αλμυρίκι','Loukoumas on Almyriki']),64,18,'#ffd23f',Math.min(1,t/1.5)); }},
+    {d:6,cap:['Ο Τάκης Λουκουμάς, λογιστής, ήρθε για ήλιο, θάλασσα… και έρωτα.','Takis Loukoumas, accountant, came for sun, sea… and love.'],low(g,t,p){ C.sky(g,0,180,['#7ac8ff','#d8f0ff']); C.R(g,0,120,320,60,'#f4f4f4'); C.R(g,0,118,320,3,'#1a3a8a'); C.fig(g,150,150,46,'#3a3a46',{head:'#eab58c',hair:'#2a1a12'}); C.R(g,166,128,16,14,'#8a4a2a'); const sx=p<.5?200-p*80:160+(p-.5)*400, sy=p<.5?60+p*60:90-(p-.5)*160; C.R(g,sx-6,sy,6,2,'#fff'); C.R(g,sx+1,sy,6,2,'#fff'); C.R(g,sx,sy+1,3,3,'#fff'); if(p>.5) C.disc(g,sx+2,sy+6,3,'#d8a050'); else C.disc(g,142,126,3,'#d8a050'); }},
+    {d:5,cap:['Και το Σάββατο: ο μεγάλος διαγωνισμός χορού. Η Δανάη θα είναι εκεί.','And on Saturday: the big dance contest. Danae will be there.'],low(g,t,p){ C.R(g,0,0,320,180,'#f4f0e8'); g.save(); const s=1+p*.1; g.translate(160,90); g.scale(s,s); g.translate(-160,-90); C.R(g,90,20,140,140,'#e0338a'); C.R(g,100,30,120,120,'#ffd23f'); C.R(g,110,40,100,20,'#2b1d3a'); for(let i=0;i<5;i++){ C.disc(g,130+i*15,110,5+Math.sin(t*4+i)*2,['#e8463a','#3a7ad8','#3fae4a','#ff8a2a','#9a5ab8'][i]); } g.restore(); },hd(o,t){ C.title(o,CINE.L(['ΔΙΑΓΩΝΙΣΜΟΣ ΧΟΡΟΥ','DANCE CONTEST']),56,12,'#ffd23f',1); }},
+  ],
+  mid:[
+    {d:5,cap:['Ο ήλιος βούτηξε στη θάλασσα. Το Αλμυρίκι άναψε.','The sun dipped into the sea. Almyriki lit up.'],low(g,t,p){ const c=p<.5?['#ff8a4a','#ffc070']:['#1a1a4a','#5a3a7a']; C.sky(g,0,100,c); C.hills(g,100,26,.02,p<.5?'#8a6a5a':'#1a1a2a',1); whiteHouses(g,92,5,p<.5); C.sea(g,100,p<.5?['#e87a4a','#5a3a7a']:['#1a1a3a','#0a0a1a'],t,p<.5?'#ffd090':'#ffd890'); },hd(o,t,p){ if(p<.5) C.glow(o,250,98-p*40,40,'255,180,90',.6); else C.glow(o,230,80,60,'255,80,200',.3*Math.sin(t*6)+.3); }},
+    {d:5,cap:['Στη ντισκοτέκ, οι μπάλες-καθρέφτες γύρισαν. Ήρθε η ώρα.','At the disco, the mirror balls began to spin. It was time.'],low(g,t){ C.R(g,0,0,320,180,'#140a24'); for(let i=0;i<8;i++) for(let j=0;j<5;j++) C.R(g,40+i*30,110+j*14,28,12,['#e0338a','#3a7ad8','#ffd23f','#3fae4a'][(i+j+Math.floor(t*4))%4]); C.disc(g,160,30,12,'#c8c8d8'); },hd(o,t){ for(let i=0;i<6;i++){ const a=t*1.5+i; C.glow(o,160+Math.cos(a)*120,90+Math.sin(a*1.3)*50,30,['255,80,200','80,180,255','255,230,80'][i%3],.35); } C.glow(o,160,30,24,'255,255,255',.5); }},
+  ],
+  ending:()=>[
+    {d:6,cap:['Πυροτεχνήματα πάνω από τον κόλπο. Το νησί χειροκροτούσε.','Fireworks over the bay. The whole island was cheering.'],low(g,t){ C.sky(g,0,110,['#0a0a2a','#2a1a4a']); C.hills(g,110,24,.02,'#0a0a1a',1); whiteHouses(g,104,5,false); C.sea(g,110,['#1a1a3a','#05050f'],t,'#ffd890'); },hd(o,t){ for(let i=0;i<5;i++){ const ph=(t*.7+i*.37)%1, x=40+i*60, y=30+(i%2)*20; for(let k=0;k<12;k++){ const a=k/12*6.28; C.glow(o,x+Math.cos(a)*ph*30,y+Math.sin(a)*ph*30+ph*ph*10,5,['255,80,120','255,220,80','120,200,255'][i%3],(1-ph)*.8); } } }},
+    {d:6,cap:['Ο Τάκης κέρδισε τον διαγωνισμό. Και κάτι πολύ πιο σημαντικό.','Takis won the contest. And something far more important.'],low(g,t){ C.R(g,0,0,320,180,'#140a24'); for(let i=0;i<8;i++) for(let j=0;j<4;j++) C.R(g,40+i*30,124+j*14,28,12,['#e0338a','#3a7ad8','#ffd23f','#3fae4a'][(i+j+Math.floor(t*4))%4]); const b=Math.sin(t*6)*3; C.fig(g,145,124+b,50,'#2b1d3a',{head:'#eab58c',hair:'#2a1a12'}); C.fig(g,175,124-b,46,'#e0338a',{head:'#f0c8a0',hair:'#ffd23f',long:true}); },hd(o,t){ C.glow(o,160,30,30,'255,255,255',.4); C.glow(o,160,90,60,'255,120,200',.25); C.title(o,CINE.L(['Τέλος','The End']),40,16,'#ffd23f',Math.min(1,t/3)); }},
+  ]}; }
+
+function CS_peripoliko(){ return { introMood:'police', midMood:'police', endMood:'police', midWhen:()=>S.scene==='street',
+  intro:[
+    {d:6,cap:['Ακτή, 1989. Πέντε και μισή το πρωί.','Akti, 1989. Half past five in the morning.'],low(g,t,p){ C.sky(g,0,120,['#1a2a5a','#8a7aa8','#ffb08a']); C.skyline(g,120,9,'#2a2a4a','#ffe090'); C.R(g,0,120,320,60,'#4a4a5a'); C.R(g,110,70,100,50,'#5a6a8a'); C.R(g,110,66,100,6,'#3a4a6a'); C.R(g,140,74,40,8,'#f4f4f4'); C.R(g,150,96,20,24,'#2a3a5a'); },hd(o,t){ o.save(); o.font='700 6px sans-serif'; o.textAlign='center'; o.fillStyle='#1a2a6a'; o.fillText(CINE.L(['ΑΣΤΥΝΟΜΙΑ','POLICE']),160,80.5); o.restore(); C.title(o,CINE.L(['Περιπολικό 7','Patrol Car 7']),40,22,'#ffffff',Math.min(1,t/1.5)); C.glow(o,300,118,70,'255,190,130',.35); }},
+    {d:5.5,cap:['Η πρώτη βάρδια του αστυφύλακα Άρη Μαυρίδη.','Officer Aris Mavridis\'s first shift.'],low(g,t,p){ C.R(g,0,0,320,180,'#2a3a5a'); g.save(); g.translate(160,90); const s=1.2+p*.3; g.scale(s,s); C.disc(g,0,0,30,'#c8a040'); C.disc(g,0,0,24,'#e8c860'); C.R(g,-6,-12,12,24,'#1a2a6a'); C.R(g,-3,-6,6,3,'#ffffff'); g.restore(); },hd(o,t){ const x=(t*60)%400-40; C.glow(o,x,70,30,'255,255,255',.5); C.title(o,'7',100,22,'#ffffff',.9); }},
+    {d:5,cap:['Κανονισμός, υπομονή, ψυχραιμία. Και κανένα λάθος.','Regulations, patience, composure. And no mistakes.'],low(g,t,p){ C.R(g,0,0,320,180,'#1a1a22'); for(let i=0;i<6;i++){ C.R(g,30+i*45,40,40,110,i===3?'#5a6a7a':'#3a4a5a'); C.R(g,62+i*45,90,3,8,'#c8c8c8'); } C.R(g,0,150,320,30,'#2a2a30'); },hd(o,t){ const on=t>1&&(t>1.6||Math.sin(t*40)>0); if(on){ C.glow(o,160,10,140,'220,240,255',.35); } C.title(o,'7',70,10,'#ffffff',1); }},
+  ],
+  mid:[
+    {d:5.5,cap:['Περιπολικό 7, σε περιπολία. Το κέντρο ακούει.','Patrol Car 7, on patrol. Dispatch is listening.'],low(g,t,p){ C.sky(g,0,110,['#5a9ad8','#c8e0f0']); C.skyline(g,110,4,'#8a9ab8','#ffffff',t*30); C.R(g,0,110,320,70,'#4a4a52'); for(let i=0;i<10;i++) C.R(g,(i*40-t*120)%360+360-40,142,20,2,'#e8e8e8'); carSide(g,130,150,'#f4f4f4',['#ff3030','#3060ff']); C.R(g,130,144,40,2,'#1a3a8a'); },hd(o,t){ const a=Math.sin(t*12)>0; C.glow(o,146,134,30,a?'255,40,40':'40,80,255',.6); }},
+  ],
+  ending:()=>[
+    {d:6,cap:['Το περιπολικό γύρισε στο τμήμα με τη δύση του ήλιου.','The patrol car came back to the station at sunset.'],low(g,t){ C.sky(g,0,120,['#2a2a5a','#c86a6a','#ffb070']); C.skyline(g,120,9,'#2a2030','#ffe090'); C.R(g,0,120,320,60,'#3a3440'); C.R(g,110,70,100,50,'#4a4a6a'); carSide(g,40,150,'#e8e8e8'); },hd(o){ C.glow(o,260,118,80,'255,170,110',.4); }},
+    {d:6,cap:['Αναφορά υπογεγραμμένη. Ο κανονισμός τηρήθηκε. Τέλος βάρδιας.','Report signed. Regulations followed. End of shift.'],low(g,t,p){ C.R(g,0,0,320,180,'#3a2a1a'); C.R(g,90,30,140,120,'#f0e8d8'); for(let i=0;i<9;i++) C.R(g,104,46+i*9,100-(i%3)*18,2,'#4a4a5a'); if(p>.4){ g.save(); g.translate(190,128); g.rotate(-.2); C.R(g,-24,-8,48,16,'rgba(40,60,160,.75)'); g.restore(); } },hd(o,t){ C.title(o,CINE.L(['Τέλος βάρδιας','End of shift']),24,12,'#ffffff',Math.min(1,t/2)); }},
+  ]}; }
+
+function CS_kokkino(){ return { introMood:'tale', midMood:'tale', endMood:'tale', midWhen:()=>S.scene==='forest',
+  intro:[
+    {d:5.5,cap:['Μια φορά κι έναν καιρό…','Once upon a time…'],low(g,t,p){ C.R(g,0,0,320,180,'#8a5a3a'); for(let i=0;i<12;i++) C.R(g,0,i*16,320,1,'#7a4a2a'); const w=Math.max(4,140*(1-Math.max(0,p-.6)*2.5)); C.R(g,160-w/2-4,26,w+8,130,'#5a1a1a'); C.R(g,160-w/2,30,w,122,'#c8302a'); if(w>60) C.disc(g,160,80,22,'#e8e0d0'); },hd(o,t,p){ if(p<.6) C.title(o,CINE.L(['Η Κοκκινοσκουφίτσα','Little Red Riding Hood']),130,13,'#ffe8b0',1); C.glow(o,160,70,120,'255,220,160',.15); }},
+    {d:6,cap:['…ζούσε ένα κοριτσάκι που φορούσε πάντα μια κόκκινη κάπα.','…there lived a little girl who always wore a red cape.'],low(g,t,p){ C.sky(g,0,110,['#8fd5ff','#e2f6ff']); C.hills(g,110,20,.02,'#7ac860',2); C.R(g,0,110,320,70,'#86cc5c'); C.R(g,40,70,50,40,'#f4e8d0'); g.fillStyle='#c8302a'; g.beginPath(); g.moveTo(34,72); g.lineTo(65,48); g.lineTo(96,72); g.fill(); C.R(g,58,86,12,24,'#8a5a2a'); for(let i=0;i<14;i++) C.disc(g,(i*29)%320,130+(i*13)%40,2,['#ff6a8a','#ffe066','#ffffff'][i%3]); const x=120+p*80; C.fig(g,x,150,30,'#e0262f',{head:'#ffe3cf',hair:'#e0262f'}); },hd(o){ C.glow(o,280,30,60,'255,240,180',.5); }},
+    {d:5,cap:['Μια μέρα, η μαμά της είπε: «Η γιαγιά είναι άρρωστη. Πήγαινέ της κουλουράκια.»','One day, her mum said: "Grandma is poorly. Take her some cookies."'],low(g,t){ C.R(g,0,0,320,180,'#f4e8d0'); C.R(g,0,130,320,50,'#c98a4f'); C.fig(g,120,140,56,'#3fae6e',{head:'#ffe3cf',hair:'#8a4a2a'}); C.fig(g,190,140,34,'#e0262f',{head:'#ffe3cf',hair:'#e0262f'}); C.R(g,200,118,14,10,'#c8903a'); },hd(o){ C.glow(o,160,60,100,'255,220,160',.2); }},
+  ],
+  mid:[
+    {d:5,cap:['Το δάσος ήταν μεγάλο και πράσινο, γεμάτο πουλάκια και πεταλούδες.','The forest was big and green, full of birds and butterflies.'],low(g,t){ C.R(g,0,0,320,180,'#3a7a4a'); for(let i=0;i<9;i++){ C.R(g,i*38,20,12,160,'#5a3a2a'); C.disc(g,i*38+6,30,26,'#2f6a3a'); } C.R(g,0,140,320,40,'#5a9a4a'); for(let i=0;i<4;i++){ const x=(i*80+t*30)%340, y=100+Math.sin(t*3+i)*10; C.R(g,x,y,3,2,'#ffe066'); C.R(g,x+3,y-1,2,4,'#ff8ab0'); } },hd(o,t){ C.beams(o,t,'255,240,170',.18,6); }},
+    {d:5,cap:['Μα πίσω από έναν θάμνο, δύο κίτρινα μάτια παρακολουθούσαν… Ποιος να ’ναι άραγε;','But behind a bush, two yellow eyes were watching… Who could it be?'],low(g,t){ C.R(g,0,0,320,180,'#1a3a2a'); C.ell(g,160,110,90,40,'#2a5a3a'); C.ell(g,140,100,60,30,'#346a44'); const bl=(t%2.4)<.15; C.R(g,140,96,8,bl?1:6,'#ffd23f'); C.R(g,166,96,8,bl?1:6,'#ffd23f'); if(!bl){ C.R(g,143,98,2,3,'#1a1a1a'); C.R(g,169,98,2,3,'#1a1a1a'); } },hd(o){ C.glow(o,157,99,30,'255,220,80',.25); C.vign(o,.6); }},
+  ],
+  ending:()=>[
+    {d:6,cap:['Και όλοι μαζί έκαναν ένα μεγάλο πάρτι στο σπιτάκι της γιαγιάς!','And they all had a big party at Grandma\'s cottage!'],low(g,t){ C.R(g,0,0,320,180,'#f4d8b0'); C.R(g,0,130,320,50,'#c98a4f'); const b=Math.sin(t*6)*3; C.fig(g,90,150+b,30,'#e0262f',{head:'#ffe3cf',hair:'#e0262f'}); C.fig(g,140,150-b,46,'#9a5ab8',{head:'#ffe3cf',hair:'#e8e8e8'}); C.fig(g,195,150+b,56,'#7a5a2a',{head:'#ffe3cf',hair:'#7a4a2a'}); C.fig(g,250,150-b,44,'#8a8a9a',{head:'#9a9aaa'}); for(let i=0;i<40;i++){ const x=(i*29+t*30*(i%3+1))%320, y=(i*47+t*60)%180; C.R(g,x,y,2,2,['#e0262f','#ffd23f','#3fae6e','#4aa8ff'][i%4]); } },hd(o){ C.glow(o,160,40,100,'255,230,160',.3); }},
+    {d:5,cap:['Και ο λύκος; Έμαθε να ζητάει συγγνώμη. Και να τρώει κουλουράκια.','And the wolf? He learned to say sorry. And to eat cookies.'],low(g,t,p){ C.R(g,0,0,320,180,'#8a5a3a'); const w=Math.max(4,140*Math.min(1,p*1.6)); C.R(g,160-w/2-4,26,w+8,130,'#5a1a1a'); C.R(g,160-w/2,30,w,122,'#c8302a'); },hd(o,t,p){ if(p>.5) C.title(o,CINE.L(['Τέλος','The End']),96,18,'#ffe8b0',Math.min(1,(p-.5)*3)); }},
+  ]}; }
+
+cineInstall(CS_apografi());
+})();
+</script>
+</body>
+</html>

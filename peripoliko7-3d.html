@@ -1,0 +1,1187 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<meta name="theme-color" content="#000000">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<title>Περιπολικό 7 · point & click</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fira+Mono:wght@500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+  --ink:#2b1d3a; --paper:#fffbe8; --pink:#e0338a; --sun:#ffd23f; --sea:#1f74d0; --line:rgba(43,29,58,.9); --bg:#2b1d3a;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){ --ink:#2b1d3a; --paper:#fffbe8; --bg:#2b1d3a; } }
+:root[data-theme="dark"]{ --ink:#2b1d3a; --paper:#fffbe8; --bg:#2b1d3a; }
+html{scroll-padding-top:env(safe-area-inset-top,0px);}
+html,body{height:100%;margin:0;background:var(--bg);overflow:hidden;}
+body{box-sizing:border-box;padding-left:env(safe-area-inset-left,0px);padding-right:env(safe-area-inset-right,0px);
+  touch-action:none;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;-webkit-tap-highlight-color:transparent;
+  font-family:'Comfortaa','Trebuchet MS','Verdana',sans-serif;font-weight:700;color:var(--ink);}
+#wrap{width:100%;height:100%;display:flex;align-items:center;justify-content:center;}
+#stage{position:relative;overflow:hidden;background:#000;--u:2px;--ts:1;}
+#cv{position:absolute;inset:0;width:100%;height:100%;image-rendering:pixelated;image-rendering:crisp-edges;}
+button{font:inherit;color:inherit;-webkit-appearance:none;appearance:none;cursor:pointer;}
+button:focus-visible{outline:2px solid var(--pink);outline-offset:2px;}
+
+#score{position:absolute;left:50%;top:calc(var(--u)*5);transform:translateX(-50%);background:var(--ink);color:var(--sun);
+  padding:calc(var(--u)*1.6) calc(var(--u)*6);border-radius:99px;font-size:calc(var(--u)*5.6*var(--ts));white-space:nowrap;pointer-events:none;}
+#score.bump{animation:bump .5s ease;}
+@keyframes bump{30%{transform:translateX(-50%) scale(1.25);background:var(--pink);color:#fff;}}
+
+#dlg{position:absolute;left:50%;top:calc(var(--u)*18);transform:translateX(-50%);width:min(94%,calc(68% + (var(--ts) - 1) * 46%));
+  max-height:calc(100% - var(--u)*56);overflow-y:auto;background:var(--paper);border:calc(var(--u)*1.2) solid var(--ink);
+  box-shadow:0 0 0 calc(var(--u)*1.2) var(--pink),calc(var(--u)*2) calc(var(--u)*3) 0 calc(var(--u)*1.2) rgba(43,29,58,.45);
+  padding:calc(var(--u)*5) calc(var(--u)*8) calc(var(--u)*6);text-align:center;border-radius:calc(var(--u)*2);}
+#dlg[hidden]{display:none;}
+#dlg:not([hidden]){animation:dlgIn .18s ease-out;}
+@keyframes dlgIn{from{opacity:0;transform:translateX(-50%) translateY(calc(var(--u)*-4)) scale(.96);}}
+#dlgText{margin:0;font-size:calc(var(--u)*7*var(--ts));line-height:1.45;min-height:1.45em;text-wrap:pretty;}
+#dlgOpts{display:flex;flex-direction:column;gap:calc(var(--u)*2.5);margin-top:calc(var(--u)*5);}
+#dlgOpts:empty{display:none;}
+#dlgOpts button{background:#fff;border:calc(var(--u)*.8) solid var(--ink);border-radius:calc(var(--u)*2);padding:calc(var(--u)*2.5) calc(var(--u)*4);font-size:calc(var(--u)*6.4*var(--ts));}
+#dlgOpts button:active{background:var(--sun);}
+#dlg.pt{display:flex;align-items:center;gap:calc(var(--u)*6);text-align:left;width:min(96%,calc(82% + (var(--ts) - 1) * 36%));padding-left:calc(var(--u)*5);}
+#pt{display:none;flex:none;flex-direction:column;align-items:center;gap:calc(var(--u)*1.6);}
+#dlg.pt #pt{display:flex;}
+#ptc{width:calc(var(--u)*42);height:calc(var(--u)*42);image-rendering:pixelated;image-rendering:crisp-edges;border:calc(var(--u)*1) solid var(--ink);border-radius:calc(var(--u)*1.5);box-shadow:0 0 0 calc(var(--u)*.9) var(--pink);background:#fff;}
+#ptn{font-size:calc(var(--u)*5*var(--ts));background:var(--ink);color:var(--sun);border-radius:99px;padding:calc(var(--u)*.6) calc(var(--u)*3.4);white-space:nowrap;max-width:calc(var(--u)*56);overflow:hidden;text-overflow:ellipsis;}
+#dlgBody{flex:1;min-width:0;}
+#more{position:absolute;right:calc(var(--u)*4);bottom:calc(var(--u)*1.5);font-size:calc(var(--u)*5);color:var(--pink);animation:bob 1s ease-in-out infinite;}
+@keyframes bob{50%{transform:translateY(2px);}}
+
+#whisper{position:absolute;left:0;right:0;top:40%;text-align:center;font-size:calc(var(--u)*12*var(--ts));color:var(--sun);
+  -webkit-text-stroke:calc(var(--u)*.6) var(--ink);text-shadow:calc(var(--u)*1.5) calc(var(--u)*1.5) 0 var(--pink);opacity:0;transition:opacity .4s, transform .4s;transform:scale(.8);pointer-events:none;}
+#whisper.show{opacity:1;transform:scale(1);}
+
+#hint{position:absolute;left:50%;bottom:calc(var(--u)*6);transform:translateX(-50%);max-width:calc(44% + (var(--ts) - 1) * 10%);text-align:center;
+  font-size:calc(var(--u)*6*var(--ts));background:var(--paper);border:calc(var(--u)*.8) solid var(--ink);border-radius:99px;padding:calc(var(--u)*1.4) calc(var(--u)*5);
+  pointer-events:none;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+#hint:empty{display:none;}
+#tip{position:absolute;left:50%;bottom:calc(var(--u)*20);transform:translateX(-50%);width:min(80%,calc(52% + (var(--ts) - 1) * 40%));text-align:center;
+  font-size:calc(var(--u)*5.6*var(--ts));color:#fff;text-shadow:0 0 calc(var(--u)*2) var(--ink),0 0 calc(var(--u)*1) var(--ink);pointer-events:none;transition:opacity .6s;opacity:0;}
+#tip.show{opacity:1;}
+
+.ctl{position:absolute;width:calc(var(--u)*30);height:calc(var(--u)*30);border-radius:50%;background:rgba(255,251,232,.78);
+  border:calc(var(--u)*1) solid var(--ink);display:flex;align-items:center;justify-content:center;padding:0;touch-action:none;
+  box-shadow:calc(var(--u)*1) calc(var(--u)*1.5) 0 rgba(43,29,58,.5);}
+.ctl svg{width:44%;height:44%;fill:none;stroke:var(--ink);stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round;}
+.ctl.held{background:var(--sun);transform:translateY(1px);}
+.ctl b{font-size:calc(var(--u)*12);line-height:1;}
+#bL{left:calc(var(--u)*6);bottom:calc(var(--u)*6);}
+#bR{left:calc(var(--u)*40);bottom:calc(var(--u)*6);}
+#bA{right:calc(var(--u)*6);bottom:calc(var(--u)*6);width:calc(var(--u)*34);height:calc(var(--u)*34);background:rgba(255,210,63,.7);}
+#bA.live{background:var(--sun);}
+#bB{right:calc(var(--u)*44);bottom:calc(var(--u)*24);width:calc(var(--u)*26);height:calc(var(--u)*26);background:rgba(224,51,138,.75);color:#fff;}
+#bB b{font-size:calc(var(--u)*10);}
+#bInv{right:calc(var(--u)*6);top:calc(var(--u)*5);width:calc(var(--u)*24);height:calc(var(--u)*24);}
+#bMenu{left:calc(var(--u)*6);top:calc(var(--u)*5);width:calc(var(--u)*22);height:calc(var(--u)*22);}
+#sel{position:absolute;right:calc(var(--u)*6);bottom:calc(var(--u)*46);max-width:42%;display:flex;align-items:center;gap:calc(var(--u)*3);
+  padding:calc(var(--u)*1.6) calc(var(--u)*5) calc(var(--u)*1.6) calc(var(--u)*2);font-size:calc(var(--u)*6*var(--ts));white-space:nowrap;
+  background:var(--paper);border:calc(var(--u)*.9) solid var(--pink);border-radius:calc(var(--u)*3);}
+#sel[hidden]{display:none;}
+#sel canvas{width:calc(var(--u)*14);height:calc(var(--u)*14);flex:none;image-rendering:pixelated;}
+#sel span{overflow:hidden;text-overflow:ellipsis;}
+#sel.pop{animation:pop .25s ease;}
+@keyframes pop{0%{transform:scale(.8)}100%{transform:none}}
+
+#inv{position:absolute;left:0;right:0;top:0;padding:calc(var(--u)*7) calc(var(--u)*36) calc(var(--u)*6);background:var(--paper);
+  border-bottom:calc(var(--u)*1.2) solid var(--ink);box-shadow:0 calc(var(--u)*1.2) 0 var(--pink);}
+#inv[hidden]{display:none;}
+#slots{display:flex;gap:calc(var(--u)*3);flex-wrap:wrap;justify-content:center;min-height:calc(var(--u)*22);}
+.slot{width:calc(var(--u)*22);height:calc(var(--u)*22);padding:calc(var(--u)*3);background:#fff;border:calc(var(--u)*.8) solid var(--ink);border-radius:calc(var(--u)*2);}
+.slot.on{background:var(--sun);border-color:var(--pink);}
+.slot canvas{width:100%;height:100%;image-rendering:pixelated;display:block;}
+#invBar{display:flex;align-items:center;justify-content:center;gap:calc(var(--u)*5);margin-top:calc(var(--u)*4);flex-wrap:wrap;}
+#invCap{font-size:calc(var(--u)*6.2*var(--ts));min-height:1.3em;text-align:center;}
+#invBar button{background:#fff;border:calc(var(--u)*.8) solid var(--ink);border-radius:99px;padding:calc(var(--u)*1.5) calc(var(--u)*6);font-size:calc(var(--u)*5.8*var(--ts));}
+#invBar button:disabled{opacity:.35;}
+
+#menu{position:absolute;left:calc(var(--u)*6);top:calc(var(--u)*30);display:flex;flex-direction:column;gap:calc(var(--u)*2);}
+#menu[hidden]{display:none;}
+#menu button{background:var(--paper);border:calc(var(--u)*.8) solid var(--ink);border-radius:calc(var(--u)*2);padding:calc(var(--u)*2.5) calc(var(--u)*7);font-size:calc(var(--u)*6.2*var(--ts));text-align:left;}
+
+.screen{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:flex-end;padding:0 calc(var(--u)*16) calc(var(--u)*12);
+  background:linear-gradient(90deg,rgba(43,29,58,.72) 0%,rgba(43,29,58,.3) 55%,rgba(43,29,58,0) 80%);color:#fff;}
+.screen[hidden]{display:none;}
+#title h1{margin:0;font-weight:700;font-size:calc(var(--u)*20);line-height:1;color:var(--sun);
+  -webkit-text-stroke:calc(var(--u)*.7) var(--ink);text-shadow:calc(var(--u)*2.5) calc(var(--u)*2.5) 0 var(--pink);letter-spacing:-.01em;}
+#title h1 b{font-weight:700;display:inline-block;}
+#title h1 .v2{display:inline-block;vertical-align:top;margin-left:calc(var(--u)*3);font-style:normal;font-size:calc(var(--u)*7);background:var(--pink);color:#fff;-webkit-text-stroke:0;text-shadow:none;border:calc(var(--u)*.8) solid var(--ink);border-radius:99px;padding:calc(var(--u)*1) calc(var(--u)*4);transform:rotate(-8deg);}
+#title h1 span{display:block;font-size:calc(var(--u)*9);color:#fff;-webkit-text-stroke:0;text-shadow:calc(var(--u)*1.5) calc(var(--u)*1.5) 0 var(--ink);margin-top:calc(var(--u)*3);}
+#title nav{display:flex;flex-direction:column;align-items:flex-start;gap:calc(var(--u)*3);margin-top:calc(var(--u)*8);}
+#title nav button{background:var(--paper);color:var(--ink);border:calc(var(--u)*.9) solid var(--ink);border-radius:99px;padding:calc(var(--u)*2) calc(var(--u)*9);
+  font-size:calc(var(--u)*7.4*var(--ts));box-shadow:calc(var(--u)*1.5) calc(var(--u)*1.5) 0 var(--pink);}
+#title nav button:active{transform:translate(1px,1px);box-shadow:none;}
+#title nav button[hidden]{display:none;}
+#title small{font-size:calc(var(--u)*5*var(--ts));margin-top:calc(var(--u)*6);opacity:.9;}
+#end{background:linear-gradient(#ff8a3d,#e0338a 60%,#6b2a8a);justify-content:center;align-items:center;text-align:center;padding:calc(var(--u)*10) calc(16% - (var(--ts) - 1) * 16%);overflow-y:auto;}
+#end h2{margin:0 0 calc(var(--u)*6);font-size:calc(var(--u)*18);color:var(--sun);-webkit-text-stroke:calc(var(--u)*.7) var(--ink);text-shadow:calc(var(--u)*2.5) calc(var(--u)*2.5) 0 var(--ink);}
+#end p{font-size:calc(var(--u)*7*var(--ts));line-height:1.5;margin:0 0 calc(var(--u)*3.5);opacity:0;animation:rise 1.4s ease forwards;text-shadow:0 calc(var(--u)*.6) 0 rgba(43,29,58,.6);}
+#end button{margin-top:calc(var(--u)*5);background:var(--paper);color:var(--ink);border:calc(var(--u)*.9) solid var(--ink);border-radius:99px;padding:calc(var(--u)*2) calc(var(--u)*9);
+  font-size:calc(var(--u)*6.6*var(--ts));opacity:0;animation:rise 1.4s ease forwards;}
+@keyframes rise{to{opacity:1;}}
+
+#settings{position:absolute;inset:0;background:var(--paper);display:flex;flex-direction:column;justify-content:center;padding:0 12%;gap:calc(var(--u)*4);z-index:5;}
+#settings[hidden]{display:none;}
+#settings h3{margin:0;font-size:calc(var(--u)*13);color:var(--pink);}
+#settings .lab{margin:0;font-size:calc(var(--u)*6);opacity:.75;}
+#tsRow,#lgRow,#ptRow,#fxRow{display:flex;gap:calc(var(--u)*3);}
+#tsRow button,#lgRow button,#ptRow button,#fxRow button{flex:1;background:#fff;border:calc(var(--u)*.8) solid var(--ink);border-radius:calc(var(--u)*2);padding:calc(var(--u)*2.5) 0;line-height:1;}
+#tsRow button[aria-pressed="true"],#lgRow button[aria-pressed="true"],#ptRow button[aria-pressed="true"],#fxRow button[aria-pressed="true"]{background:var(--sun);border-color:var(--pink);}
+#tsPrev{margin:0;font-size:calc(var(--u)*7*var(--ts));line-height:1.4;min-height:2.8em;}
+#settings .row{display:flex;gap:calc(var(--u)*3);flex-wrap:wrap;}
+#settings .row button{background:#fff;border:calc(var(--u)*.8) solid var(--ink);border-radius:99px;padding:calc(var(--u)*2.5) calc(var(--u)*8);font-size:calc(var(--u)*6.4);}
+
+#rotate{position:fixed;inset:0;background:var(--bg);color:var(--sun);display:none;flex-direction:column;align-items:center;justify-content:center;gap:24px;
+  font-size:20px;text-align:center;padding:0 12%;z-index:9;}
+#rotate i{display:block;width:34px;height:58px;border:3px solid var(--sun);border-radius:7px;animation:turn 2.4s ease-in-out infinite;}
+@keyframes turn{0%,30%{transform:rotate(0)}60%,100%{transform:rotate(-90deg)}}
+@media (orientation:portrait) and (max-width:900px){#rotate{display:flex;}}
+@media (prefers-reduced-motion:reduce){#more,#rotate i{animation:none;}}
+
+[hidden]{display:none!important;}
+</style>
+<style>
+#vbar{position:absolute;left:0;right:0;top:0;height:calc(var(--u)*24);display:flex;align-items:center;gap:calc(var(--u)*2.5);padding:0 calc(var(--u)*4);
+  background:linear-gradient(#4a3a6a,#2b1d3a);border-bottom:calc(var(--u)*1) solid var(--sun);box-shadow:0 calc(var(--u)*1) 0 rgba(0,0,0,.35);z-index:2;}
+#vbar[hidden]{display:none;}
+.vb{width:calc(var(--u)*24);height:calc(var(--u)*20);flex:none;background:#5a4a7a;border:calc(var(--u)*.8) solid #140a24;border-radius:calc(var(--u)*2);
+  box-shadow:inset 0 calc(var(--u)*1) 0 rgba(255,255,255,.18),inset 0 calc(var(--u)*-1) 0 rgba(0,0,0,.3);padding:calc(var(--u)*1.6) calc(var(--u)*3);display:flex;align-items:center;justify-content:center;}
+.vb canvas{width:100%;height:100%;image-rendering:pixelated;image-rendering:crisp-edges;display:block;}
+.vb.on{background:var(--sun);box-shadow:inset 0 calc(var(--u)*-1) 0 rgba(0,0,0,.25),0 0 0 calc(var(--u)*.8) #fff;}
+.vb:disabled{opacity:.35;}
+.vb:active{transform:translateY(1px);}
+#vbar .sep{width:calc(var(--u)*.8);height:calc(var(--u)*16);background:rgba(255,255,255,.18);flex:none;}
+#score{flex:1;text-align:center;color:var(--sun);font-size:calc(var(--u)*6.2*var(--ts));white-space:nowrap;position:static;transform:none;background:none;padding:0;}
+#score.bump{animation:sbump .6s ease;}
+@keyframes sbump{30%{color:#fff;transform:scale(1.2);}}
+#hover{position:absolute;transform:translate(-50%,calc(var(--u)*10));background:rgba(43,29,58,.88);color:var(--sun);font-size:calc(var(--u)*5.4*var(--ts));padding:calc(var(--u)*1) calc(var(--u)*4);border-radius:99px;pointer-events:none;white-space:nowrap;z-index:1;}
+#hover[hidden]{display:none;}
+#hint{position:absolute;left:50%;top:calc(var(--u)*28);bottom:auto;transform:translateX(-50%);background:var(--paper);border:calc(var(--u)*.8) solid var(--ink);border-radius:99px;padding:calc(var(--u)*1.2) calc(var(--u)*5);
+  font-size:calc(var(--u)*5.6*var(--ts));opacity:0;transition:opacity .25s;pointer-events:none;white-space:nowrap;max-width:none;}
+#hint.show{opacity:1;}
+#cv{cursor:none;}
+@media (hover:none){#cv{cursor:auto;}}
+#dlg{top:calc(var(--u)*34);}
+#inv{top:calc(var(--u)*24);}
+#menu{top:calc(var(--u)*28);left:auto;right:calc(var(--u)*4);}
+#tip{bottom:calc(var(--u)*8);}
+#title h1 .v2{display:inline-block;vertical-align:top;margin-left:calc(var(--u)*3);font-style:normal;font-size:calc(var(--u)*6);background:var(--pink);color:#fff;-webkit-text-stroke:0;text-shadow:none;border:calc(var(--u)*.8) solid var(--ink);border-radius:99px;padding:calc(var(--u)*1) calc(var(--u)*4);transform:rotate(-8deg);}
+#title h1 b{display:inline-block;}
+</style>
+<style>
+#dlg.pt{}
+#fxRow{display:flex;gap:calc(var(--u)*3);}
+#fxRow button{flex:1;background:#fff;border:calc(var(--u)*.8) solid var(--ink);border-radius:calc(var(--u)*2);padding:calc(var(--u)*2.5) 0;line-height:1;}
+#fxRow button[aria-pressed="true"]{background:var(--sun);border-color:var(--pink);}
+
+:root{--ink:#000000;--paper:#ffffff;--pink:#0000aa;--sun:#ffff55;}
+body{font-family:'Fira Mono','Courier New',monospace;font-weight:500;}
+#vbar{background:#0000aa;border-bottom:calc(var(--u)*.8) solid #ffff55;}
+.vb{background:#aaaaaa;border-color:#000;border-radius:0;box-shadow:inset calc(var(--u)*-1) calc(var(--u)*-1) 0 rgba(0,0,0,.35);}
+.vb.on{background:#ffff55;}
+#score{color:#ffffff;}
+#dlg{background:#fff;border:calc(var(--u)*1) solid #0000aa;box-shadow:inset 0 0 0 calc(var(--u)*1) #fff,inset 0 0 0 calc(var(--u)*1.8) #0000aa;border-radius:0;text-align:left;}
+#dlgText{font-size:calc(var(--u)*6.4*var(--ts));}
+#dlgOpts button{background:#aaaaaa;border:calc(var(--u)*.6) solid #000;border-radius:0;box-shadow:none;text-align:left;font-size:calc(var(--u)*6*var(--ts));}
+#hint,#hover{background:#000;color:#fff;border:0;border-radius:0;}
+#tip{background:rgba(0,0,170,.85);color:#fff;text-shadow:none;}
+#inv{background:#aaaaaa;border-bottom:calc(var(--u)*1) solid #000;box-shadow:none;}
+.slot{border-radius:0;} .slot.on{background:#ffff55;}
+#invBar button,#menu button{border-radius:0;}
+#settings{background:#aaaaaa;} #settings h3{color:#0000aa;}
+#tsRow button,#lgRow button,#fxRow button,#settings .row button{border-radius:0;}
+.screen{background:linear-gradient(90deg,rgba(0,0,170,.88) 0%,rgba(0,0,170,.45) 55%,rgba(0,0,170,0) 82%);color:#fff;}
+#title h1{color:#ffff55;-webkit-text-stroke:0;text-shadow:calc(var(--u)*2) calc(var(--u)*2) 0 #000;font-size:calc(var(--u)*20);}
+#title h1 span{color:#55ffff;text-shadow:calc(var(--u)*1) calc(var(--u)*1) 0 #000;font-size:calc(var(--u)*7);}
+#title h1 .v2{background:#aa0000;border-color:#000;border-radius:0;transform:none;}
+#title nav button{background:#aaaaaa;color:#000;border:calc(var(--u)*.8) solid #000;border-radius:0;box-shadow:calc(var(--u)*1.5) calc(var(--u)*1.5) 0 #000;}
+#end{background:#0000aa;color:#fff;} #end.over{background:#aa0000;}
+#end h2{color:#ffff55;-webkit-text-stroke:0;text-shadow:calc(var(--u)*1.5) calc(var(--u)*1.5) 0 #000;}
+#end button{background:#aaaaaa;color:#000;border:calc(var(--u)*.8) solid #000;border-radius:0;box-shadow:calc(var(--u)*1.5) calc(var(--u)*1.5) 0 #000;margin:calc(var(--u)*2);}
+#end button[hidden]{display:none;}
+
+</style>
+</head>
+<body>
+<div id="wrap">
+<div id="stage">
+  <canvas id="cv" width="320" height="180"></canvas>
+  <div id="hover" hidden></div>
+  <div id="whisper"></div>
+  <div id="hint"></div>
+  <div id="tip"></div>
+  <div id="vbar" hidden>
+    <button class="vb on" data-v="walk" data-i18n-label="Περπάτα" aria-label="Περπάτα"><canvas width="16" height="16" data-icon="walk"></canvas></button>
+    <button class="vb" data-v="look" data-i18n-label="Κοίτα" aria-label="Κοίτα"><canvas width="16" height="16" data-icon="look"></canvas></button>
+    <button class="vb" data-v="hand" data-i18n-label="Πάρε / Χρησιμοποίησε" aria-label="Πάρε / Χρησιμοποίησε"><canvas width="16" height="16" data-icon="hand"></canvas></button>
+    <button class="vb" data-v="talk" data-i18n-label="Μίλα" aria-label="Μίλα"><canvas width="16" height="16" data-icon="talk"></canvas></button>
+    <button class="vb" data-v="item" id="vItemB" disabled data-i18n-label="Χρησιμοποίησε αντικείμενο" aria-label="Χρησιμοποίησε αντικείμενο"><canvas width="16" height="16" id="vItem"></canvas></button>
+    <span class="sep"></span>
+    <div id="score"></div>
+    <button class="vb" id="bInv" data-i18n-label="Αντικείμενα" aria-label="Αντικείμενα"><canvas width="16" height="16" data-icon="bag"></canvas></button>
+    <button class="vb" id="bMenu" data-i18n-label="Μενού" aria-label="Μενού"><canvas width="16" height="16" data-icon="menu"></canvas></button>
+  </div>
+  <div id="menu" hidden>
+    <button id="mSet" data-i18n="Ρυθμίσεις">Ρυθμίσεις</button>
+    <button id="mTitle" data-i18n="Στην αρχική">Στην αρχική</button>
+  </div>
+  <div id="inv" hidden>
+    <div id="slots"></div>
+    <div id="invBar">
+      <div id="invCap"></div>
+      <button id="bExam" disabled data-i18n="Εξέταση">Εξέταση</button>
+      <button id="bClose" data-i18n="Κλείσιμο">Κλείσιμο</button>
+    </div>
+  </div>
+  <div id="dlg" hidden><div id="pt"><canvas id="ptc" width="42" height="42"></canvas><span id="ptn"></span></div><div id="dlgBody"><p id="dlgText"></p><div id="dlgOpts"></div></div><span id="more">▼</span></div>
+
+  <div class="screen" id="title">
+    <h1><b data-i18n="Περιπολικό 7">Περιπολικό 7</b><em class="v2">point &amp; click</em><span data-i18n="Πρώτη βάρδια στην Ακτή, 1989">Πρώτη βάρδια στην Ακτή, 1989</span></h1>
+    <nav>
+      <button id="tNew" data-i18n="Νέο παιχνίδι">Νέο παιχνίδι</button>
+      <button id="tCont" hidden data-i18n="Συνέχεια">Συνέχεια</button>
+      <button id="tSet" data-i18n="Ρυθμίσεις">Ρυθμίσεις</button>
+    </nav>
+    <small data-i18n="Ακολούθησε τον κανονισμό. Ο κανονισμός σε κρατάει ζωντανό.">Ακολούθησε τον κανονισμό. Ο κανονισμός σε κρατάει ζωντανό.</small>
+  </div>
+  <div id="settings" hidden role="dialog">
+    <h3 data-i18n="Ρυθμίσεις">Ρυθμίσεις</h3>
+    <p class="lab" data-i18n="Μέγεθος γραμμάτων">Μέγεθος γραμμάτων</p>
+    <div id="tsRow">
+      <button data-ts="1" style="font-size:calc(var(--u)*7)">Α</button>
+      <button data-ts="1.3" style="font-size:calc(var(--u)*9)">Α</button>
+      <button data-ts="1.6" style="font-size:calc(var(--u)*11)">Α</button>
+      <button data-ts="2" style="font-size:calc(var(--u)*13)">Α</button>
+    </div>
+    <p class="lab" data-i18n="Γλώσσα">Γλώσσα</p>
+    <div id="lgRow"><button data-lg="el" style="font-size:calc(var(--u)*6.4)">Ελληνικά</button><button data-lg="en" style="font-size:calc(var(--u)*6.4)">English</button></div>
+
+    <p class="lab" data-i18n="Οπτικά εφέ">Οπτικά εφέ</p>
+    <div id="fxRow"><button data-fx="1" style="font-size:calc(var(--u)*6.4)" data-i18n="Πλήρη">Πλήρη</button><button data-fx="0" style="font-size:calc(var(--u)*6.4)" data-i18n="Ελαφριά">Ελαφριά</button></div>
+    <div class="row">
+      <button id="sSound">Ήχος: ναι</button>
+      <button id="sFull" data-i18n="Πλήρης οθόνη">Πλήρης οθόνη</button>
+      <button id="sClose" data-i18n="Κλείσιμο">Κλείσιμο</button>
+    </div>
+  </div>
+  <div class="screen" id="end" hidden>
+    <h2 id="endH"></h2>
+    <div id="endT"></div>
+    <button id="endR" hidden data-i18n="Δοκίμασε ξανά">Δοκίμασε ξανά</button><button id="endB" data-i18n="Στην αρχική">Στην αρχική</button>
+  </div>
+</div>
+</div>
+<div id="rotate"><i></i><span data-i18n="Γύρισε το κινητό οριζόντια.">Γύρισε το κινητό οριζόντια.</span></div>
+<script>
+'use strict';
+/* ============================================================
+   Ο ΛΟΥΚΟΥΜΑΣ — point & click edition (Sierra SCI style, 2.5D)
+   Everything (art, perspective floors, sprites, music) is generated in code.
+   ============================================================ */
+let LANG='el';
+let lastHint='';
+const EN={"Σημειωματάριο": "Notebook", "Το σημειωματάριο υπηρεσίας. Κανονισμός: ό,τι δεν γράφεται, δεν έγινε.": "Your duty notebook. Regulation: if it isn't written down, it didn't happen.", "«Κλεμμένο κόκκινο κουπέ, ΑΚΤ-4471. Ύποπτος: Στέλιος Μπέκας. Δερμάτινο μπουφάν.»": "\"Stolen red coupé, AKT-4471. Suspect: Stelios Bekas. Leather jacket.\"", "«Οδός Λιμανιού: ΑΚΤ-4471 εντοπίστηκε.»": "\"Port Street: AKT-4471 located.\"", "Υπηρεσιακό όπλο": "Service pistol", "Στη θήκη του. Εκεί μένει, εκτός αν υπάρχει πραγματικός κίνδυνος.": "In its holster. That's where it stays, unless there is real danger.", "Κανονισμός: ποτέ οπλισμένος μέσα στα κρατητήρια.": "Regulation: never armed inside the holding area.", "Ασύρματος": "Radio", "Φορητός ασύρματος, κανάλι του Κέντρου. Διάλεξέ τον με το B και πάτα A για να καλέσεις.": "Handheld radio, Dispatch channel. Select it with B and press A to call.", "Χειροπέδες": "Handcuffs", "Ατσάλινες. Κλειδί στη ζώνη.": "Steel. Key on your belt.", "Φακός": "Flashlight", "Βαρύς φακός μαγκλίτσα. Δυνατό φως.": "A heavy-duty flashlight. Strong beam.", "Κλειδιά περιπολικού": "Patrol car keys", "Περιπολικό 7. Ένα μπρελόκ με τον Άγιο Χριστόφορο.": "Patrol Car 7. A Saint Christopher keyring.", "Σακούλα με ρολόγια": "Bag of watches", "Πειστήριο. Δώδεκα καινούργια ρολόγια, με τις ετικέτες ακόμα πάνω.": "Evidence. Twelve brand-new watches, price tags still on.", "Πόντοι:": "Points:", "από": "of", "Προς την αίθουσα ενημέρωσης": "To the briefing room", "Δεν βγαίνεις στη βάρδια χωρίς εξοπλισμό. Το ντουλάπι σου είναι το νούμερο 7.": "You don't start a shift without your gear. Your locker is number 7.", "Ανακοίνωση": "Notice", "«ΥΠΕΝΘΥΜΙΣΗ: Επιθεώρηση οχήματος πριν από κάθε βάρδια. Όπλα στη θυρίδα πριν από τα κρατητήρια. Καμία εξαίρεση.»": "\"REMINDER: Vehicle inspection before every shift. Firearms in the lockbox before entering holding. No exceptions.\"", "Από κάτω, με μολύβι: «Και πλένετε τις κούπες σας.»": "Underneath, in pencil: \"And wash your mugs.\"", "Πάγκος": "Bench", "Ο πάγκος των αποδυτηρίων. Εδώ έχουν ειπωθεί περισσότερα ψέματα για ψάρεμα απ’ ό,τι σε όλο το λιμάνι.": "The locker-room bench. More fishing lies have been told here than in the whole harbour.", "Ντουλάπι 7": "Locker 7", "Άδειο. Μόνο μια φωτογραφία της ομάδας μπάσκετ του τμήματος, του 1984. Χάσαμε.": "Empty. Just a photo of the precinct basketball team, 1984. We lost.", "Ανοίγεις το ντουλάπι 7.": "You open locker 7.", "Περνάς τη ζώνη: όπλο στη θήκη, χειροπέδες, ασύρματος, φακός.": "You buckle on your duty belt: pistol holstered, handcuffs, radio, flashlight.", "Αστυφύλακας Άρης Μαυρίδης. Έτοιμος για την πρώτη σου βάρδια.": "Officer Aris Mavridis. Ready for your first shift.", "Βρύση": "Tap", "Πίνεις λίγο νερό. Έχει γεύση από χλώριο και από είκοσι χρόνια υπηρεσίας.": "You drink some water. It tastes of chlorine and twenty years of service.", "Ρολόι": "Clock", "Έξι και μισή το πρωί. Η βάρδια ξεκινάει στις επτά.": "Six thirty in the morning. Shift starts at seven.", "Προς τα αποδυτήρια": "To the locker room", "Κρατητήρια": "Holding cells", "Τα κρατητήρια. Δεν έχεις κάποιον να φέρεις εκεί. Ακόμα.": "The holding cells. You have nobody to bring there. Yet.", "Αρχιφύλακας Κανελλόπουλος": "Sergeant Kanellopoulos", "Αρχιφύλακας: «Καλημέρα, Μαυρίδη. Πρώτη μέρα. Μη μου τα κάνεις θάλασσα.»": "Sergeant: \"Morning, Mavridis. First day. Don't make a mess of it.\"", "Αρχιφύλακας: «Κλεμμένο χθες βράδυ: κόκκινο κουπέ, πινακίδα ΑΚΤ-4471.»": "Sergeant: \"Stolen last night: red coupé, plate AKT-4471.\"", "Αρχιφύλακας: «Ύποπτος ο Στέλιος Μπέκας, “ο Γάτος”. Δερμάτινο μπουφάν, μαύρα γυαλιά, κανένα χιούμορ.»": "Sergeant: \"Suspect is Stelios Bekas, 'the Cat'. Leather jacket, dark glasses, no sense of humour.\"", "Αρχιφύλακας: «Επιθεώρηση στο όχημα πριν φύγεις. Και στα κρατητήρια, το όπλο στη θυρίδα. Πάντα.»": "Sergeant: \"Inspect your vehicle before you leave. And in holding, your weapon goes in the lockbox. Always.\"", "Αρχιφύλακας: «Κλειδιά στον πίνακα. Περιπολικό 7. Άντε.»": "Sergeant: \"Keys are on the board. Patrol Car 7. Go.\"", "Αρχιφύλακας: «ΑΚΤ-4471. Μπέκας. Κανονισμός. Μη με κάνεις να επαναλαμβάνομαι.»": "Sergeant: \"AKT-4471. Bekas. Regulations. Don't make me repeat myself.\"", "Πίνακας": "Chalkboard", "Ένας χάρτης της Ακτής με κιμωλία. Ένας κύκλος στην οδό Λιμανιού.": "A chalk map of Akti. A circle around Port Street.", "Πίνακας κλειδιών": "Key board", "Τα κλειδιά του Περιπολικού 7 είναι ήδη στην τσέπη σου.": "The keys to Patrol Car 7 are already in your pocket.", "Αρχιφύλακας: «Μαυρίδη! Πρώτα ενημέρωση, μετά κλειδιά. Έτσι γίνεται εδώ μέσα.»": "Sergeant: \"Mavridis! Briefing first, then keys. That's how it works in here.\"", "Παίρνεις τα κλειδιά του Περιπολικού 7.": "You take the keys to Patrol Car 7.", "Μηχάνημα καφέ": "Coffee machine", "Ο καφές μηχανής του τμήματος.": "The precinct coffee machine.", "Έχει λύσει περισσότερες υποθέσεις από όλους σας. Και έχει προκαλέσει άλλες τόσες γαστρίτιδες.": "It has solved more cases than all of you. And caused just as many ulcers.", "Προς το πάρκινγκ": "To the garage", "Χωρίς κλειδιά, στο πάρκινγκ θα πας μόνο για να κοιτάξεις.": "Without keys, you'd only go to the garage to look.", "Πίσω λάστιχο": "Rear tyre", "Φουσκωμένο και καινούργιο.": "Inflated and brand new.", "Κάνεις τον γύρο του περιπολικού, όπως λέει ο κανονισμός.": "You walk around the patrol car, as regulations require.", "Φώτα εντάξει. Φάρος εντάξει.": "Lights OK. Light bar OK.", "Το πίσω αριστερό λάστιχο όμως είναι μισοξεφούσκωτο. Μέσα του, ένα καρφί.": "But the rear left tyre is half flat. There's a nail in it.", "Μισοξεφούσκωτο. Με αυτό δεν πας πουθενά. Μίλα στον μηχανικό.": "Half flat. You're going nowhere on that. Talk to the mechanic.", "Περιπολικό 7": "Patrol Car 7", "Ελέγχεις τα φώτα με τον φακό. Δουλεύουν όλα.": "You check the lights with the flashlight. All working.", "Μήτσος, ο μηχανικός": "Mitsos, the mechanic", "Μήτσος: «Τα περιπολικά τα προσέχω σαν παιδιά μου. Τα παιδιά μου όχι τόσο.»": "Mitsos: \"I look after these cars like my own kids. My kids, not so much.\"", "Λες στον Μήτσο για το λάστιχο.": "You tell Mitsos about the tyre.", "Μήτσος: «Καρφί; Καλά που το είδες. Θα σου έσκαγε στην πρώτη στροφή.»": "Mitsos: \"A nail? Good thing you spotted it. It would've blown on the first bend.\"", "Πέντε λεπτά και πολλές βρισιές αργότερα, το λάστιχο είναι καινούργιο.": "Five minutes and a lot of swearing later, the tyre is new.", "Μήτσος: «Το Επτά είναι έτοιμο. Νομίζω. Το έλεγξες;»": "Mitsos: \"Seven's ready. I think. Did you check it?\"", "Πάγκος εργαλείων": "Workbench", "Κλειδιά, κατσαβίδια και ένα ημερολόγιο του 1986 που κανείς δεν τόλμησε να κατεβάσει.": "Spanners, screwdrivers and a 1986 calendar nobody has dared to take down.", "Κλειδωμένο. Τα κλειδιά είναι στον πίνακα της αίθουσας ενημέρωσης.": "Locked. The keys are on the board in the briefing room.", "Με ξεφούσκωτο λάστιχο δεν φεύγεις. Μίλα στον Μήτσο.": "You're not leaving on a flat tyre. Talk to Mitsos.", "Η βάρδια τελείωσε. Ώρα για αναφορά, όχι για βόλτες.": "The shift is over. Time for paperwork, not joyrides.", "Περιπολικό 7: πού πας;": "Patrol Car 7: where to?", "Περιπολία στην πόλη": "Patrol the city", "Βάζεις μπρος. Βγαίνεις από το πάρκινγκ. Η πόλη ξυπνάει.": "You start the engine. You pull out of the garage. The city is waking up.", "Ασύρματος: «Περιπολικό 7, από Κέντρο.»": "Radio: \"Patrol Car 7, this is Dispatch.\"", "Ασύρματος: «Κόκκινο κουπέ, πιθανώς το ΑΚΤ-4471, εντοπίστηκε στην οδό Λιμανιού, έξω από το καφέ “Γλάρος”. Ελέγξτε.»": "Radio: \"Red coupé, possibly AKT-4471, spotted on Port Street outside the 'Seagull' café. Check it out.\"", "Εσύ: «Ελήφθη, Κέντρο. Κατευθύνομαι.»": "You: \"Copy, Dispatch. On my way.\"", "Μένω ακόμα εδώ": "Stay here a little longer", "Δεν τελείωσες εδώ. Μια κλεμμένη πινακίδα δεν βρίσκεται μόνη της.": "You're not done here. A stolen plate doesn't find itself.", "Πριν τον βάλεις στο περιπολικό:": "Before putting him in the car:", "Τον ενημερώνω για τον λόγο της σύλληψης και τα δικαιώματά του.": "I inform him of the reason for arrest and his rights.", "Τον βάζω κατευθείαν μέσα. Βιάζομαι.": "I put him straight in. I'm in a hurry.", "Κάτι σε σταματάει. Η φωνή του εκπαιδευτή σου από τη Σχολή: «Ενημέρωση δικαιωμάτων, Μαυρίδη. Πάντα.»": "Something stops you. Your instructor's voice from the Academy: \"Rights, Mavridis. Always.\"", "Βάζεις τον Μπέκα στο πίσω κάθισμα, με το χέρι πάνω από το κεφάλι του για να μη χτυπήσει.": "You put Bekas in the back seat, hand over his head so he doesn't bump it.", "Ασύρματος: «Περιπολικό 7, Κέντρο. Ένας συλληφθείς. Επιστρέφω στο τμήμα.»": "Radio: \"Patrol Car 7 to Dispatch. One in custody. Returning to the station.\"", "Κόκκινο κουπέ": "Red coupé", "Ένα κόκκινο κουπέ, παρκαρισμένο πάνω στη διάβαση. Θράσος.": "A red coupé, parked on the pedestrian crossing. The nerve.", "Πινακίδα ΑΚΤ-4471.": "Plate AKT-4471.", "Πρώτα σημειώνεις. Μετά συμπεραίνεις.": "Note it down first. Draw conclusions later.", "Τη σημείωσες ήδη.": "You've already noted it.", "Σημειώνεις την πινακίδα: ΑΚΤ-4471.": "You note down the plate: AKT-4471.", "Ταιριάζει με την ενημέρωση του αρχιφύλακα. Επόμενο βήμα κατά τον κανονισμό: ενημέρωση του Κέντρου.": "It matches the sergeant's briefing. Next step by the book: inform Dispatch.", "Δεν υπάρχει τίποτε άλλο μέσα.": "There's nothing else inside.", "Φωτίζεις μέσα από το τζάμι. Κάτω από το κάθισμα, μια σακούλα.": "You shine the light through the window. Under the seat, a bag.", "Η πόρτα είναι ξεκλείδωτη. Δώδεκα ρολόγια, με τις ετικέτες ακόμα πάνω. Πειστήριο.": "The door is unlocked. Twelve watches, price tags still on. Evidence.", "Άντρας με δερμάτινο": "Man in leather jacket", "Φοράει ήδη χειροπέδες.": "He's already cuffed.", "Χωρίς έλεγχο στοιχείων και λόγο σύλληψης; Δεν είσαι σε ταινία.": "Without an ID check and a reason for arrest? This isn't a movie.", "Μπέκας: «Εντάξει, εντάξει. Χωρίς φασαρίες.»": "Bekas: \"Alright, alright. No fuss.\"", "Του περνάς χειροπέδες. Τον ελέγχεις για όπλα. Τίποτα, εκτός από ένα πακέτο τσίχλες.": "You cuff him. You pat him down for weapons. Nothing but a packet of chewing gum.", "Σημειώνεις την περιγραφή του. Δερμάτινο, γυαλιά, κανένα χιούμορ. Ταιριάζει.": "You note down his description. Leather, glasses, no sense of humour. It matches.", "Τραπεζάκι": "Café table", "Ένα άδειο τραπεζάκι. Και ένα φλιτζάνι καφέ με αποτύπωμα κραγιόν.": "An empty table. And a coffee cup with a lipstick mark.", "Περιστέρια": "Pigeons", "Τα περιστέρια της οδού Λιμανιού. Έχουν δει τα πάντα. Δεν μιλάνε σε μπάτσους.": "The pigeons of Port Street. They've seen everything. They don't talk to cops.", "Περίπτερο": "Kiosk", "Κυρία Ρούλα, περιπτερού: «Αστυφύλακα! Ο τύπος με το δερμάτινο βγήκε από το κόκκινο αμάξι πριν από δέκα λεπτά.»": "Mrs Roula, kiosk owner: \"Officer! The guy in the leather jacket got out of the red car ten minutes ago.\"", "Κυρία Ρούλα: «Κάθεται στον “Γλάρο” και πίνει φρέντο σαν να μην τρέχει τίποτα. Σιγά μην είναι δικό του το αμάξι.»": "Mrs Roula: \"He's sitting at the 'Seagull' drinking a freddo like nothing's wrong. As if that car were his.\"", "Σημειώνεις: μάρτυρας, κυρία Ρούλα, περίπτερο οδού Λιμανιού.": "You note: witness, Mrs Roula, Port Street kiosk.", "Κυρία Ρούλα: «Άντε, πιάσ’ τον, να ησυχάσει η γειτονιά!»": "Mrs Roula: \"Go on, catch him, so the neighbourhood can get some peace!\"", "Οδός Λιμανιού. Το κόκκινο κουπέ είναι εκεί, πάνω στη διάβαση.": "Port Street. The red coupé is there, parked on the crossing.", "Έξω από το καφέ «Γλάρος» κάθεται ένας άντρας με δερμάτινο μπουφάν.": "Outside the 'Seagull' café sits a man in a leather jacket.", "Τον ενημερώνεις για τον λόγο της σύλληψης και για τα δικαιώματά του: δικηγόρο, διερμηνέα, ενημέρωση συγγενή.": "You inform him of the reason for his arrest and of his rights: a lawyer, an interpreter, notifying a relative.", "Μπέκας: «Ναι, ναι. Τα ξέρω απ’ έξω. Καλύτερα από σένα.»": "Bekas: \"Yeah, yeah. I know them by heart. Better than you.\"", "Μπέκας: «Ο φρέντο μου έμεινε μισός. Αυτό να το γράψεις στην αναφορά.»": "Bekas: \"My freddo's still half full. Put that in your report.\"", "Ο Μπέκας σε κοιτάζει πάνω από τα γυαλιά του. Περιμένει να δει τι θα κάνεις. Ο κανονισμός λέει: χειροπέδες.": "Bekas looks at you over his glasses. Waiting to see what you'll do. Regulations say: handcuffs.", "Ο άντρας με το δερμάτινο σε κοιτάζει πάνω από το φλιτζάνι του.": "The man in the leather jacket looks at you over his cup.", "Πριν πλησιάσεις ύποπτο, ενημερώνεις το Κέντρο. Το λέει ο κανονισμός, και ο αρχιφύλακας θα στο θυμίζει ως τη σύνταξη.": "Before approaching a suspect, you inform Dispatch. It's in the regulations, and the sergeant will remind you until you retire.", "Πώς τον προσεγγίζεις;": "How do you approach him?", "«Καλημέρα. Έλεγχος στοιχείων, παρακαλώ.»": "\"Good morning. ID check, please.\"", "Σου δίνει την ταυτότητά του, αργά. «Στυλιανός Μπέκας».": "He hands you his ID card, slowly. \"Stylianos Bekas\".", "Πάνω στο τραπέζι, ένα κλειδί αυτοκινήτου με κόκκινο μπρελόκ.": "On the table, a car key on a red keyring.", "Εσύ: «Κύριε Μπέκα, είστε υπό σύλληψη για κλοπή οχήματος.»": "You: \"Mr Bekas, you are under arrest for vehicle theft.\"", "Μπέκας: «Πρωί πρωί; Ούτε τον φρέντο μου δεν τελείωσα.»": "Bekas: \"This early? I haven't even finished my freddo.\"", "«Ψηλά τα χέρια, κάθαρμα!»": "\"Hands up, scumbag!\"", "Τον κοιτάζεις επίμονα, σαν στις ταινίες.": "Stare at him intensely, like in the movies.", "Τον κοιτάζεις επίμονα.": "You stare at him intensely.", "Σε κοιτάζει κι αυτός επίμονα. Τελικά κάνει ένα μπαλόνι με την τσίχλα του.": "He stares back intensely. Eventually he blows a bubble with his gum.", "Αυτό δεν οδηγεί πουθενά.": "This is going nowhere.", "Έξοδος": "Exit", "Έχεις έναν συλληφθέντα δεμένο πάνω σου. Πρώτα τον παραδίδεις.": "You have a prisoner handcuffed to you. Hand him over first.", "Πρώτα η αναφορά. Μετά σπίτι.": "Report first. Then home.", "«ΑΠΑΓΟΡΕΥΕΤΑΙ Η ΕΙΣΟΔΟΣ ΜΕ ΟΠΛΟ ΠΕΡΑ ΑΠΟ ΤΗΝ ΚΙΤΡΙΝΗ ΓΡΑΜΜΗ.»": "\"NO FIREARMS BEYOND THE YELLOW LINE.\"", "Θυρίδα όπλων": "Weapons lockbox", "Το όπλο σου είναι κλειδωμένο στη θυρίδα. Το κλειδί στην τσέπη σου.": "Your pistol is locked in the lockbox. The key is in your pocket.", "Θυρίδες για τα όπλα. Κανονισμός: κανείς οπλισμένος πέρα από την κίτρινη γραμμή.": "Lockboxes for weapons. Regulation: nobody goes armed past the yellow line.", "Βγάζεις το όπλο από τη θήκη, το βάζεις στη θυρίδα και κλειδώνεις.": "You take the pistol out of its holster, put it in the lockbox and lock it.", "Κανονισμός. Ο αρχιφύλακας θα ήταν περήφανος. Δεν θα στο έλεγε ποτέ, αλλά θα ήταν.": "Regulations. The sergeant would be proud. He'd never say so, but he would.", "Αστυφύλακας Γιαννάκης": "Officer Giannakis", "Γιαννάκης: «Καλή δουλειά, συνάδελφε. Για πρώτη μέρα, όχι κι άσχημα.»": "Giannakis: \"Good work, colleague. Not bad for a first day.\"", "Παραδίδεις τον Μπέκα στον Γιαννάκη. Αφαιρείτε τις χειροπέδες και καταγράφετε τα προσωπικά του αντικείμενα.": "You hand Bekas over to Giannakis. You remove the cuffs and log his personal belongings.", "Ένα πακέτο τσίχλες. Ένα χτένι. Τρία ανέκδοτα που κανείς δεν ζήτησε.": "A packet of gum. A comb. Three jokes nobody asked for.", "Γιαννάκης: «Μέσα, Μπέκα. Και τώρα, συνάδελφε… η αναφορά.»": "Giannakis: \"In you go, Bekas. And now, colleague… the report.\"", "Γιαννάκης: «Η αναφορά, συνάδελφε. Στο σημειωματάριο, και μετά στη γραφομηχανή.»": "Giannakis: \"The report, colleague. In your notebook, then on the typewriter.\"", "Γιαννάκης: «Ησυχία σήμερα. Ελπίζω να μείνει έτσι.»": "Giannakis: \"Quiet today. I hope it stays that way.\"", "Γράφεις την αναφορά: ώρα, τόπος, πινακίδα, μάρτυρας, πειστήρια, σύλληψη, ενημέρωση δικαιωμάτων.": "You write the report: time, place, plate, witness, evidence, arrest, rights given.", "Γιαννάκης: «Καθαρή δουλειά. Πάρ’ τη στον αρχιφύλακα.»": "Giannakis: \"Clean work. Take it to the sergeant.\"", "Παραδίδεις τη σακούλα με τα ρολόγια ως πειστήριο. Ο Γιαννάκης την καταγράφει.": "You hand over the bag of watches as evidence. Giannakis logs it.", "Κελί": "Cell", "Ο Μπέκας κάθεται στον πάγκο και σφυρίζει. Φάλτσα.": "Bekas sits on the bench, whistling. Off-key.", "Ένα άδειο κελί. Μυρίζει χλωρίνη και κακές αποφάσεις.": "An empty cell. It smells of bleach and bad decisions.", "Δύο χιλιόμετρα μετά, στη Λεωφόρο Παραλίας, το πίσω λάστιχο σκάει.": "Two kilometres later, on Seafront Avenue, the rear tyre blows.", "Το Περιπολικό 7 καταλήγει, αργά και με αξιοπρέπεια, πάνω σε μια καντίνα με κουλούρια.": "Patrol Car 7 ends up, slowly and with dignity, in a pretzel cart.", "Κανονισμός: επιθεώρηση οχήματος πριν από κάθε βάρδια. Πάντα.": "Regulation: vehicle inspection before every shift. Always.", "Ο Μπέκας αναποδογυρίζει το τραπέζι και χάνεται στα στενά του λιμανιού.": "Bekas flips the table over and disappears into the harbour alleys.", "Η ψυχραιμία είναι το πρώτο εργαλείο του αστυνομικού. Ο αρχιφύλακας σε περιμένει με μια πολύ μεγάλη αναφορά.": "Composure is a police officer's first tool. The sergeant is waiting for you with a very long report.", "Τράβηξες το υπηρεσιακό όπλο χωρίς πραγματικό κίνδυνο.": "You drew your service pistol with no real danger present.", "Οι Εσωτερικές Υποθέσεις δεν έχουν χιούμορ. Ούτε ο αρχιφύλακας.": "Internal Affairs has no sense of humour. Neither does the sergeant.", "Κανονισμός: το όπλο είναι η τελευταία λύση, όχι η πρώτη.": "Regulation: the weapon is the last resort, not the first.", "Πέρασες την κίτρινη γραμμή με το όπλο στη θήκη.": "You crossed the yellow line with your pistol still holstered.", "Ο Μπέκας, παρά τις χειροπέδες, το άρπαξε σε μια στιγμή απροσεξίας. Ευτυχώς ο Γιαννάκης τον ακινητοποίησε πριν γίνει το κακό.": "Despite the handcuffs, Bekas grabbed it in a moment of carelessness. Luckily Giannakis pinned him down before anything worse happened.", "Κανονισμός: ποτέ οπλισμένος στα κρατητήρια. Ποτέ.": "Regulation: never armed in the holding area. Never.", "Τέλος καριέρας": "Career over", "Τέλος βάρδιας": "End of shift", "Βαθμολογία: υποδειγματικός αστυφύλακας.": "Rating: exemplary officer.", "Βαθμολογία: πολύ καλός αστυφύλακας.": "Rating: very good officer.", "Βαθμολογία: θα τα ξαναπούμε στην εκπαίδευση.": "Rating: see you back at the Academy.", "Αρχιφύλακας: «Μαυρίδη. Διάβασα την αναφορά.»": "Sergeant: \"Mavridis. I read your report.\"", "Αρχιφύλακας: «Κλεμμένο όχημα, μάρτυρας, πειστήρια, σύλληψη χωρίς φασαρία. Και όλα με τον κανονισμό.»": "Sergeant: \"Stolen vehicle, witness, evidence, an arrest with no fuss. And all by the book.\"", "Αρχιφύλακας: «…Μη συνηθίσεις. Αύριο στις επτά.»": "Sergeant: \"…Don't get used to it. Tomorrow at seven.\"", "Ασύρματος: «Περιπολικό 7, χωρίς λόγο δεν πιάνουμε τη συχνότητα. Τέλος.»": "Radio: \"Patrol Car 7, keep the channel clear unless you need it. Out.\"", "Ασύρματος: «Σε ακούμε, Επτά. Δεύτερο περιπολικό σε λίγα λεπτά. Συνέχισε με προσοχή.»": "Radio: \"We hear you, Seven. Second unit is a few minutes out. Proceed with caution.\"", "Εσύ: «Κέντρο, από Περιπολικό 7.»": "You: \"Dispatch, this is Patrol Car 7.\"", "Ασύρματος: «Λέγε, Επτά. Τι έχεις;»": "Radio: \"Go ahead, Seven. What have you got?\"", "Δεν έχεις τίποτα συγκεκριμένο ακόμα. Πρώτα επιβεβαίωσε την πινακίδα.": "You have nothing specific yet. Confirm the plate first.", "Εσύ: «Κέντρο, από Περιπολικό 7. Οδός Λιμανιού. Επιβεβαιώνω κόκκινο κουπέ, ΑΚΤ-4471. Πιθανός ύποπτος στο καφέ “Γλάρος”.»": "You: \"Dispatch, Patrol Car 7. Port Street. Confirming red coupé, AKT-4471. Possible suspect at the 'Seagull' café.\"", "Ασύρματος: «Ελήφθη, Επτά. Το όχημα είναι δηλωμένο κλεμμένο. Δεύτερο περιπολικό καθ’ οδόν. Προχώρα με προσοχή.»": "Radio: \"Copy, Seven. Vehicle is reported stolen. Second unit en route. Proceed with caution.\"", "Ήχος:": "Sound:", "ναι": "on", "όχι": "off", "Άδεια χέρια.": "Empty hands.", "Αυτά τα δύο δεν συνδυάζονται.": "These two don't go together.", "Διάλεξε ένα αντικείμενο.": "Pick an item.", "Αυτό δεν προβλέπεται από τον κανονισμό.": "That's not in the regulations.", "Όχι. Απλώς όχι.": "No. Just no.", "Δεν βγαίνει νόημα, αστυφύλακα.": "That makes no sense, officer.", "Δεν βγάζεις το όπλο χωρίς λόγο. Ποτέ.": "You don't draw your weapon without reason. Ever.", "Δεν υπάρχει τίποτα εδώ για να το χρησιμοποιήσεις. (B για άδεια χέρια)": "There's nothing here to use it on. (B for empty hands)", "Ακτή, 1989. Αστυνομικό Τμήμα Παραλίας.": "Akti, 1989. Seafront Police Station.", "Είσαι ο αστυφύλακας Άρης Μαυρίδης. Είκοσι τεσσάρων ετών, φρέσκος από τη Σχολή.": "You are Officer Aris Mavridis. Twenty-four, fresh out of the Academy.", "Πρώτη σου βάρδια. Ο αρχιφύλακας Κανελλόπουλος έχει ήδη αμφιβολίες.": "Your first shift. Sergeant Kanellopoulos already has his doubts.", "Κάνε τη δουλειά σωστά. Με τον κανονισμό. Βήμα βήμα.": "Do the job right. By the book. Step by step.", "Βέλη για κίνηση. A εξετάζει ή χρησιμοποιεί. B αλλάζει το αντικείμενο που κρατάς. Τσάντα για εξέταση.": "Arrows to move. A examines or uses. B switches the item you're holding. Bag to examine items.", " · A για χρήση": " · A to use", "Ρυθμίσεις": "Settings", "Στην αρχική": "Back to title", "Εξέταση": "Examine", "Κλείσιμο": "Close", "Πρώτη βάρδια στην Ακτή, 1989": "First shift in Akti, 1989", "Νέο παιχνίδι": "New game", "Συνέχεια": "Continue", "Ακολούθησε τον κανονισμό. Ο κανονισμός σε κρατάει ζωντανό.": "Follow the regulations. The regulations keep you alive.", "Μέγεθος γραμμάτων": "Text size", "Γλώσσα": "Language", "Έτσι θα φαίνονται τα κείμενα: «Περιπολικό 7, από Κέντρο.»": "This is how text will look: \"Patrol Car 7, this is Dispatch.\"", "Πλήρης οθόνη": "Full screen", "Δοκίμασε ξανά": "Try again", "Γύρισε το κινητό οριζόντια.": "Turn your phone sideways.", "Τίποτα που να ενδιαφέρει την υπηρεσία.": "Nothing of interest to the force.", "Αυτό δεν χρειάζεται να το πάρεις.": "You don't need to take that.", "Δεν απαντάει. Ο κανονισμός δεν προβλέπει συζήτηση με αντικείμενα.": "It doesn't answer. Regulations don't cover conversations with objects.", "Διάλεξε ενέργεια από τη μπάρα: πόδια, μάτι, χέρι, στόμα ή αντικείμενο. Μετά πάτα πάνω στην εικόνα. Με ποντίκι, το δεξί κλικ αλλάζει ενέργεια.": "Pick an action from the bar: feet, eye, hand, mouth or item. Then tap the picture. With a mouse, right-click changes the action.", "Η πόρτα προς την αίθουσα ενημέρωσης.": "The door to the briefing room.", "Το ντουλάπι σου. Νούμερο 7. Ακόμα μυρίζει καινούργια μπογιά.": "Your locker. Number 7. It still smells of fresh paint.", "Ντουλάπια": "Lockers", "Τα ντουλάπια των συναδέλφων. Σε ένα κάποιος έχει κολλήσει αυτοκόλλητο του Ολυμπιακού. Σε άλλο, του Παναθηναϊκού. Δίπλα δίπλα. Θαύμα.": "Your colleagues' lockers. One has an Olympiacos sticker. Another, a Panathinaikos one. Side by side. A miracle.", "Μια βρύση με πόσιμο νερό.": "A drinking-water tap.", "Η πόρτα για τα κρατητήρια. Από πάνω, μια κόκκινη πινακίδα.": "The door to the holding cells. A red sign hangs above it.", "Ο αρχιφύλακας Κανελλόπουλος. Τριάντα χρόνια στην υπηρεσία, και τα τριάντα με το ίδιο μουστάκι.": "Sergeant Kanellopoulos. Thirty years on the force, all thirty with the same moustache.", "Ο πίνακας με τα κλειδιά των περιπολικών.": "The board with the patrol car keys.", "Πατάς το κουμπί. Το μηχάνημα βήχει και σου δίνει κάτι καφέ. Δεν το πίνεις.": "You press the button. The machine coughs and gives you something brown. You don't drink it.", "Το πίσω λάστιχο του περιπολικού.": "The patrol car's rear tyre.", "Το Περιπολικό 7. Λευκό, με μπλε ρίγα και έναν φάρο που έχει δει πολλά.": "Patrol Car 7. White, with a blue stripe and a light bar that has seen a lot.", "Ο Μήτσος. Λάδια μέχρι τους αγκώνες, χαμόγελο μέχρι τα αυτιά.": "Mitsos. Oil up to his elbows, grin up to his ears.", "Το Περιπολικό 7, παρκαρισμένο με τον φάρο αναμμένο.": "Patrol Car 7, parked with its lights flashing.", "Ένας άντρας με δερμάτινο μπουφάν και μαύρα γυαλιά. Πίνει φρέντο σαν να μην τρέχει τίποτα.": "A man in a leather jacket and dark glasses. He's drinking a freddo as if nothing is wrong.", "Καφέ «Γλάρος»": "'Seagull' café", "Το καφέ «Γλάρος». Φρέντο, τοστ και κουτσομπολιό από τις έξι το πρωί.": "The 'Seagull' café. Freddo, toasties and gossip from six in the morning.", "Το περίπτερο της κυρίας Ρούλας. Εφημερίδες, τσιγάρα και πληροφορίες.": "Mrs Roula's kiosk. Newspapers, cigarettes and information.", "Ο αστυφύλακας Γιαννάκης, φύλακας των κρατητηρίων και της γραφομηχανής.": "Officer Giannakis, keeper of the cells and of the typewriter.", "Περπάτα": "Walk", "Κοίτα": "Look", "Πάρε / Χρησιμοποίησε": "Take / Use", "Μίλα": "Talk", "Χρησιμοποίησε αντικείμενο": "Use item", "Διάλεξε ένα αντικείμενο. Πάτα δεύτερο για να τα συνδυάσεις.": "Pick an item. Tap a second one to combine them.", "Αντικείμενα": "Items", "Μενού": "Menu", "Οπτικά εφέ": "Visual effects", "Πλήρη": "Full", "Ελαφριά": "Light"};
+let T=0; let F={};
+const tr=t=>(LANG==='en'&&EN[t]!==undefined)?EN[t]:t;
+const W=320,H=180;
+const $=id=>document.getElementById(id); const stage=$('stage');
+const OUT=$('cv'), octx=OUT.getContext('2d');
+const cv=document.createElement('canvas'); cv.width=W; cv.height=H; const ctx=cv.getContext('2d'); ctx.imageSmoothingEnabled=false;
+let OW=W, OH=H;
+
+function rng(seed){ let s=seed>>>0; return ()=>{ s=(s*1664525+1013904223)>>>0; return s/4294967296; }; }
+function R(g,x,y,w,h,c){ g.fillStyle=c; g.fillRect(Math.round(x),Math.round(y),Math.round(w),Math.round(h)); }
+function disc(g,cx,cy,r,c){ g.fillStyle=c; for(let dy=-r;dy<=r;dy++){ const dx=Math.floor(Math.sqrt(r*r-dy*dy+r*.6)); g.fillRect(Math.round(cx-dx),Math.round(cy+dy),dx*2+1,1); } }
+function ell(g,cx,cy,rx,ry,c){ g.fillStyle=c; for(let y=-ry;y<=ry;y++){ const w=Math.round(rx*Math.sqrt(Math.max(0,1-(y*y)/((ry+.5)*(ry+.5))))); g.fillRect(Math.round(cx-w),Math.round(cy+y),w*2+1,1); } }
+function line(g,x0,y0,x1,y1,c){ g.fillStyle=c; x0=Math.round(x0);y0=Math.round(y0);x1=Math.round(x1);y1=Math.round(y1);
+  const dx=Math.abs(x1-x0),dy=-Math.abs(y1-y0),sx=x0<x1?1:-1,sy=y0<y1?1:-1; let e=dx+dy;
+  for(let i=0;i<2000;i++){ g.fillRect(x0,y0,1,1); if(x0===x1&&y0===y1)break; const e2=2*e; if(e2>=dy){e+=dy;x0+=sx;} if(e2<=dx){e+=dx;y0+=sy;} } }
+function dith(g,x,y,w,h,c){ g.fillStyle=c; x=Math.round(x); y=Math.round(y); for(let j=0;j<h;j++) for(let i=((x+y+j)&1);i<w;i+=2) g.fillRect(x+i,y+j,1,1); }
+function bands(g,w,y0,y1,cols){ const n=cols.length, bh=(y1-y0)/n; for(let i=0;i<n;i++){ const ya=Math.round(y0+i*bh), yb=Math.round(y0+(i+1)*bh); R(g,0,ya,w,yb-ya,cols[i]); if(i<n-1) dith(g,0,yb-2,w,2,cols[i+1]); } }
+function poly(g,pts,c){ g.fillStyle=c; g.beginPath(); pts.forEach(([x,y],i)=>i?g.lineTo(x,y):g.moveTo(x,y)); g.closePath(); g.fill(); }
+function inPoly(x,y,p){ let c=false; for(let i=0,j=p.length-1;i<p.length;j=i++){ const [xi,yi]=p[i],[xj,yj]=p[j]; if(((yi>y)!==(yj>y))&&(x<(xj-xi)*(y-yi)/(yj-yi)+xi)) c=!c; } return c; }
+const hexA=c=>[1,3,5].map(i=>parseInt(c.slice(i,i+2),16));
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v)); const rand=(a,b)=>a+Math.random()*(b-a); const lerp=(a,b,t)=>a+(b-a)*t;
+const frac=v=>v-Math.floor(v);
+const hash2=(a,b)=>{ let h=(a*374761393+b*668265263)|0; h=(h^(h>>>13))*1274126177; return ((h^(h>>>16))>>>0)/4294967296; };
+function shadowE(g,cx,cy,rw,rh,a){ a=a||.32; cx=Math.round(cx); cy=Math.round(cy); for(let y=-rh;y<=rh;y++){ const ww=Math.round(rw*Math.sqrt(Math.max(0,1-(y*y)/((rh+.5)*(rh+.5))))); for(let x=-ww;x<=ww;x++){ const d=(x*x)/(rw*rw+.01)+(y*y)/(rh*rh+.01);
+  if(d<.5){ g.fillStyle='rgba(43,29,58,'+a+')'; g.fillRect(cx+x,cy+y,1,1); } else if(((cx+x+cy+y)&1)===0){ g.fillStyle='rgba(43,29,58,'+(a*.7)+')'; g.fillRect(cx+x,cy+y,1,1); } } } }
+function cloud(g,x,y,s){ ell(g,x+8*s,y+2*s,12*s,4*s,'#d8ecff'); disc(g,x,y,5*s,'#ffffff'); disc(g,x+8*s,y-3*s,7*s,'#ffffff'); disc(g,x+16*s,y,5*s,'#ffffff'); R(g,x-3*s,y+1*s,24*s,3*s,'#ffffff'); R(g,x-2*s,y+4*s,22*s,1,'#cfe4f8'); }
+/* per-pixel perspective floor: X = sideways world units, Z = depth */
+function floorFill(g,pl,hz,vx,S1,S2,fn){
+  const xs=pl.map(p=>p[0]), ys=pl.map(p=>p[1]);
+  const x0=Math.max(0,Math.floor(Math.min(...xs))), x1=Math.min(g.canvas.width,Math.ceil(Math.max(...xs))), y0=Math.max(0,Math.floor(Math.min(...ys))), y1=Math.min(H,Math.ceil(Math.max(...ys)));
+  const w=x1-x0, id=g.getImageData(x0,y0,w,y1-y0), d=id.data;
+  for(let y=y0;y<y1;y++){ const dz=y-hz+.5; if(dz<=0) continue; const Z=S2/dz;
+    for(let x=x0;x<x1;x++){ if(!inPoly(x+.5,y+.5,pl)) continue; const X=(x+.5-vx)/dz*S1; const c=fn(X,Z,x,y); const i=((y-y0)*w+(x-x0))*4; d[i]=c[0]; d[i+1]=c[1]; d[i+2]=c[2]; d[i+3]=255; } }
+  g.putImageData(id,x0,y0); }
+
+/* ---------- sprite pipeline: draw native sprite, outline, scale with depth ---------- */
+const SPW=48, SPH=80, OX=24, OY=76;
+const spr=document.createElement('canvas'); spr.width=SPW; spr.height=SPH; const SG=spr.getContext('2d');
+const sil=document.createElement('canvas'); sil.width=SPW; sil.height=SPH; const SIG=sil.getContext('2d');
+const spo=document.createElement('canvas'); spo.width=SPW; spo.height=SPH; const SOG=spo.getContext('2d');
+function actor(g,fn,wx,wy,sc,flip,night,noShadow){
+  if(!noShadow) shadowE(g,wx,wy,Math.max(4,Math.round(10*sc)),Math.max(1,Math.round(2.4*sc)),.3);
+  SG.clearRect(0,0,SPW,SPH); SG.save(); SG.translate(OX,OY); if(flip) SG.scale(-1,1); fn(SG); SG.restore();
+  SIG.globalCompositeOperation='source-over'; SIG.clearRect(0,0,SPW,SPH); SIG.drawImage(spr,0,0); SIG.globalCompositeOperation='source-in'; SIG.fillStyle=night?(G.outlineNight||'#0a0414'):(G.outline||'#2b1d3a'); SIG.fillRect(0,0,SPW,SPH);
+  SOG.clearRect(0,0,SPW,SPH); for(const [dx,dy] of [[1,0],[-1,0],[0,1],[0,-1]]) SOG.drawImage(sil,dx,dy); SOG.drawImage(spr,0,0);
+  const q=Math.round(sc*24)/24, w=Math.round(SPW*q), h=Math.round(SPH*q);
+  g.drawImage(spo,Math.round(wx-OX*q),Math.round(wy-OY*q),w,h);
+}
+
+/* ---------- generic NPC painter (side or front) ---------- */
+function person(g,o){
+  const h=o.h||56, wd=o.wide?18:13, sk=o.skin, skD=o.skinD||'rgba(0,0,0,.15)', b=o.bob?-Math.round(Math.abs(Math.sin(T*o.bob))*2):0, blink=((T+(o.seed||0))%3.7)<.13;
+  const legH=Math.round(h*.36), bodyH=Math.round(h*.33), hy=-legH-bodyH-13+b, by=-legH-bodyH+b;
+  if(o.dress){ R(g,-wd/2-1,by+bodyH-3,wd+2,legH*.65,o.bottom); R(g,-wd/2-1,by+bodyH+legH*.6-4,wd+2,1,'rgba(0,0,0,.2)'); R(g,-4,-legH*.4,3,legH*.4-2,sk); R(g,1,-legH*.4,3,legH*.4-2,sk); }
+  else { R(g,-5,-legH,4,legH-2,o.bottom); R(g,1,-legH,4,legH-2,o.bottom); R(g,-5,-legH,1,legH-2,'rgba(0,0,0,.18)'); if(o.bare){ R(g,-5,-legH*.5,4,legH*.5-2,sk); R(g,1,-legH*.5,4,legH*.5-2,sk);} }
+  R(g,-6,-2,6,2,o.shoe||'#3a2420'); R(g,1,-2,6,2,o.shoe||'#3a2420');
+  R(g,-wd/2,by,wd,bodyH+1,o.top); R(g,-wd/2,by,2,bodyH+1,'rgba(0,0,0,.16)'); if(o.stripe) for(let y=by+2;y<by+bodyH;y+=3) R(g,-wd/2,y,wd,1,o.stripe);
+  if(o.apron) R(g,-wd/2+2,by+4,wd-4,bodyH+4,o.apron);
+  if(o.tag) R(g,2,by+3,3,2,'#ffd23f');
+  if(o.arms==='cross'){ R(g,-wd/2-2,by+6,wd+4,4,o.sleeve||o.top); R(g,-wd/2,by+7,wd,2,sk); }
+  else if(o.arms==='up'){ const k=Math.sin(T*9)>0; R(g,-wd/2-3,by-(k?9:3),3,11,sk); R(g,wd/2,by-(k?3:9),3,11,sk); }
+  else if(o.arms==='read'){ R(g,-2,by+5,9,3,sk); R(g,3,by+1,7,6,o.book||'#e8463a'); }
+  else { const sw=o.wave?Math.round(Math.sin(T*6)*2):0; R(g,-wd/2-3,by+1,3,bodyH-2,o.sleeve||o.top); R(g,wd/2,by+1-sw,3,bodyH-2,o.sleeve||o.top); R(g,-wd/2-3,by+bodyH-2,3,3,sk); R(g,wd/2,by+bodyH-2-sw,3,3,sk); }
+  R(g,-2,by-2,5,2,sk); R(g,-2,by-2,5,1,'rgba(0,0,0,.12)');
+  const front=o.view==='front';
+  R(g,-5,hy,11,13,sk); R(g,-5,hy,1,13,'rgba(0,0,0,.14)'); R(g,-4,hy+12,9,1,'rgba(0,0,0,.14)');
+  if(front){ for(const ex of [-3,2]){ R(g,ex,hy+5,2,2,blink?sk:'#fff'); if(!blink) R(g,ex+(ex<0?1:0),hy+5,1,2,'#1a1210'); } R(g,0,hy+6,1,3,'rgba(0,0,0,.18)'); R(g,-6,hy+5,1,3,sk); R(g,6,hy+5,1,3,sk);
+    if(o.blush){ R(g,-4,hy+8,2,1,'#ff8aa8'); R(g,3,hy+8,2,1,'#ff8aa8'); } }
+  else { R(g,3,hy+5,2,2,blink?sk:'#fff'); if(!blink) R(g,4,hy+5,1,2,'#1a1210'); R(g,6,hy+5,2,4,sk); R(g,7,hy+8,1,1,'rgba(0,0,0,.2)'); R(g,-3,hy+5,2,3,'rgba(0,0,0,.15)'); if(o.blush) R(g,2,hy+8,2,1,'#ff8aa8'); }
+  const m=front?-2:2; R(g,m,hy+10,front?5:4,1,o.lips||'rgba(120,40,40,.7)');
+  if(o.must) R(g,front?-3:1,hy+9,front?7:6,2,o.must);
+  if(o.beard) R(g,-4,hy+9,10,5,o.beard);
+  const hc=o.hair;
+  switch(o.hs){
+    case 'bald': R(g,-5,hy+2,2,6,hc); if(front) R(g,4,hy+2,2,6,hc); R(g,-1,hy+1,3,1,'rgba(255,255,255,.35)'); break;
+    case 'short': R(g,-6,hy-2,12,4,hc); R(g,-6,hy+2,2,5,hc); if(front) R(g,4,hy+2,2,4,hc); break;
+    case 'grey': R(g,-6,hy-1,12,3,hc); R(g,-6,hy+2,2,5,hc); R(g,-1,hy-1,1,2,'rgba(0,0,0,.2)'); break;
+    case 'pony': R(g,-6,hy-2,12,4,hc); R(g,-6,hy+2,3,6,hc); if(front){ R(g,4,hy+2,2,6,hc); R(g,-8,hy+3,3,10,hc);} else R(g,-10,hy+2,4,12,hc); R(g,-7,hy+1,2,2,'#e0338a'); break;
+    case 'bun': R(g,-6,hy-2,12,4,hc); R(g,-6,hy+2,2,5,hc); if(front) R(g,4,hy+2,2,5,hc); disc(g,front?0:-6,hy-4,4,hc); R(g,front?3:-3,hy-8,1,6,'#ffd23f'); break;
+    case 'big': for(const [x,y] of [[-9,-4],[-5,-6],[0,-6],[5,-4],[-10,1],[6,1],[-9,6],[6,6]]){ disc(g,x,hy+y,4,hc); } R(g,-3,hy-5,4,1,'rgba(255,255,255,.4)'); break;
+    case 'cap': R(g,-6,hy-3,12,5,o.cap||hc); R(g,front?-6:2,hy+1,front?12:8,2,'rgba(0,0,0,.25)'); if(!front) R(g,5,hy+1,6,2,o.cap||hc); R(g,-6,hy+2,2,4,hc); break;
+  }
+  if(o.glasses==='sun'){ if(front){ R(g,-4,hy+4,9,3,'#111'); R(g,-3,hy+4,2,1,'#5a5a8a'); } else R(g,1,hy+4,7,3,'#111'); }
+  else if(o.glasses){ const c=o.glasses===true?'#3a3a6a':o.glasses; if(front){ R(g,-4,hy+4,4,1,c); R(g,1,hy+4,4,1,c); R(g,-4,hy+7,4,1,c); R(g,1,hy+7,4,1,c);} else { R(g,2,hy+4,4,1,c); R(g,2,hy+7,4,1,c); R(g,-2,hy+5,4,1,c); } }
+  if(o.phones){ R(g,-7,hy+3,3,6,'#222'); R(g,-6,hy-3,12,2,'#222'); if(front) R(g,5,hy+3,3,6,'#222'); }
+  if(o.earring){ R(g,front?-7:-2,hy+9,1,2,'#ffd23f'); if(front) R(g,6,hy+9,1,2,'#ffd23f'); }
+  if(o.wire) line(g,-6,hy+8,-5,by+8,'#9a9aaa');
+}
+/* ---------- shared state ---------- */
+const S={ mode:'title', scene:'', x:160, y:150, dir:'front', face:1, phase:0, moving:false, path:[], onArrive:null, cam:0, inv:[], sel:null, verb:'walk',
+  fade:1, fadeFrom:1, fadeTo:1, fadeT:0, fadeDur:0, fadeCb:null, trans:0, lock:0, dance:0, mouse:null, hover:null, mouseOn:false, shk:0, shkA:0, idle:0 };
+const has=i=>S.inv.includes(i);
+function give(i){ if(!has(i)) S.inv.push(i); renderInv(); }
+function take(i){ S.inv=S.inv.filter(x=>x!==i); if(S.sel===i) setSel(null); renderInv(); }
+const timers=[]; const after=(s,fn)=>timers.push({t:s,fn});
+function shake(d,a){ S.shk=d; S.shkA=a; }
+const POP=[];
+function pts(n,key){ if(F['p_'+key]) return; F['p_'+key]=1; F.score=(F.score||0)+n; sfx('score'); showScore(true); POP.push({x:S.x,y:S.y-62*scl(S.y),t:0,txt:'+'+n}); }
+function showScore(bump){ const el=$('score'); if(!el) return; if(G.noScore){ el.textContent=tr(G.barTitle||''); return; } el.textContent=tr(G.scoreLabel||'Πόντοι:')+' '+(F.score||0)+(G.scoreSep?' '+tr(G.scoreSep)+' ':' / ')+G.maxPts; if(bump){ el.classList.remove('bump'); void el.offsetWidth; el.classList.add('bump'); } }
+function scl(y){ const s=SC[S.scene]; return clamp(lerp(s.sFar,1,(y-s.far)/(s.near-s.far)),s.sFar*.92,1.04); }
+function npcRect(x,b,k){ return [x-10*k,b-62*k,20*k,62*k]; }
+const SC={};
+function room1(g,w,o){ // one-point perspective room shell: back wall [bx0,bx1]x[by0,by1], vanishing point (vx,vy)
+  const {bx0,bx1,by0,by1,vx,vy}=o, sl=(by1-vy)/(vx-bx0), sr=(by1-vy)/(bx1-vx), tl=(by0-vy)/(bx0-vx), tr2=(by0-vy)/(bx1-vx);
+  const ylT=by0-bx0*tl, yrT=by0+(w-bx1)*tr2, ylB=by1+bx0*sl, yrB=by1+(w-bx1)*sr;
+  poly(g,[[0,0],[w,0],[w,yrT],[bx1,by0],[bx0,by0],[0,ylT]],o.ceil);
+  poly(g,[[0,ylT],[bx0,by0],[bx0,by1],[0,ylB]],o.left); poly(g,[[bx1,by0],[w,yrT],[w,yrB],[bx1,by1]],o.right);
+  R(g,bx0,by0,bx1-bx0,by1-by0,o.back);
+  const fl=[[bx0,by1],[bx1,by1],[bx1+(180-by1)/sr,180],[bx0-(180-by1)/sl,180]];
+  if(o.floor) floorFill(g,fl,vy,vx,o.S1||40,o.S2||8000,o.floor);
+  line(g,0,ylT,bx0,by0,o.edge||'rgba(0,0,0,.3)'); line(g,w,yrT,bx1,by0,o.edge||'rgba(0,0,0,.3)'); line(g,bx0,by1,0,ylB,o.edge||'rgba(0,0,0,.3)'); line(g,bx1,by1,w,yrB,o.edge||'rgba(0,0,0,.3)');
+  return {wallL:x=>[ylT+(by0-ylT)*x/bx0, ylB+(by1-ylB)*x/bx0], wallR:x=>[by0+(yrT-by0)*(x-bx1)/(w-bx1), by1+(yrB-by1)*(x-bx1)/(w-bx1)], fl};
+}
+function wallQuad(g,side,x0,x1,f0,f1,W2,c){ // draw a rect on a side wall between x0..x1, at heights f0..f1 (0=top,1=floor)
+  const a=W2(x0), b=W2(x1); poly(g,[[x0,lerp(a[0],a[1],f0)],[x1,lerp(b[0],b[1],f0)],[x1,lerp(b[0],b[1],f1)],[x0,lerp(a[0],a[1],f1)]],c); }
+
+/* ================= ΠΕΡΙΠΟΛΙΚΟ 7 · point & click ================= */
+const E={k:'#000000',b:'#0000aa',g:'#00aa00',c:'#00aaaa',r:'#aa0000',m:'#aa00aa',br:'#aa5500',lg:'#aaaaaa',dg:'#555555',lb:'#5555ff',lgr:'#55ff55',lc:'#55ffff',lr:'#ff5555',lm:'#ff55ff',y:'#ffff55',w:'#ffffff'};
+const SKIN='#ffaa77', SKIND='#cc7744';
+function ptSet(l){ return l; }
+const G={ key:'peripoliko7-pc', title:'Περιπολικό 7', maxPts:100, scoreSep:'από', outline:'#000000',
+  DEF:{ look:['Τίποτα που να ενδιαφέρει την υπηρεσία.'], hand:['Αυτό δεν χρειάζεται να το πάρεις.'], talk:['Δεν απαντάει. Ο κανονισμός δεν προβλέπει συζήτηση με αντικείμενα.'] },
+  NOPE:['Αυτό δεν προβλέπεται από τον κανονισμό.','Όχι. Απλώς όχι.','Δεν βγαίνει νόημα, αστυφύλακα.'],
+  titleScene:['street','start'], titleMusic:'theme', musicFor(id){ return id==='street'?'theme':'quiet'; }, speed:50,
+  dust:{street:'#cfcfcf'}, popFont:'700 9px "Fira Mono", monospace', popFill:'#ffff55', popStroke:'#000000', irisCol:'#000000', irisRim:'rgba(255,255,85,.85)', vigRGB:'0,0,40', vig(){ return .3; },
+  playerFn(){ return S.dir==='side'?(g=>copSide(g,S.phase,S.moving)):(g=>copFront(g,S.phase,S.moving,S.dir==='back')); },
+  newGame(){ F={score:0}; S.inv=['notebook']; enter('locker','start'); S.trail=[]; },
+  intro(){ say(['Ακτή, 1989. Αστυνομικό Τμήμα Παραλίας.','Είσαι ο αστυφύλακας Άρης Μαυρίδης. Είκοσι τεσσάρων ετών, φρέσκος από τη Σχολή.','Πρώτη σου βάρδια. Ο αρχιφύλακας Κανελλόπουλος έχει ήδη αμφιβολίες.','Κάνε τη δουλειά σωστά. Με τον κανονισμό. Βήμα βήμα.'],
+    ()=>tip('Διάλεξε ενέργεια από τη μπάρα: πόδια, μάτι, χέρι, στόμα ή αντικείμενο. Μετά πάτα πάνω στην εικόνα. Με ποντίκι, το δεξί κλικ αλλάζει ενέργεια.',9000)); },
+  itemFallback(h,it){ if(it==='gun'){ if(h&&h.id!=='lockbox'){ gameOver('gun'); return true; } say(['Δεν βγάζεις το όπλο χωρίς λόγο. Ποτέ.']); return true; } if(it==='radio'){ radioCall(); return true; } return false; },
+  onPlace(){ S.trail=[]; },
+  update(dt,s){ if(F.cuffed&&!F.booked&&!F.inCar){ S.trail.push([S.x,S.y]); if(S.trail.length>200) S.trail.shift(); }
+    if(s===SC.booking&&has('gun')&&F.cuffed&&!F.booked&&!S.trans&&S.mode==='play'){ const X=(S.x-160)/(S.y-46)*40; if(X>-18) gameOver('cell'); }
+    if(s===SC.street&&!F.pigeons&&Math.abs(S.x-440)<30&&Math.abs(S.y-150)<20){ F.pigeons=T; for(let i=0;i<3;i++) PFX.push({x:432+i*8,y:150,vx:rand(-40,-10),vy:rand(-50,-30),t:0,max:1.6,c:'#aaaaaa',r:2,g:-6}); sfx('blip'); } },
+  extra(L,s){ if(F.cuffed&&!F.booked&&!F.inCar&&(s===SC.street||s===SC.booking)){ const tr2=S.trail, p=tr2.length>22?tr2[tr2.length-22]:[S.x-14*S.face,S.y-2]; const q=tr2.length>23?tr2[tr2.length-23]:p, dx=p[0]-q[0];
+      L.push({y:p[1],draw(g){ actor(g,gg=>person(gg,{skin:SKIN,hair:E.k,hs:'short',top:'#555555',bottom:'#333377',glasses:'sun',must:'#331100',arms:'cross',view:Math.abs(dx)>.2?'side':'front',seed:3}),p[0],p[1],scl(p[1]),dx<0); }}); } },
+  hd(s,cam,td){ if(s.outdoor){ hdSun(268,12,0); octx.save(); const g=octx.createLinearGradient(0,0,0,60); g.addColorStop(0,'rgba(40,60,180,.35)'); g.addColorStop(1,'rgba(160,220,255,0)'); octx.globalCompositeOperation='soft-light'; octx.fillStyle=g; octx.fillRect(0,0,320,60); octx.restore(); }
+    else hdAdd(()=>{ for(const x of s.tubes||[]){ const cx=x-cam, fl=.85+.15*Math.sin(T*50+x); hdGlow(cx,16,42,'220,240,255',.24*fl); hdBeam([[cx-14,17],[cx+14,17],[cx+40,170],[cx-40,170]],'220,235,255',.07*fl,0,17,170); } });
+    if(s===SC.street&&!F.inCar){ const on=Math.sin(T*6)>0; hdAdd(()=>{ hdGlow(76-cam,140,on?46:20,'255,50,50',on?.5:.15); hdGlow(90-cam,140,on?20:46,'70,110,255',on?.15:.5); }); }
+    if(s===SC.garage){ const on=Math.sin(T*6)>0; hdAdd(()=>{ hdGlow(206-cam,108,30,on?'255,60,60':'70,110,255',.18); }); } },
+  grade(s){ hdGrade('soft-light',s.outdoor?'255,190,120':'200,220,255',s.outdoor?.28:.2); },
+};
+S.trail=[];
+/* ---------- items ---------- */
+const ITEMS={
+  notebook:{n:'Σημειωματάριο',d:()=>{ const L=[tr('Το σημειωματάριο υπηρεσίας. Κανονισμός: ό,τι δεν γράφεται, δεν έγινε.')]; if(F.brief) L.push(tr('«Κλεμμένο κόκκινο κουπέ, ΑΚΤ-4471. Ύποπτος: Στέλιος Μπέκας. Δερμάτινο μπουφάν.»')); if(F.plate) L.push(tr('«Οδός Λιμανιού: ΑΚΤ-4471 εντοπίστηκε.»')); return L; }},
+  gun:{n:'Υπηρεσιακό όπλο',d:['Στη θήκη του. Εκεί μένει, εκτός αν υπάρχει πραγματικός κίνδυνος.','Κανονισμός: ποτέ οπλισμένος μέσα στα κρατητήρια.']},
+  radio:{n:'Ασύρματος',d:['Φορητός ασύρματος, κανάλι του Κέντρου. Διάλεξέ τον με το B και πάτα A για να καλέσεις.']},
+  cuffs:{n:'Χειροπέδες',d:['Ατσάλινες. Κλειδί στη ζώνη.']},
+  flashlight:{n:'Φακός',d:['Βαρύς φακός μαγκλίτσα. Δυνατό φως.']},
+  keys:{n:'Κλειδιά περιπολικού',d:['Περιπολικό 7. Ένα μπρελόκ με τον Άγιο Χριστόφορο.']},
+  evidence:{n:'Σακούλα με ρολόγια',d:['Πειστήριο. Δώδεκα καινούργια ρολόγια, με τις ετικέτες ακόμα πάνω.']},
+};
+const ICON={
+  notebook:g=>{ R(g,2,1,8,10,E.br); R(g,3,2,6,8,E.w); for(let y=3;y<9;y+=2) R(g,4,y,4,1,E.dg); },
+  gun:g=>{ R(g,2,4,8,3,E.dg); R(g,2,7,3,4,E.br); R(g,8,3,2,1,E.dg); },
+  radio:g=>{ R(g,3,3,6,8,E.k); R(g,4,4,4,2,E.lgr); R(g,4,7,4,3,E.dg); R(g,7,0,1,3,E.k); },
+  cuffs:g=>{ disc(g,3,6,2,E.lg); disc(g,8,6,2,E.lg); g.clearRect(3,6,1,1); g.clearRect(8,6,1,1); R(g,5,6,2,1,E.lg); },
+  flashlight:g=>{ R(g,1,5,7,3,E.k); R(g,8,4,3,5,E.lg); R(g,10,5,1,3,E.y); },
+  keys:g=>{ disc(g,3,4,2,E.y); g.clearRect(3,4,1,1); R(g,5,4,5,1,E.y); R(g,8,5,1,2,E.y); R(g,2,8,3,3,E.lb); },
+  evidence:g=>{ R(g,2,3,8,8,E.w); R(g,2,3,8,1,E.r); R(g,4,6,2,2,E.y); R(g,7,7,2,2,E.lg); },
+};
+const RECIPES={};
+const rkey=(a,b)=>[a,b].sort().join('+');
+function iconCanvas(id){ const c=document.createElement('canvas'); c.width=12; c.height=12; ICON[id](c.getContext('2d')); return c; }
+
+
+
+/* ---------- officer ---------- */
+function copSide(g,ph,mv){ const sw=mv?Math.sin(ph):0, l1=Math.round(sw*3), yb=mv?-Math.round(Math.abs(Math.cos(ph))):0, blink=(T%3.4)<.12;
+  for(const [dx,back] of [[-l1,1],[l1,0]]){ R(g,-2+dx,-24+yb,4,22,back?'#000077':E.b); R(g,-3+dx,-2+yb,6,2,E.k); }
+  R(g,-6,-27+yb,13,3,E.k); if(has('gun')) R(g,-8,-30+yb,3,6,E.dg); R(g,-8,-27+yb,4,6,E.k); if(has('radio')) R(g,3,-31+yb,3,5,E.k); if(has('cuffs')) R(g,-1,-27+yb,2,2,E.lg);
+  const ax=Math.round(-sw*2.5); R(g,-8-ax,-46+yb,3,14,'#3333cc'); R(g,-8-ax,-32+yb,3,3,SKIND);
+  R(g,-6,-48+yb,13,21,E.lb); R(g,-6,-48+yb,3,21,'#3333cc'); R(g,2,-44+yb,3,3,E.y); R(g,1,-48+yb,4,3,E.w); R(g,3,-46+yb,1,6,E.b); R(g,-6,-48+yb,4,1,E.b);
+  R(g,4+ax,-46+yb,3,14,E.lb); R(g,4+ax,-32+yb,3,3,SKIN);
+  R(g,-1,-51+yb,4,3,SKIN);
+  R(g,-4,-62+yb,10,11,SKIN); R(g,-4,-62+yb,1,11,SKIND); R(g,-5,-61+yb,3,5,'#552200'); R(g,-1,-58+yb,2,3,SKIND);
+  R(g,3,-58+yb,2,2,blink?SKIN:E.w); if(!blink) R(g,4,-58+yb,1,2,E.k); R(g,6,-56+yb,2,3,SKIN); R(g,2,-53+yb,3,1,SKIND);
+  R(g,-6,-67+yb,12,6,E.b); R(g,-6,-67+yb,12,1,'#3333cc'); R(g,3,-62+yb,7,2,E.k); R(g,-1,-66+yb,3,3,E.y); }
+function copFront(g,ph,mv,back){ const s=mv?Math.sin(ph):0, la=s>0?Math.round(s*2):0, ra=s<0?Math.round(-s*2):0, yb=mv?-Math.round(Math.abs(Math.cos(ph))):0, blink=(T%3.4)<.12;
+  R(g,-5,-24-la+yb,4,22,'#000077'); R(g,1,-24-ra+yb,4,22,E.b); R(g,-6,-2-la+yb,6,2,E.k); R(g,0,-2-ra+yb,6,2,E.k);
+  R(g,-8,-27+yb,16,3,E.k); if(has('gun')) R(g,back?4:-10,-29+yb,3,7,E.dg);
+  R(g,-8,-48+yb,16,21,E.lb); R(g,-8,-48+yb,2,21,'#3333cc'); R(g,6,-48+yb,2,21,'#3333cc');
+  R(g,-11,-47+ra+yb,3,14,E.lb); R(g,8,-47+la+yb,3,14,E.lb); R(g,-11,-33+ra+yb,3,3,SKIND); R(g,8,-33+la+yb,3,3,SKIN);
+  R(g,-2,-51+yb,4,3,SKIN);
+  if(back){ R(g,-5,-62+yb,10,11,SKIN); R(g,-5,-62+yb,10,6,'#552200'); R(g,-6,-67+yb,12,6,E.b); return; }
+  R(g,-2,-48+yb,4,3,E.w); R(g,-1,-46+yb,2,6,E.b); R(g,2,-44+yb,3,3,E.y); R(g,-6,-44+yb,3,2,E.b);
+  R(g,-5,-62+yb,10,11,SKIN); R(g,-5,-62+yb,1,11,SKIND); R(g,-6,-58+yb,1,3,SKIN); R(g,5,-58+yb,1,3,SKIN);
+  for(const ex of [-3,1]){ R(g,ex,-58+yb,2,2,blink?SKIN:E.w); if(!blink) R(g,ex+(ex<0?1:0),-58+yb,1,2,E.k); }
+  R(g,0,-56+yb,1,3,SKIND); R(g,-2,-53+yb,4,1,SKIND); R(g,-6,-67+yb,12,6,E.b); R(g,-7,-62+yb,14,2,E.k); R(g,-1,-66+yb,3,3,E.y); }
+
+/* ---------- vehicles ---------- */
+function patrolCar(g,x,y,o={}){ shadowE(g,x+60,y,62,4,.3);
+  R(g,x,y-22,120,14,E.w); R(g,x,y-22,120,1,E.lg); R(g,x,y-10,120,3,E.dg); R(g,x+26,y-36,60,14,E.w); R(g,x+30,y-34,24,11,'#000044'); R(g,x+58,y-34,24,11,'#000044'); R(g,x+31,y-33,3,9,'rgba(255,255,255,.35)');
+  R(g,x,y-18,120,5,E.b); R(g,x+54,y-21,1,12,E.lg); R(g,x+46,y-41,24,5,E.k); const on=o.lit&&Math.sin(T*6)>0; R(g,x+47,y-40,10,3,on?E.lr:E.r); R(g,x+59,y-40,10,3,on?E.b:E.lb);
+  R(g,x+116,y-20,4,4,E.y); R(g,x,y-20,3,4,E.r);
+  const wheel=(wx,flat)=>{ if(flat){ R(g,wx-7,y-6,15,6,E.k); R(g,wx-4,y-5,8,2,E.dg); } else { disc(g,wx,y-5,6,E.k); disc(g,wx,y-5,2,E.lg); } }; wheel(x+22,o.flat); wheel(x+98,false); }
+function coupe(g,x,y){ shadowE(g,x+40,y,42,4,.3); R(g,x,y-17,82,11,E.r); R(g,x,y-17,82,1,E.lr); R(g,x+20,y-29,40,12,E.r); R(g,x+23,y-27,15,9,E.k); R(g,x+40,y-27,16,9,E.k); R(g,x+78,y-15,4,3,E.y); R(g,x,y-15,3,3,E.lr);
+  disc(g,x+16,y-5,6,E.k); disc(g,x+16,y-5,2,E.lg); disc(g,x+66,y-5,6,E.k); disc(g,x+66,y-5,2,E.lg); R(g,x+34,y-12,14,4,E.w); R(g,x+35,y-11,12,2,E.k); }
+function officeRoom(g,w,o){ return room1(g,w,Object.assign({ceil:E.dg,left:'#888888',right:'#888888',back:E.lg,S1:40,S2:7000,floor:(X,Z)=>((Math.floor(X/10)+Math.floor(Z/9))&1)?[170,170,170]:[255,255,255]},o)); }
+function stripeWall(g,x,y,w,h){ dith(g,x,y,w,Math.round(h*.45),E.w); R(g,x,y+h-30,w,4,E.b); R(g,x,y+h-26,w,26,E.c); dith(g,x,y+h-26,w,26,E.b); }
+
+/* ---------- LOCKER ---------- */
+SC.locker={ w:320, far:124, near:176, sFar:.7, tubes:[110,210],
+  bg(g,w){ const RM=officeRoom(g,w,{bx0:70,bx1:250,by0:24,by1:114,vx:160,vy:44}); stripeWall(g,70,24,180,90);
+    for(let i=0;i<7;i++){ const lx=88+i*22; R(g,lx,50,21,64,E.k); R(g,lx+1,51,19,62,i===3?E.lb:E.b); R(g,lx+1,51,19,1,E.lb); for(let v=0;v<3;v++) R(g,lx+5,56+v*3,11,1,E.k); R(g,lx+15,82,2,6,E.lg); R(g,lx+8,64,5,4,E.w); }
+    disc(g,232,38,8,E.k); disc(g,232,38,7,E.w); R(g,232,33,1,5,E.k); R(g,232,38,4,1,E.k);
+    const wl=RM.wallL, wr=RM.wallR; wallQuad(g,'L',12,44,.3,1,wl,E.k); wallQuad(g,'L',15,41,.33,1,wl,E.br); wallQuad(g,'L',19,37,.38,.55,wl,E.c);
+    wallQuad(g,'L',50,64,.3,.5,wl,E.w); wallQuad(g,'L',50,64,.3,.35,wl,E.r);
+    wallQuad(g,'R',272,290,.5,1,wr,E.dg); wallQuad(g,'R',273,289,.5,.6,wr,E.lg); },
+  walk:[[80,124],[240,124],[300,177],[20,177]], block:[[110,142,100,10]],
+  props(){ return [{y:152,draw(g){ shadowE(g,160,153,52,3,.3); R(g,108,140,104,5,E.br); dith(g,108,140,104,5,'#773300'); R(g,112,145,3,8,E.dg); R(g,205,145,3,8,E.dg); }}, F.gear?{y:115,draw(g){ R(g,155,51,19,62,E.k); dith(g,155,51,19,62,E.dg); }}:{y:0,draw(){}}]; },
+  hs:[
+    {id:'door',n:'Προς την αίθουσα ενημέρωσης',rect:[10,56,36,116],at:[40,156],face:'left',look:['Η πόρτα προς την αίθουσα ενημέρωσης.'],
+      hand(){ if(!F.gear) return say(['Δεν βγαίνεις στη βάρδια χωρίς εξοπλισμό. Το ντουλάπι σου είναι το νούμερο 7.']); sfx('door'); go('brief','locker'); }, exit(){ this.hand(); }},
+    {id:'notice',n:'Ανακοίνωση',rect:[48,54,18,30],at:[64,140],face:'left',look:['«ΥΠΕΝΘΥΜΙΣΗ: Επιθεώρηση οχήματος πριν από κάθε βάρδια. Όπλα στη θυρίδα πριν από τα κρατητήρια. Καμία εξαίρεση.»','Από κάτω, με μολύβι: «Και πλένετε τις κούπες σας.»']},
+    {id:'locker7',n:'Ντουλάπι 7',rect:[154,50,21,64],at:[164,128],face:'back',look:['Το ντουλάπι σου. Νούμερο 7. Ακόμα μυρίζει καινούργια μπογιά.'],
+      hand(){ if(F.gear) return say(['Άδειο. Μόνο μια φωτογραφία της ομάδας μπάσκετ του τμήματος, του 1984. Χάσαμε.']);
+        F.gear=1; ['gun','radio','cuffs','flashlight'].forEach(give); pts(5,'gear'); sfx('locker'); say(['Ανοίγεις το ντουλάπι 7.','Περνάς τη ζώνη: όπλο στη θήκη, χειροπέδες, ασύρματος, φακός.','Αστυφύλακας Άρης Μαυρίδης. Έτοιμος για την πρώτη σου βάρδια.']); }},
+    {id:'lockers',n:'Ντουλάπια',rect:[86,50,66,64],at:[120,128],face:'back',look:['Τα ντουλάπια των συναδέλφων. Σε ένα κάποιος έχει κολλήσει αυτοκόλλητο του Ολυμπιακού. Σε άλλο, του Παναθηναϊκού. Δίπλα δίπλα. Θαύμα.']},
+    {id:'bench',n:'Πάγκος',rect:[106,132,108,22],at:[160,164],face:'back',look:['Ο πάγκος των αποδυτηρίων. Εδώ έχουν ειπωθεί περισσότερα ψέματα για ψάρεμα απ’ ό,τι σε όλο το λιμάνι.']},
+    {id:'clock',n:'Ρολόι',rect:[224,30,16,16],at:null,look:['Έξι και μισή το πρωί. Η βάρδια ξεκινάει στις επτά.']},
+    {id:'tap',n:'Βρύση',rect:[270,96,22,30],at:[270,150],face:'right',look:['Μια βρύση με πόσιμο νερό.'],hand:['Πίνεις λίγο νερό. Έχει γεύση από χλώριο και από είκοσι χρόνια υπηρεσίας.']},
+  ],
+  entries:{start:[160,160,'front'], brief:[44,158,'side',1]} };
+
+/* ---------- BRIEFING ---------- */
+SC.brief={ w:400, far:126, near:176, sFar:.66, tubes:[100,200,300],
+  bg(g,w){ const RM=officeRoom(g,w,{bx0:60,bx1:340,by0:24,by1:114,vx:200,vy:44}); stripeWall(g,60,24,280,90);
+    R(g,138,34,120,56,E.br); R(g,141,37,114,50,'#005500'); dith(g,141,37,114,50,E.g); line(g,150,48,190,50,E.w); line(g,190,50,205,70,E.w); line(g,205,70,240,72,E.w); disc(g,208,70,3,E.lr); R(g,150,78,40,1,E.w);
+    R(g,268,48,30,30,E.br); R(g,270,50,26,26,'#773300'); for(let i=0;i<4;i++) R(g,273+i*6,54,1,2,E.lg);
+    R(g,84,58,24,56,E.k); R(g,86,60,20,54,E.dg); dith(g,86,60,20,54,E.k); R(g,84,48,24,9,E.r); R(g,87,50,18,1,E.w); R(g,87,53,18,1,E.w);
+    const wl=RM.wallL, wr=RM.wallR; wallQuad(g,'L',12,44,.3,1,wl,E.k); wallQuad(g,'L',15,41,.33,1,wl,E.br);
+    wallQuad(g,'R',356,388,.3,1,wr,E.k); wallQuad(g,'R',359,385,.33,1,wr,E.lg); },
+  walk:[[70,126],[330,126],[392,177],[8,177]], block:[[186,120,32,10],[230,140,90,14],[300,118,26,10]],
+  props(){ const L=[];
+    L.push({y:124,draw(g){ actor(g,gg=>person(gg,{skin:SKIN,hair:E.lg,hs:'grey',top:E.lb,bottom:E.b,must:E.lg,tag:true,view:'front',seed:1}),202,120,scl(126)); }});
+    L.push({y:128,draw(g){ shadowE(g,202,129,16,2,.3); R(g,188,100,28,28,E.br); dith(g,188,100,28,28,'#773300'); R(g,186,98,32,3,'#773300'); }});
+    L.push({y:154,draw(g){ shadowE(g,276,155,48,3,.28); for(let i=0;i<4;i++){ const cx=236+i*22; R(g,cx,138,14,4,E.dg); R(g,cx+12,122,3,18,E.dg); R(g,cx+1,142,2,12,E.k); R(g,cx+11,142,2,12,E.k); } }});
+    L.push({y:128,draw(g){ shadowE(g,312,129,14,2,.3); R(g,300,82,26,46,E.r); R(g,302,86,22,12,E.k); R(g,304,88,18,3,Math.sin(T*3)>.7?E.y:E.lgr); R(g,306,102,14,10,E.k); R(g,310,108,6,4,E.w); }});
+    return L; },
+  hs:[
+    {id:'ldoor',n:'Προς τα αποδυτήρια',rect:[10,56,36,116],at:[40,156],face:'left',hand(){ sfx('door'); go('locker','brief'); },exit(){ sfx('door'); go('locker','brief'); }},
+    {id:'cells',n:'Κρατητήρια',rect:[84,48,24,66],at:[96,132],face:'back',look:['Η πόρτα για τα κρατητήρια. Από πάνω, μια κόκκινη πινακίδα.'],
+      hand(){ if(F.cuffed&&!F.booked){ sfx('door'); go('booking','brief'); } else say(['Τα κρατητήρια. Δεν έχεις κάποιον να φέρεις εκεί. Ακόμα.']); }, exit(){ this.hand(); }},
+    {id:'sarge',n:'Αρχιφύλακας Κανελλόπουλος',rect:()=>npcRect(202,120,scl(126)),at:[202,134],face:'back',look:['Ο αρχιφύλακας Κανελλόπουλος. Τριάντα χρόνια στην υπηρεσία, και τα τριάντα με το ίδιο μουστάκι.'],
+      talk(){ if(!F.brief){ F.brief=1; pts(5,'brief'); return say(['Αρχιφύλακας: «Καλημέρα, Μαυρίδη. Πρώτη μέρα. Μη μου τα κάνεις θάλασσα.»','Αρχιφύλακας: «Κλεμμένο χθες βράδυ: κόκκινο κουπέ, πινακίδα ΑΚΤ-4471.»','Αρχιφύλακας: «Ύποπτος ο Στέλιος Μπέκας, “ο Γάτος”. Δερμάτινο μπουφάν, μαύρα γυαλιά, κανένα χιούμορ.»','Αρχιφύλακας: «Επιθεώρηση στο όχημα πριν φύγεις. Και στα κρατητήρια, το όπλο στη θυρίδα. Πάντα.»','Αρχιφύλακας: «Κλειδιά στον πίνακα. Περιπολικό 7. Άντε.»']); }
+        say(['Αρχιφύλακας: «ΑΚΤ-4471. Μπέκας. Κανονισμός. Μη με κάνεις να επαναλαμβάνομαι.»']); }, hand(){ this.talk(); }},
+    {id:'board',n:'Πίνακας',rect:[138,34,120,56],at:[180,134],face:'back',look:['Ένας χάρτης της Ακτής με κιμωλία. Ένας κύκλος στην οδό Λιμανιού.']},
+    {id:'keys',n:'Πίνακας κλειδιών',rect:[266,46,34,34],at:[282,132],face:'back',look:['Ο πίνακας με τα κλειδιά των περιπολικών.'],
+      hand(){ if(F.keys) return say(['Τα κλειδιά του Περιπολικού 7 είναι ήδη στην τσέπη σου.']); if(!F.brief) return say(['Αρχιφύλακας: «Μαυρίδη! Πρώτα ενημέρωση, μετά κλειδιά. Έτσι γίνεται εδώ μέσα.»']);
+        F.keys=1; give('keys'); pts(5,'keys'); sfx('pick'); say(['Παίρνεις τα κλειδιά του Περιπολικού 7.']); }},
+    {id:'coffee',n:'Μηχάνημα καφέ',rect:[298,80,30,48],at:[312,136],face:'back',look:['Ο καφές μηχανής του τμήματος.','Έχει λύσει περισσότερες υποθέσεις από όλους σας. Και έχει προκαλέσει άλλες τόσες γαστρίτιδες.'],hand:['Πατάς το κουμπί. Το μηχάνημα βήχει και σου δίνει κάτι καφέ. Δεν το πίνεις.']},
+    {id:'gdoor',n:'Προς το πάρκινγκ',rect:[354,56,36,116],at:[372,156],face:'right',
+      hand(){ if(!F.keys) return say(['Χωρίς κλειδιά, στο πάρκινγκ θα πας μόνο για να κοιτάξεις.']); sfx('door'); go('garage','brief'); }, exit(){ this.hand(); }},
+  ],
+  entries:{locker:[44,158,'side',1], booking:[96,134,'front'], garage:[368,158,'side',-1]} };
+
+/* ---------- GARAGE ---------- */
+SC.garage={ w:420, far:128, near:176, sFar:.64, tubes:[120,300],
+  bg(g,w){ const r=rng(5); room1(g,w,{bx0:40,bx1:380,by0:20,by1:112,vx:210,vy:40,ceil:'#222222',left:E.dg,right:E.dg,back:E.dg,S1:40,S2:7000,
+      floor:(X,Z,x,y)=>{ if(Math.abs(X+40)<1.2||Math.abs(X-40)<1.2) return [255,255,85]; const n=hash2(x>>1,y>>1); return n>.92?[40,40,40]:[85+((x+y)&1)*8,85,85]; }});
+    dith(g,40,20,340,92,E.lg); R(g,40,70,340,4,E.y); dith(g,40,70,340,4,E.k);
+    R(g,60,52,24,60,E.k); R(g,62,54,20,58,E.lg); dith(g,62,54,20,58,E.dg);
+    R(g,260,36,56,40,E.br); dith(g,260,36,56,40,'#773300'); line(g,268,44,268,66,E.lg); line(g,278,42,286,62,E.lg); R(g,294,44,10,4,E.r); R(g,296,52,2,18,E.lg);
+    R(g,330,30,50,82,E.lg); for(let y=34;y<112;y+=6) R(g,330,y,50,2,E.dg);
+    for(let i=0;i<8;i++) disc(g,60+r()*300,140+r()*30,2+((r()*3)|0),'#3a3a3a'); },
+  walk:[[50,130],[370,130],[410,177],[10,177]], block:[[140,140,128,16],[280,128,30,10]],
+  props(){ return [
+    {y:154,draw(g){ patrolCar(g,144,154,{flat:!F.fixed}); }},
+    {y:132,draw(g){ actor(g,gg=>person(gg,{skin:SKIN,hair:E.k,hs:'short',top:E.dg,bottom:E.dg,must:E.k,seed:2}),300,132,scl(132),true); }},
+    {y:136,draw(g){ shadowE(g,330,137,14,2,.3); R(g,318,122,26,14,E.r); R(g,318,120,26,3,E.lr); }},
+  ]; },
+  hs:[
+    {id:'door',n:'Προς την αίθουσα ενημέρωσης',rect:[60,50,26,62],at:[72,136],face:'back',hand(){ sfx('door'); go('brief','garage'); },exit(){ sfx('door'); go('brief','garage'); }},
+    {id:'tire',n:'Πίσω λάστιχο',rect:[154,140,24,16],at:[168,166],face:'back',look(){ say(F.fixed?['Φουσκωμένο και καινούργιο.']:F.inspect?['Μισοξεφούσκωτο. Με αυτό δεν πας πουθενά. Μίλα στον μηχανικό.']:['Το πίσω λάστιχο του περιπολικού.']); },
+      hand(){ if(F.fixed) return say(['Φουσκωμένο και καινούργιο.']); if(!F.inspect){ F.inspect=1; pts(10,'inspect'); return say(['Κάνεις τον γύρο του περιπολικού, όπως λέει ο κανονισμός.','Φώτα εντάξει. Φάρος εντάξει.','Το πίσω αριστερό λάστιχο όμως είναι μισοξεφούσκωτο. Μέσα του, ένα καρφί.']); } say(['Μισοξεφούσκωτο. Με αυτό δεν πας πουθενά. Μίλα στον μηχανικό.']); }},
+    {id:'car',n:'Περιπολικό 7',rect:[180,112,90,44],at:[226,164],face:'back',look:['Το Περιπολικό 7. Λευκό, με μπλε ρίγα και έναν φάρο που έχει δει πολλά.'],hand(){ drive(); },
+      item(i){ if(i==='keys'){ drive(); return true; } if(i==='flashlight'){ say(['Ελέγχεις τα φώτα με τον φακό. Δουλεύουν όλα.']); return true; } }},
+    {id:'mitsos',n:'Μήτσος, ο μηχανικός',rect:()=>npcRect(300,132,scl(132)),at:[284,142],face:'right',look:['Ο Μήτσος. Λάδια μέχρι τους αγκώνες, χαμόγελο μέχρι τα αυτιά.'],
+      talk(){ if(F.fixed) return say(['Μήτσος: «Τα περιπολικά τα προσέχω σαν παιδιά μου. Τα παιδιά μου όχι τόσο.»']);
+        if(F.inspect){ F.fixed=1; sfx('wrench'); return say(['Λες στον Μήτσο για το λάστιχο.','Μήτσος: «Καρφί; Καλά που το είδες. Θα σου έσκαγε στην πρώτη στροφή.»','Πέντε λεπτά και πολλές βρισιές αργότερα, το λάστιχο είναι καινούργιο.']); }
+        say(['Μήτσος: «Το Επτά είναι έτοιμο. Νομίζω. Το έλεγξες;»']); }, hand(){ this.talk(); }},
+    {id:'tools',n:'Πάγκος εργαλείων',rect:[258,34,60,44],at:[290,136],face:'back',look:['Κλειδιά, κατσαβίδια και ένα ημερολόγιο του 1986 που κανείς δεν τόλμησε να κατεβάσει.']},
+  ],
+  entries:{brief:[72,138,'front'], street:[120,160,'side',1]} };
+function drive(){
+  if(!has('keys')) return say(['Κλειδωμένο. Τα κλειδιά είναι στον πίνακα της αίθουσας ενημέρωσης.']);
+  if(!F.fixed){ if(F.inspect) return say(['Με ξεφούσκωτο λάστιχο δεν φεύγεις. Μίλα στον Μήτσο.']); return gameOver('tire'); }
+  if(F.done) return say(['Η βάρδια τελείωσε. Ώρα για αναφορά, όχι για βόλτες.']);
+  choose('Περιπολικό 7: πού πας;',[
+    {t:'Περιπολία στην πόλη',f:()=>{ sfx('engine'); say(['Βάζεις μπρος. Βγαίνεις από το πάρκινγκ. Η πόλη ξυπνάει.','Ασύρματος: «Περιπολικό 7, από Κέντρο.»','Ασύρματος: «Κόκκινο κουπέ, πιθανώς το ΑΚΤ-4471, εντοπίστηκε στην οδό Λιμανιού, έξω από το καφέ “Γλάρος”. Ελέγξτε.»','Εσύ: «Ελήφθη, Κέντρο. Κατευθύνομαι.»'],()=>{ sfx('siren'); go('street','garage'); }); }},
+    {t:'Μένω ακόμα εδώ',f:()=>{}}]); }
+
+/* ---------- STREET ---------- */
+SC.street={ w:520, far:126, near:166, sFar:.62, outdoor:true,
+  bg(g,w){ const r=rng(9);
+    R(g,0,0,w,50,E.lb); dith(g,0,0,w,22,E.b); dith(g,0,38,w,12,E.lc);
+    const block=(x,bw,top,col,colD)=>{ R(g,x,top,bw,118-top,col); dith(g,x,top,bw,118-top,colD); for(let y=top+6;y<104;y+=16){ R(g,x,y+11,bw,2,E.dg); for(let wx=x+4;wx<x+bw-8;wx+=12){ R(g,wx,y,8,9,E.k); dith(g,wx,y,8,9,E.c); if(r()<.2) R(g,wx,y,8,4,E.r); } } };
+    block(0,96,20,E.lg,E.w); block(96,80,28,E.y,E.w); block(176,110,14,E.lg,E.c); block(286,130,24,E.w,E.lg); block(416,104,18,E.lg,E.w);
+    R(g,300,78,110,40,E.k); R(g,304,82,102,28,E.c); dith(g,304,82,102,28,E.lc); R(g,298,70,114,10,E.r); for(let x=298;x<412;x+=10) R(g,x,70,5,10,E.w); R(g,330,60,52,9,E.br); R(g,334,63,44,3,E.y);
+    R(g,440,76,48,42,E.y); R(g,436,70,56,7,E.r); R(g,444,82,40,20,E.k); for(let i=0;i<8;i++) R(g,446+i*5,104,4,12,[E.r,E.w,E.lb,E.lgr][i%4]);
+    for(const tx of [150,270]){ R(g,tx,86,4,32,E.br); disc(g,tx+2,74,13,E.g); dith(g,tx-10,62,24,22,E.lgr); }
+    floorFill(g,[[0,118],[w,118],[w,166],[0,166]],40,260,52,3600,(X,Z,x,y)=>{ const fx=X/9, fz=Z/4; if(frac(fx)<.06||frac(fz)<.08) return [85,85,85]; return ((x+y)&1)?[170,170,170]:[255,255,255]; });
+    R(g,0,166,w,3,E.dg); R(g,0,169,w,11,E.dg); dith(g,0,169,w,11,E.k); for(let x=0;x<w;x+=30) R(g,x,175,14,1,E.w);
+    R(g,0,118,w,2,E.dg); },
+  walk:[[8,124],[512,124],[512,166],[8,166]], block:[[318,124,90,10],[440,118,52,8]],
+  props(){ const L=[];
+    L.push({y:136,draw(g){ for(const tx of [334,384]){ shadowE(g,tx,135,10,1,.25); R(g,tx-9,124,19,2,E.w); R(g,tx-1,126,2,9,E.dg); } }});
+    if(!F.cuffed) L.push({y:133,draw(g){ actor(g,gg=>{ person(gg,{skin:SKIN,hair:E.k,hs:'short',top:'#555555',bottom:'#333377',glasses:'sun',must:'#331100',view:'side',seed:3}); R(gg,-8,-22,6,3,E.br); },360,134,scl(134),true); R(g,350,126,4,2,E.r); }});
+    L.push({y:118,draw(g){ actor(g,gg=>person(gg,{h:44,skin:SKIN,hair:E.dg,hs:'bun',top:E.m,bottom:E.m,view:'front',blush:true,seed:4}),464,104,.62,false,false,true); R(g,442,100,46,3,E.y); }});
+    if(!F.pigeons) L.push({y:150,draw(g){ for(let i=0;i<3;i++){ const px=432+i*8+Math.round(Math.sin(T*3+i)*2); R(g,px,147,5,3,E.lg); R(g,px+4,146,2,2,E.dg); } }});
+    L.push({y:178,draw(g){ coupe(g,196,178); }});
+    if(!F.inCar) L.push({y:179,draw(g){ patrolCar(g,20,179,{lit:true}); }});
+    return L; },
+  hs:[
+    {id:'car',n:'Περιπολικό 7',rect:[20,136,120,44],at:[84,160],face:'front',look:['Το Περιπολικό 7, παρκαρισμένο με τον φάρο αναμμένο.'],
+      hand(){ if(!F.cuffed) return say(['Δεν τελείωσες εδώ. Μια κλεμμένη πινακίδα δεν βρίσκεται μόνη της.']);
+        if(!F.rights) return choose('Πριν τον βάλεις στο περιπολικό:',[{t:'Τον ενημερώνω για τον λόγο της σύλληψης και τα δικαιώματά του.',f:()=>suspect()},{t:'Τον βάζω κατευθείαν μέσα. Βιάζομαι.',f:()=>say(['Κάτι σε σταματάει. Η φωνή του εκπαιδευτή σου από τη Σχολή: «Ενημέρωση δικαιωμάτων, Μαυρίδη. Πάντα.»'])}]);
+        F.inCar=1; sfx('door'); say(['Βάζεις τον Μπέκα στο πίσω κάθισμα, με το χέρι πάνω από το κεφάλι του για να μη χτυπήσει.','Ασύρματος: «Περιπολικό 7, Κέντρο. Ένας συλληφθείς. Επιστρέφω στο τμήμα.»'],()=>{ sfx('engine'); go('booking','street'); }); },
+      item(i){ if(i==='keys'){ this.hand(); return true; } }},
+    {id:'coupe',n:'Κόκκινο κουπέ',rect:[196,146,84,34],at:[236,162],face:'front',look(){ say(['Ένα κόκκινο κουπέ, παρκαρισμένο πάνω στη διάβαση. Θράσος.', F.plate?'Πινακίδα ΑΚΤ-4471.':'Πρώτα σημειώνεις. Μετά συμπεραίνεις.']); },
+      item(i){ if(i==='notebook'){ if(F.plate){ say(['Τη σημείωσες ήδη.']); return true; } F.plate=1; pts(10,'plate'); sfx('write'); say(['Σημειώνεις την πινακίδα: ΑΚΤ-4471.','Ταιριάζει με την ενημέρωση του αρχιφύλακα. Επόμενο βήμα κατά τον κανονισμό: ενημέρωση του Κέντρου.']); return true; }
+        if(i==='flashlight'){ if(F.evidence){ say(['Δεν υπάρχει τίποτε άλλο μέσα.']); return true; } F.evidence=1; give('evidence'); pts(5,'evidence'); say(['Φωτίζεις μέσα από το τζάμι. Κάτω από το κάθισμα, μια σακούλα.','Η πόρτα είναι ξεκλείδωτη. Δώδεκα ρολόγια, με τις ετικέτες ακόμα πάνω. Πειστήριο.']); return true; } }},
+    {id:'suspect',n:'Άντρας με δερμάτινο',rect:()=>F.cuffed?[0,0,0,0]:npcRect(360,134,scl(134)),at:[344,140],face:'right',look:['Ένας άντρας με δερμάτινο μπουφάν και μαύρα γυαλιά. Πίνει φρέντο σαν να μην τρέχει τίποτα.'],
+      talk(){ suspect(); }, hand(){ suspect(); },
+      item(i){ if(i==='cuffs'){ if(!F.id){ say(['Χωρίς έλεγχο στοιχείων και λόγο σύλληψης; Δεν είσαι σε ταινία.']); return true; } F.cuffed=1; pts(10,'cuffs'); sfx('cuffs'); S.trail=[]; say(['Μπέκας: «Εντάξει, εντάξει. Χωρίς φασαρίες.»','Του περνάς χειροπέδες. Τον ελέγχεις για όπλα. Τίποτα, εκτός από ένα πακέτο τσίχλες.']); return true; }
+        if(i==='notebook'){ say(['Σημειώνεις την περιγραφή του. Δερμάτινο, γυαλιά, κανένα χιούμορ. Ταιριάζει.']); return true; } }},
+    {id:'cafe',n:'Καφέ «Γλάρος»',rect:[298,58,114,60],at:[350,130],face:'back',look:['Το καφέ «Γλάρος». Φρέντο, τοστ και κουτσομπολιό από τις έξι το πρωί.']},
+    {id:'kiosk',n:'Περίπτερο',rect:[436,70,56,48],at:[462,132],face:'back',look:['Το περίπτερο της κυρίας Ρούλας. Εφημερίδες, τσιγάρα και πληροφορίες.'],
+      talk(){ if(!F.witness){ F.witness=1; pts(5,'witness'); return say(['Κυρία Ρούλα, περιπτερού: «Αστυφύλακα! Ο τύπος με το δερμάτινο βγήκε από το κόκκινο αμάξι πριν από δέκα λεπτά.»','Κυρία Ρούλα: «Κάθεται στον “Γλάρο” και πίνει φρέντο σαν να μην τρέχει τίποτα. Σιγά μην είναι δικό του το αμάξι.»','Σημειώνεις: μάρτυρας, κυρία Ρούλα, περίπτερο οδού Λιμανιού.']); } say(['Κυρία Ρούλα: «Άντε, πιάσ’ τον, να ησυχάσει η γειτονιά!»']); }, hand(){ this.talk(); }},
+    {id:'pigeons',n:'Περιστέρια',rect:[426,140,32,12],at:[440,152],face:'back',look:['Τα περιστέρια της οδού Λιμανιού. Έχουν δει τα πάντα. Δεν μιλάνε σε μπάτσους.']},
+  ],
+  entries:{start:[120,150,'front'], garage:[110,156,'side',1]},
+  onEnter(){ if(!F.sSeen){ F.sSeen=1; say(['Οδός Λιμανιού. Το κόκκινο κουπέ είναι εκεί, πάνω στη διάβαση.','Έξω από το καφέ «Γλάρος» κάθεται ένας άντρας με δερμάτινο μπουφάν.']); } } };
+function suspect(){
+  if(F.cuffed){ if(!F.rights){ F.rights=1; pts(5,'rights'); return say(['Τον ενημερώνεις για τον λόγο της σύλληψης και για τα δικαιώματά του: δικηγόρο, διερμηνέα, ενημέρωση συγγενή.','Μπέκας: «Ναι, ναι. Τα ξέρω απ’ έξω. Καλύτερα από σένα.»']); } return say(['Μπέκας: «Ο φρέντο μου έμεινε μισός. Αυτό να το γράψεις στην αναφορά.»']); }
+  if(F.id) return say(['Ο Μπέκας σε κοιτάζει πάνω από τα γυαλιά του. Περιμένει να δει τι θα κάνεις. Ο κανονισμός λέει: χειροπέδες.']);
+  if(!F.called) return say(['Ο άντρας με το δερμάτινο σε κοιτάζει πάνω από το φλιτζάνι του.','Πριν πλησιάσεις ύποπτο, ενημερώνεις το Κέντρο. Το λέει ο κανονισμός, και ο αρχιφύλακας θα στο θυμίζει ως τη σύνταξη.']);
+  choose('Πώς τον προσεγγίζεις;',[
+    {t:'«Καλημέρα. Έλεγχος στοιχείων, παρακαλώ.»',f:()=>{ F.id=1; pts(10,'id'); say(['Σου δίνει την ταυτότητά του, αργά. «Στυλιανός Μπέκας».','Πάνω στο τραπέζι, ένα κλειδί αυτοκινήτου με κόκκινο μπρελόκ.','Εσύ: «Κύριε Μπέκα, είστε υπό σύλληψη για κλοπή οχήματος.»','Μπέκας: «Πρωί πρωί; Ούτε τον φρέντο μου δεν τελείωσα.»']); }},
+    {t:'«Ψηλά τα χέρια, κάθαρμα!»',f:()=>gameOver('rude')},
+    {t:'Τον κοιτάζεις επίμονα, σαν στις ταινίες.',f:()=>say(['Τον κοιτάζεις επίμονα.','Σε κοιτάζει κι αυτός επίμονα. Τελικά κάνει ένα μπαλόνι με την τσίχλα του.','Αυτό δεν οδηγεί πουθενά.'])}]); }
+function radioCall(){
+  if(S.scene!=='street') return say(['Ασύρματος: «Περιπολικό 7, χωρίς λόγο δεν πιάνουμε τη συχνότητα. Τέλος.»']);
+  if(F.called) return say(['Ασύρματος: «Σε ακούμε, Επτά. Δεύτερο περιπολικό σε λίγα λεπτά. Συνέχισε με προσοχή.»']);
+  if(!F.plate) return say(['Εσύ: «Κέντρο, από Περιπολικό 7.»','Ασύρματος: «Λέγε, Επτά. Τι έχεις;»','Δεν έχεις τίποτα συγκεκριμένο ακόμα. Πρώτα επιβεβαίωσε την πινακίδα.']);
+  F.called=1; pts(10,'called'); sfx('radio');
+  say(['Εσύ: «Κέντρο, από Περιπολικό 7. Οδός Λιμανιού. Επιβεβαιώνω κόκκινο κουπέ, ΑΚΤ-4471. Πιθανός ύποπτος στο καφέ “Γλάρος”.»','Ασύρματος: «Ελήφθη, Επτά. Το όχημα είναι δηλωμένο κλεμμένο. Δεύτερο περιπολικό καθ’ οδόν. Προχώρα με προσοχή.»']); }
+
+/* ---------- BOOKING ---------- */
+SC.booking={ w:320, far:126, near:176, sFar:.68, tubes:[110,210],
+  bg(g,w){ const RM=officeRoom(g,w,{bx0:70,bx1:250,by0:24,by1:114,vx:160,vy:46,back:E.lg,
+      floor:(X,Z)=>{ if(Math.abs(X+18)<1.6) return [255,255,85]; return ((Math.floor(X/10)+Math.floor(Z/9))&1)?[170,170,170]:[255,255,255]; }});
+    R(g,70,24,180,90,E.lg); dith(g,70,24,180,40,E.w); R(g,70,84,180,4,E.r); R(g,70,88,180,26,E.dg); dith(g,70,88,180,26,E.lg);
+    for(let x=190;x<250;x+=5) R(g,x,30,2,84,E.k); R(g,190,30,60,3,E.k); R(g,196,92,48,5,E.br);
+    const wl=RM.wallL; wallQuad(g,'L',22,58,.45,.75,wl,E.k); for(let i=0;i<2;i++) for(let j=0;j<3;j++) wallQuad(g,'L',24+i*17,38+i*17,.47+j*.09,.54+j*.09,wl,E.lg);
+    wallQuad(g,'L',24,56,.2,.38,wl,E.r); wallQuad(g,'L',27,53,.23,.35,wl,E.w); wallQuad(g,'L',12,22,.3,1,wl,E.k); },
+  walk:[[80,126],[240,126],[300,177],[20,177]], block:[[90,128,90,14]],
+  props(){ const L=[];
+    L.push({y:126,draw(g){ actor(g,gg=>person(gg,{skin:SKIN,hair:E.br,hs:'short',top:E.lb,bottom:E.b,glasses:true,tag:true,view:'front',seed:5}),135,124,scl(126)); }});
+    L.push({y:142,draw(g){ shadowE(g,135,143,46,3,.3); R(g,90,112,92,30,E.br); dith(g,90,112,92,30,'#773300'); R(g,88,108,96,5,E.lg); R(g,104,102,16,6,E.w); }});
+    if(F.booked) L.push({y:110,draw(g){ actor(g,gg=>person(gg,{skin:SKIN,hair:E.k,hs:'short',top:'#555555',bottom:'#333377',glasses:'sun',view:'front',seed:3}),220,108,.62); for(let x=190;x<250;x+=5) R(g,x,52,2,58,E.k); }});
+    return L; },
+  hs:[
+    {id:'exit',n:'Έξοδος',rect:[10,60,14,110],at:[30,160],face:'left',hand(){ if(F.cuffed&&!F.booked) return say(['Έχεις έναν συλληφθέντα δεμένο πάνω σου. Πρώτα τον παραδίδεις.']); if(F.done) return say(['Πρώτα η αναφορά. Μετά σπίτι.']); sfx('door'); go('brief','booking'); },exit(){ this.hand(); }},
+    {id:'sign',n:'Ανακοίνωση',rect:[24,40,34,30],at:[50,140],face:'left',look:['«ΑΠΑΓΟΡΕΥΕΤΑΙ Η ΕΙΣΟΔΟΣ ΜΕ ΟΠΛΟ ΠΕΡΑ ΑΠΟ ΤΗΝ ΚΙΤΡΙΝΗ ΓΡΑΜΜΗ.»']},
+    {id:'lockbox',n:'Θυρίδα όπλων',rect:[22,72,38,40],at:[46,150],face:'left',look(){ say(F.gunLocked?['Το όπλο σου είναι κλειδωμένο στη θυρίδα. Το κλειδί στην τσέπη σου.']:['Θυρίδες για τα όπλα. Κανονισμός: κανείς οπλισμένος πέρα από την κίτρινη γραμμή.']); }, hand(){ this.look(); },
+      item(i){ if(i==='gun'){ if(F.gunLocked) return true; F.gunLocked=1; take('gun'); pts(10,'gunlock'); sfx('locker'); say(['Βγάζεις το όπλο από τη θήκη, το βάζεις στη θυρίδα και κλειδώνεις.','Κανονισμός. Ο αρχιφύλακας θα ήταν περήφανος. Δεν θα στο έλεγε ποτέ, αλλά θα ήταν.']); return true; } }},
+    {id:'desk',n:'Αστυφύλακας Γιαννάκης',rect:[88,74,96,68],at:[136,150],face:'back',look:['Ο αστυφύλακας Γιαννάκης, φύλακας των κρατητηρίων και της γραφομηχανής.'],
+      talk(){ if(F.done) return say(['Γιαννάκης: «Καλή δουλειά, συνάδελφε. Για πρώτη μέρα, όχι κι άσχημα.»']);
+        if(F.cuffed&&!F.booked){ F.booked=1; sfx('cell'); return say(['Παραδίδεις τον Μπέκα στον Γιαννάκη. Αφαιρείτε τις χειροπέδες και καταγράφετε τα προσωπικά του αντικείμενα.','Ένα πακέτο τσίχλες. Ένα χτένι. Τρία ανέκδοτα που κανείς δεν ζήτησε.','Γιαννάκης: «Μέσα, Μπέκα. Και τώρα, συνάδελφε… η αναφορά.»']); }
+        if(F.booked) return say(['Γιαννάκης: «Η αναφορά, συνάδελφε. Στο σημειωματάριο, και μετά στη γραφομηχανή.»']);
+        say(['Γιαννάκης: «Ησυχία σήμερα. Ελπίζω να μείνει έτσι.»']); }, hand(){ this.talk(); },
+      item(i){ if(i==='notebook'&&F.booked&&!F.done){ F.done=1; pts(5,'report'); sfx('write'); say(['Γράφεις την αναφορά: ώρα, τόπος, πινακίδα, μάρτυρας, πειστήρια, σύλληψη, ενημέρωση δικαιωμάτων.','Γιαννάκης: «Καθαρή δουλειά. Πάρ’ τη στον αρχιφύλακα.»'],()=>after(.6,()=>ending())); return true; }
+        if(i==='evidence'){ say(['Παραδίδεις τη σακούλα με τα ρολόγια ως πειστήριο. Ο Γιαννάκης την καταγράφει.']); take('evidence'); return true; } }},
+    {id:'cell',n:'Κελί',rect:[190,30,60,84],at:[214,132],face:'back',look(){ say(F.booked?['Ο Μπέκας κάθεται στον πάγκο και σφυρίζει. Φάλτσα.']:['Ένα άδειο κελί. Μυρίζει χλωρίνη και κακές αποφάσεις.']); }},
+  ],
+  entries:{brief:[34,160,'side',1], street:[34,160,'side',1]} };
+
+const OVERS={
+  tire:['Δύο χιλιόμετρα μετά, στη Λεωφόρο Παραλίας, το πίσω λάστιχο σκάει.','Το Περιπολικό 7 καταλήγει, αργά και με αξιοπρέπεια, πάνω σε μια καντίνα με κουλούρια.','Κανονισμός: επιθεώρηση οχήματος πριν από κάθε βάρδια. Πάντα.'],
+  rude:['«Ψηλά τα χέρια, κάθαρμα!»','Ο Μπέκας αναποδογυρίζει το τραπέζι και χάνεται στα στενά του λιμανιού.','Η ψυχραιμία είναι το πρώτο εργαλείο του αστυνομικού. Ο αρχιφύλακας σε περιμένει με μια πολύ μεγάλη αναφορά.'],
+  gun:['Τράβηξες το υπηρεσιακό όπλο χωρίς πραγματικό κίνδυνο.','Οι Εσωτερικές Υποθέσεις δεν έχουν χιούμορ. Ούτε ο αρχιφύλακας.','Κανονισμός: το όπλο είναι η τελευταία λύση, όχι η πρώτη.'],
+  cell:['Πέρασες την κίτρινη γραμμή με το όπλο στη θήκη.','Ο Μπέκας, παρά τις χειροπέδες, το άρπαξε σε μια στιγμή απροσεξίας. Ευτυχώς ο Γιαννάκης τον ακινητοποίησε πριν γίνει το κακό.','Κανονισμός: ποτέ οπλισμένος στα κρατητήρια. Ποτέ.'] };
+function gameOver(k){ S.lock=1; S.path=[]; closeInv(); D.active=false; D.opts=null; dlgEl.hidden=true; sfx('over'); shake(.5,3);
+  fadeTo(1,.9,()=>{ S.mode='end'; const e=$('end'); e.classList.add('over'); $('endH').textContent=tr('Τέλος καριέρας');
+    const box=$('endT'); box.innerHTML=''; OVERS[k].forEach((t,i)=>{ const p=document.createElement('p'); p.textContent=tr(t); p.style.animationDelay=(.3+i*1)+'s'; box.appendChild(p); });
+    $('endR').hidden=!load(); $('endR').style.animationDelay=$('endB').style.animationDelay=(.6+OVERS[k].length)+'s'; e.hidden=false; setUI(false); music(null); }); }
+function ending(){ pts(5,'end');
+  fadeTo(1,1,()=>{ S.mode='end'; const e=$('end'); e.classList.remove('over'); $('endH').textContent=tr('Τέλος βάρδιας');
+    const sc=F.score||0, rank=sc>=100?'Βαθμολογία: υποδειγματικός αστυφύλακας.':sc>=80?'Βαθμολογία: πολύ καλός αστυφύλακας.':'Βαθμολογία: θα τα ξαναπούμε στην εκπαίδευση.';
+    const ps=['Αρχιφύλακας: «Μαυρίδη. Διάβασα την αναφορά.»','Αρχιφύλακας: «Κλεμμένο όχημα, μάρτυρας, πειστήρια, σύλληψη χωρίς φασαρία. Και όλα με τον κανονισμό.»','Αρχιφύλακας: «…Μη συνηθίσεις. Αύριο στις επτά.»',tr('Πόντοι:')+' '+sc+' '+tr('από')+' '+G.maxPts,rank];
+    const box=$('endT'); box.innerHTML=''; ps.forEach((t,i)=>{ const p=document.createElement('p'); p.textContent=tr(t); p.style.animationDelay=(.3+i*1.1)+'s'; box.appendChild(p); });
+    $('endR').hidden=true; $('endB').style.animationDelay=(.6+ps.length*1.1)+'s'; e.hidden=false; setUI(false); clearSave(); music('theme'); }); }
+
+$('endR').addEventListener('click',e=>{ e.stopPropagation(); const d=load(); if(d) startGame(d); else toTitle(); });
+/* ---------- audio + music ---------- */
+const A={ c:null, m:null, on:true,
+  init(){ if(this.c){ if(this.c.state==='suspended') this.c.resume(); return; }
+    try{ this.c=new (window.AudioContext||window.webkitAudioContext)(); }catch(e){ return; }
+    const c=this.c; this.m=c.createGain(); this.m.gain.value=this.on?.85:0; this.m.connect(c.destination);
+    const b=c.createBuffer(1,c.sampleRate*3,c.sampleRate), d=b.getChannelData(0); for(let i=0;i<d.length;i++) d[i]=Math.random()*2-1; this.nb=b;
+    const s=c.createBufferSource(); s.buffer=b; s.loop=true; const f=c.createBiquadFilter(); f.type='bandpass'; f.frequency.value=500; this.tg=c.createGain(); this.tg.gain.value=0;
+    s.connect(f); f.connect(this.tg); this.tg.connect(this.m); s.start(); this.amb(); },
+  amb(){ if(!this.c) return; this.tg.gain.setTargetAtTime(SC[S.scene].outdoor||S.mode==='title'?.03:0,this.c.currentTime,.5); },
+  setOn(v){ this.on=v; if(this.m) this.m.gain.setTargetAtTime(v?.85:0,this.c.currentTime,.05); },
+  tone(f,dur,o={}){ const c=this.c; if(!c) return; const t=c.currentTime+(o.at||0), osc=c.createOscillator(), g=c.createGain();
+    osc.type=o.type||'square'; osc.frequency.setValueAtTime(f,t); if(o.f2) osc.frequency.exponentialRampToValueAtTime(o.f2,t+dur);
+    g.gain.setValueAtTime(.0001,t); g.gain.exponentialRampToValueAtTime(o.vol||.05,t+(o.att||.004)); g.gain.exponentialRampToValueAtTime(.0001,t+dur);
+    osc.connect(g); g.connect(this.m); osc.start(t); osc.stop(t+dur+.05); },
+  noise(dur,o={}){ const c=this.c; if(!c) return; const t=c.currentTime+(o.at||0), s=c.createBufferSource(), f=c.createBiquadFilter(), g=c.createGain();
+    s.buffer=this.nb; f.type=o.ft||'lowpass'; f.frequency.setValueAtTime(o.ff||1000,t); if(o.ff2) f.frequency.exponentialRampToValueAtTime(o.ff2,t+dur); f.Q.value=o.q||1;
+    g.gain.setValueAtTime(.0001,t); g.gain.exponentialRampToValueAtTime(o.vol||.1,t+(o.att||.003)); g.gain.exponentialRampToValueAtTime(.0001,t+dur);
+    s.connect(f); f.connect(g); g.connect(this.m); s.start(t,Math.random()*Math.max(0,2.8-dur)); s.stop(t+dur+.05); } };
+const mf=m=>440*Math.pow(2,(m-69)/12);
+const SONGS={
+  theme:{ step:.18, mel:[62,0,65,0,69,0,67,65,64,0,62,0,57,0,0,0,62,0,65,0,69,0,72,70,69,67,65,64,62,0,0,0],
+          bass:[38,0,38,45,38,0,38,45,34,0,34,41,33,0,33,40,38,0,38,45,38,0,38,45,34,0,36,0,38,0,33,0] },
+  quiet:{ step:.3, mel:[0,0,0,0,69,0,0,0,0,0,0,0,67,0,65,0], bass:[38,0,45,0,38,0,45,0,34,0,41,0,33,0,40,0] },
+};
+const MU={ song:null, i:0, next:0 };
+function music(name){ MU.song=name?SONGS[name]:null; MU.i=0; MU.next=0; }
+function musicTick(dt){ if(!MU.song||!A.c||!A.on) return; MU.next-=dt; if(MU.next>0) return; const s=MU.song; MU.next+=s.step; if(MU.next<-.3) MU.next=0;
+  const i=MU.i%s.mel.length, m=s.mel[i], b=s.bass[i];
+  if(m) A.tone(mf(m),s.step*1.7,{type:'square',vol:.02}); if(b) A.tone(mf(b),s.step*1.3,{type:'triangle',vol:.07}); MU.i++; }
+function sfx(n){ if(!A.c||!A.on) return;
+  switch(n){
+    case 'step': A.noise(.04,{ft:'bandpass',ff:SC[S.scene].outdoor?1500:700,q:1.5,vol:.06}); break;
+    case 'pick': A.tone(880,.08,{vol:.05}); A.tone(1320,.12,{vol:.05,at:.07}); break;
+    case 'score': [67,72,76].forEach((m,i)=>A.tone(mf(m),.12,{vol:.05,at:i*.08})); break;
+    case 'door': A.noise(.15,{ff:400,vol:.15}); A.tone(110,.15,{type:'triangle',vol:.1,at:.05}); break;
+    case 'locker': A.noise(.12,{ft:'bandpass',ff:2500,q:4,vol:.18}); A.tone(300,.1,{vol:.04,at:.1}); break;
+    case 'write': for(let i=0;i<6;i++) A.noise(.05,{ft:'highpass',ff:5000,vol:.05,at:i*.08}); break;
+    case 'wrench': for(let i=0;i<4;i++) A.tone(1800+i*90,.05,{vol:.04,at:i*.15}); break;
+    case 'cuffs': A.noise(.06,{ft:'highpass',ff:4000,vol:.2}); A.noise(.06,{ft:'highpass',ff:4000,vol:.2,at:.18}); break;
+    case 'cell': A.noise(.3,{ft:'bandpass',ff:900,q:3,vol:.25}); A.tone(80,.3,{vol:.15,at:.2}); break;
+    case 'engine': A.tone(55,1.2,{type:'sawtooth',f2:110,vol:.06,att:.2}); break;
+    case 'siren': for(let i=0;i<3;i++){ A.tone(700,.35,{f2:1100,vol:.04,at:i*.7}); A.tone(1100,.35,{f2:700,vol:.04,at:i*.7+.35}); } break;
+    case 'radio': A.noise(.3,{ft:'bandpass',ff:1800,q:2,vol:.08}); A.tone(1200,.06,{vol:.03,at:.3}); break;
+    case 'over': [64,63,62,61].forEach((m,i)=>A.tone(mf(m-12),.4,{type:'triangle',vol:.1,at:i*.35})); break;
+    case 'blip': A.tone(660,.04,{vol:.03}); break;
+  } }
+
+/* ---------- walk grid + A* pathfinding ---------- */
+const CELL=4;
+function buildGrid(s){ const gw=Math.ceil(s.w/CELL), gh=Math.ceil(H/CELL), m=new Uint8Array(gw*gh);
+  for(let gy=0;gy<gh;gy++) for(let gx=0;gx<gw;gx++){ const x=gx*CELL+2, y=gy*CELL+2; let ok=inPoly(x,y,s.walk); if(ok) for(const b of s.block) if(x>=b[0]&&x<=b[0]+b[2]&&y>=b[1]&&y<=b[1]+b[3]){ ok=false; break; } m[gy*gw+gx]=ok?1:0; }
+  s.grid={gw,gh,m}; }
+function walkable(s,x,y){ const G=s.grid, gx=Math.floor(x/CELL), gy=Math.floor(y/CELL); return gx>=0&&gy>=0&&gx<G.gw&&gy<G.gh&&G.m[gy*G.gw+gx]===1; }
+function nearestCell(s,x,y){ const G=s.grid; const gx=clamp(Math.floor(x/CELL),0,G.gw-1), gy=clamp(Math.floor(y/CELL),0,G.gh-1); if(G.m[gy*G.gw+gx]) return [gx,gy];
+  for(let r=1;r<70;r++){ let best=null, bd=1e9; for(let dy=-r;dy<=r;dy++) for(let dx=-r;dx<=r;dx++){ if(Math.max(Math.abs(dx),Math.abs(dy))!==r) continue; const cx=gx+dx, cy=gy+dy; if(cx<0||cy<0||cx>=G.gw||cy>=G.gh||!G.m[cy*G.gw+cx]) continue; const d=dx*dx*2.5+dy*dy; if(d<bd){ bd=d; best=[cx,cy]; } } if(best) return best; } return null; }
+function los(s,a,b){ const d=Math.hypot(b[0]-a[0],b[1]-a[1]), n=Math.ceil(d/2); for(let i=1;i<=n;i++){ const t=i/n; if(!walkable(s,a[0]+(b[0]-a[0])*t,a[1]+(b[1]-a[1])*t)) return false; } return true; }
+function findPath(s,sx,sy,tx,ty){
+  const G=s.grid, gw=G.gw, st=nearestCell(s,sx,sy), en=nearestCell(s,tx,ty); if(!st||!en) return [];
+  const N=gw*G.gh, sI=st[1]*gw+st[0], eI=en[1]*gw+en[0], gS=new Float32Array(N).fill(1e9), came=new Int32Array(N).fill(-1), closed=new Uint8Array(N), heap=[];
+  const push=(i,f)=>{ heap.push([f,i]); let c=heap.length-1; while(c>0){ const p=(c-1)>>1; if(heap[p][0]<=heap[c][0]) break; [heap[p],heap[c]]=[heap[c],heap[p]]; c=p; } };
+  const pop=()=>{ const top=heap[0], last=heap.pop(); if(heap.length){ heap[0]=last; let c=0; for(;;){ const l=c*2+1, r=l+1; let m=c; if(l<heap.length&&heap[l][0]<heap[m][0]) m=l; if(r<heap.length&&heap[r][0]<heap[m][0]) m=r; if(m===c) break; [heap[m],heap[c]]=[heap[c],heap[m]]; c=m; } } return top; };
+  const hf=i=>{ const dx=Math.abs(i%gw-en[0]), dy=Math.abs(((i/gw)|0)-en[1]); return Math.max(dx,dy)+.414*Math.min(dx,dy); };
+  gS[sI]=0; push(sI,hf(sI));
+  while(heap.length){ const [,i]=pop(); if(closed[i]) continue; if(i===eI) break; closed[i]=1; const x=i%gw, y=(i/gw)|0;
+    for(let dy=-1;dy<=1;dy++) for(let dx=-1;dx<=1;dx++){ if(!dx&&!dy) continue; const nx=x+dx, ny=y+dy; if(nx<0||ny<0||nx>=gw||ny>=G.gh) continue; const j=ny*gw+nx; if(!G.m[j]||closed[j]) continue;
+      if(dx&&dy&&(!G.m[y*gw+nx]||!G.m[ny*gw+x])) continue; const c=gS[i]+(dx&&dy?1.414:1); if(c<gS[j]){ gS[j]=c; came[j]=i; push(j,c+hf(j)); } } }
+  if(sI!==eI&&came[eI]<0) return [];
+  const cells=[]; for(let i=eI;i!==sI&&i>=0;i=came[i]) cells.push(i); cells.reverse();
+  const pts=cells.map(i=>[(i%gw)*CELL+2,((i/gw)|0)*CELL+2]); if(walkable(s,tx,ty)) pts.push([tx,ty]); if(!pts.length) return [];
+  const out=[]; let cur=[sx,sy], k=0;
+  while(k<pts.length){ let far=k; for(let m=pts.length-1;m>k;m--) if(los(s,cur,pts[m])){ far=m; break; } out.push(pts[far]); cur=pts[far]; k=far+1; }
+  return out; }
+function walkTo(x,y,cb,force){ const s=SC[S.scene]; S.path=findPath(s,S.x,S.y,x,y); S.onArrive=cb||null; if(!S.path.length){ S.onArrive=null; if(cb) cb(); } }
+function faceTo(h){ const f=h.face; if(f==='back') S.dir='back'; else if(f==='front') S.dir='front'; else if(f==='left'){ S.dir='side'; S.face=-1; } else if(f==='right'){ S.dir='side'; S.face=1; } }
+
+/* ---------- particles ---------- */
+const PFX=[];
+function puff(x,y,c,n){ for(let i=0;i<(n||3);i++) PFX.push({x:x+rand(-2,2),y:y-1,vx:rand(-9,9),vy:rand(-10,-3),t:0,max:rand(.35,.6),c,r:rand(1,2.2)}); }
+
+/* ---------- hotspots ---------- */
+function hRect(h){ return typeof h.rect==='function'?h.rect():h.rect; }
+function hotAt(wx,wy){ const s=SC[S.scene]; let best=null, ba=1e9;
+  for(const h of s.hs){ const r=hRect(h); if(wx>=r[0]&&wx<=r[0]+r[2]&&wy>=r[1]&&wy<=r[1]+r[3]){ const a=r[2]*r[3]; if(a<ba){ ba=a; best=h; } } } return best; }
+const DEF=G.DEF;
+const NOPE=G.NOPE;
+function doVerb(h,v){
+  if(v==='item'){ const it=S.sel; if(h.item&&h.item(it)) return; if(G.itemFallback&&G.itemFallback(h,it)) return; return say([NOPE[(Math.random()*NOPE.length)|0]]); }
+  if(v==='walk'&&h.exit) return h.exit();
+  const f=h[v]; if(typeof f==='function') return f.call(h); if(Array.isArray(f)) return say(f);
+  if(v==='hand'&&h.exit) return h.exit();
+  say(DEF[v]||DEF.look); }
+function clickAt(sx,sy,touch){
+  if(!$('settings').hidden) return;
+  if(D.active){ if(!D.opts) advance(); return; }
+  if(S.mode!=='play'||S.lock||S.trans) return;
+  closeInv(); const wx=sx+S.cam, wy=sy, h=hotAt(wx,wy), v=S.verb; S.idle=0;
+  if(touch&&h) flashLabel(tr(typeof h.n==='function'?h.n():h.n),sx,sy);
+  if(v==='walk'){ if(h&&h.exit){ walkTo(h.at[0],h.at[1],()=>{ faceTo(h); h.exit(); }); return; } tapFx(wx,wy); walkTo(wx,Math.max(wy,SC[S.scene].far)); return; }
+  if(!h){ if(v==='item'&&G.itemFallback&&G.itemFallback(null,S.sel)) return; if(v==='look'&&SC[S.scene].look) return say(SC[S.scene].look); tapFx(wx,wy); return; }
+  if(v==='look'||!h.at){ if(h.at&&v!=='look'){} doVerb(h,v); return; }
+  walkTo(h.at[0],h.at[1],()=>{ faceTo(h); doVerb(h,v); }); }
+let TAP=null; function tapFx(x,y){ TAP={x,y,t:.35}; }
+
+/* ---------- verbs, cursor, icon bar ---------- */
+const VERBS=G.verbs||['walk','look','hand','talk','item'];
+const VNAME=Object.assign({walk:'Περπάτα',look:'Κοίτα',hand:'Πάρε / Χρησιμοποίησε',talk:'Μίλα',item:'Χρησιμοποίησε αντικείμενο'},G.VNAME||{});
+const VIC={
+  walk:g=>{ for(const [x,y] of [[3,2],[9,7]]){ R(g,x,y,4,6,'#7a4a2a'); R(g,x+1,y+1,2,4,'#c8804a'); R(g,x,y-1,4,1,'#2b1d3a'); R(g,x+1,y+6,2,2,'#7a4a2a'); } },
+  look:g=>{ R(g,2,6,12,5,'#ffffff'); R(g,3,5,10,1,'#2b1d3a'); R(g,3,11,10,1,'#2b1d3a'); R(g,1,7,1,3,'#2b1d3a'); R(g,14,7,1,3,'#2b1d3a'); disc(g,8,8,2,'#2a5fd6'); R(g,8,8,1,1,'#1a1210'); R(g,7,7,1,1,'#ffffff'); },
+  hand:g=>{ R(g,4,6,8,8,'#f6caa0'); for(let i=0;i<4;i++) R(g,4+i*2,2+(i===0?2:0),2,5,'#f6caa0'); R(g,12,7,3,2,'#f6caa0'); R(g,4,13,8,1,'#c98d63'); for(let i=0;i<4;i++) R(g,5+i*2,3+(i===0?2:0),1,1,'#ffe8d0'); R(g,3,6,1,7,'#c98d63'); },
+  talk:g=>{ R(g,3,6,10,5,'#e8463a'); R(g,4,5,8,1,'#e8463a'); R(g,4,11,8,1,'#c82a28'); R(g,4,8,8,1,'#7a1414'); R(g,5,8,6,1,'#ffffff'); R(g,13,3,2,1,'#ffd23f'); R(g,13,13,2,1,'#ffd23f'); R(g,14,8,2,1,'#ffd23f'); },
+  bag:g=>{ R(g,2,6,12,8,'#a8703e'); R(g,2,6,12,1,'#c8904a'); R(g,6,3,4,3,'#7a4a2a'); R(g,7,4,2,2,'#4a3a6a'); R(g,7,8,2,2,'#ffd23f'); R(g,2,13,12,1,'#7a4a2a'); },
+  menu:g=>{ disc(g,8,8,5,'#cfcfdf'); disc(g,8,8,2,'#4a3a6a'); for(const [x,y] of [[7,1],[7,13],[1,7],[13,7]]) R(g,x,y,2,2,'#cfcfdf'); },
+};
+function iconInto(c,fn){ const g=c.getContext('2d'); g.clearRect(0,0,c.width,c.height); fn(g); }
+function setVerb(v){ if(v==='item'&&!S.sel) return; S.verb=v; document.querySelectorAll('.vb[data-v]').forEach(b=>b.classList.toggle('on',b.dataset.v===v)); hint(tr(VNAME[v])+(v==='item'&&S.sel?': '+tr(ITEMS[S.sel].n):'')); }
+function cycleVerb(){ const list=VERBS.filter(v=>v!=='item'||S.sel); const i=list.indexOf(S.verb); setVerb(list[(i+1)%list.length]); sfx('blip'); }
+let hintT=0; function hint(t){ const el=$('hint'); el.textContent=t; el.classList.add('show'); clearTimeout(hintT); hintT=setTimeout(()=>el.classList.remove('show'),1400); }
+function flashLabel(t,sx,sy){ const el=$('hover'); el.textContent=t; el.style.left=(sx/W*100)+'%'; el.style.top=(sy/H*100)+'%'; el.hidden=false; clearTimeout(flashLabel.t); flashLabel.t=setTimeout(()=>{ if(!S.mouseOn) el.hidden=true; },1100); }
+const CUR=document.createElement('canvas'); CUR.width=16; CUR.height=16;
+function drawCursor(g,x,y){ const c=CUR.getContext('2d'); c.clearRect(0,0,16,16);
+  if(S.verb==='item'&&S.sel){ c.save(); c.translate(2,2); ICON[S.sel](c); c.restore(); } else VIC[S.verb](c);
+  g.save(); g.globalAlpha=.85; g.globalCompositeOperation='source-over';
+  for(const [dx,dy] of [[1,0],[-1,0],[0,1],[0,-1]]){ g.filter='none'; } g.drawImage(CUR,Math.round(x)-8,Math.round(y)-8); g.restore();
+  const h=S.hover; if(h){ R(g,Math.round(x)-1,Math.round(y)+8,3,1,'#ffd23f'); } }
+
+/* ---------- inventory ---------- */
+const invEl=$('inv'), slotsEl=$('slots'), capEl=$('invCap');
+function renderInv(){ slotsEl.innerHTML='';
+  S.inv.forEach(id=>{ const b=document.createElement('button'); b.className='slot'+(S.sel===id?' on':''); b.setAttribute('aria-label',tr(ITEMS[id].n)); b.appendChild(iconCanvas(id)); b.addEventListener('click',e=>{ e.stopPropagation(); invTap(id); }); slotsEl.appendChild(b); });
+  $('bExam').disabled=!S.sel; updItemBtn(); }
+function updItemBtn(){ const c=$('vItem'); const g=c.getContext('2d'); g.clearRect(0,0,16,16); if(S.sel){ g.save(); g.translate(2,2); ICON[S.sel](g); g.restore(); } $('vItemB').disabled=!S.sel; }
+function setSel(id){ S.sel=id; updItemBtn(); if(id) setVerb('item'); else if(S.verb==='item') setVerb('walk'); }
+function invTap(id){ A.init();
+  if(S.sel&&S.sel!==id){ const r=RECIPES[rkey(S.sel,id)];
+    if(r){ const a=S.sel; take(a); take(id); give(r[0]); setSel(null); if(r[2]) pts(r[2],r[3]); sfx('pick'); closeInv(); say([r[1]]); }
+    else { setSel(null); capEl.textContent=tr('Αυτά τα δύο δεν συνδυάζονται.'); }
+    renderInv(); return; }
+  if(S.sel===id){ setSel(null); capEl.textContent=tr('Διάλεξε ένα αντικείμενο.'); } else { setSel(id); capEl.textContent=tr(ITEMS[id].n); }
+  renderInv(); }
+function openInv(){ if(S.mode!=='play'||D.active||S.trans) return; renderInv(); capEl.textContent=tr(S.sel?ITEMS[S.sel].n:'Διάλεξε ένα αντικείμενο. Πάτα δεύτερο για να τα συνδυάσεις.'); invEl.hidden=false; }
+function closeInv(){ invEl.hidden=true; }
+
+
+/* ---------- HD layer ---------- */
+const lc=document.createElement('canvas'); lc.width=W; lc.height=H; const lg=lc.getContext('2d');
+function hdAdd(fn){ octx.save(); octx.globalCompositeOperation='lighter'; fn(); octx.restore(); }
+function hdGlow(x,y,r,rgb,a){ if(r<=0) return; const g=octx.createRadialGradient(x,y,0,x,y,r); g.addColorStop(0,'rgba('+rgb+','+a+')'); g.addColorStop(1,'rgba('+rgb+',0)'); octx.fillStyle=g; octx.fillRect(x-r,y-r,r*2,r*2); }
+function hdBeam(pts,rgb,a0,a1,y0,y1){ octx.beginPath(); pts.forEach(([x,y],i)=>i?octx.lineTo(x,y):octx.moveTo(x,y)); octx.closePath(); const g=octx.createLinearGradient(0,y0,0,y1); g.addColorStop(0,'rgba('+rgb+','+a0+')'); g.addColorStop(1,'rgba('+rgb+','+a1+')'); octx.fillStyle=g; octx.fill(); }
+function hdSun(sx,sy,warm){ const cg=Math.round(236-warm*70), cb=Math.round(190-warm*120);
+  hdAdd(()=>{ hdGlow(sx,sy,90,'255,'+cg+','+cb,.45); octx.fillStyle='rgba(255,'+(250-warm*60)+','+(220-warm*120)+',.95)'; octx.beginPath(); octx.arc(sx,sy,6,0,7); octx.fill();
+    if(FXFULL) for(let i=0;i<4;i++){ const a=2.0+i*.24+Math.sin(T*.3+i)*.03, len=260, w2=.035+.02*Math.sin(T*.5+i*2); octx.beginPath(); octx.moveTo(sx,sy); octx.lineTo(sx+Math.cos(a-w2)*len,sy+Math.sin(a-w2)*len); octx.lineTo(sx+Math.cos(a+w2)*len,sy+Math.sin(a+w2)*len); octx.closePath();
+      const l2=octx.createLinearGradient(sx,sy,sx+Math.cos(a)*len,sy+Math.sin(a)*len); l2.addColorStop(0,'rgba(255,'+cg+','+cb+',.075)'); l2.addColorStop(1,'rgba(0,0,0,0)'); octx.fillStyle=l2; octx.fill(); } }); }
+function hdGrade(mode,rgb,a){ octx.save(); octx.globalCompositeOperation=mode; octx.fillStyle='rgba('+rgb+','+a+')'; octx.fillRect(0,0,W,H); octx.restore(); }
+function hdVignette(a,rgb){ const vg=octx.createRadialGradient(W/2,H/2,H*.42,W/2,H/2,W*.7); vg.addColorStop(0,'rgba('+(rgb||'20,8,30')+',0)'); vg.addColorStop(1,'rgba('+(rgb||'20,8,30')+','+a+')'); octx.fillStyle=vg; octx.fillRect(0,0,W,H); }
+const hdl=document.createElement('canvas'), hdg=hdl.getContext('2d');
+function composite(dt,cam,lights,dark){
+  const s=SC[S.scene], k=OW/W;
+  octx.setTransform(1,0,0,1,0,0); octx.globalCompositeOperation='source-over'; octx.globalAlpha=1; octx.imageSmoothingEnabled=false; octx.drawImage(cv,0,0,OW,OH);
+  if(dark>0){ if(hdl.width!==OW||hdl.height!==OH){ hdl.width=OW; hdl.height=OH; }
+    hdg.setTransform(1,0,0,1,0,0); hdg.globalCompositeOperation='source-over'; hdg.clearRect(0,0,OW,OH); hdg.fillStyle='rgba('+(G.darkRGB||'4,3,8')+','+dark+')'; hdg.fillRect(0,0,OW,OH);
+    hdg.setTransform(k,0,0,k,0,0); hdg.globalCompositeOperation='destination-out';
+    for(const [x0,y,r,i] of lights){ const x=x0-cam; if(x<-r||x>W+r) continue; const g=hdg.createRadialGradient(x,y,0,x,y,r); g.addColorStop(0,'rgba(0,0,0,'+i+')'); g.addColorStop(.4,'rgba(0,0,0,'+(i*.7)+')'); g.addColorStop(.75,'rgba(0,0,0,'+(i*.22)+')'); g.addColorStop(1,'rgba(0,0,0,0)'); hdg.fillStyle=g; hdg.fillRect(x-r,y-r,r*2,r*2); }
+    octx.drawImage(hdl,0,0); }
+  octx.setTransform(k,0,0,k,0,0); octx.imageSmoothingEnabled=true;
+  const td=G.tod?G.tod():0;
+  if(G.hd) G.hd(s,cam,td,dt,lights);
+  if(G.grade) G.grade(s,td);
+  for(let i=POP.length-1;i>=0;i--){ const p=POP[i]; p.t+=dt; if(p.t>1.4){ POP.splice(i,1); continue; } const x=p.x-cam, y=p.y-p.t*16;
+    octx.save(); octx.globalAlpha=Math.min(1,(1.4-p.t)*2); octx.font=G.popFont||'700 10px sans-serif'; octx.textAlign='center'; octx.lineWidth=3; octx.strokeStyle=G.popStroke||'#2b1d3a'; octx.strokeText(p.txt,x,y); octx.fillStyle=G.popFill||'#ffd23f'; octx.fillText(p.txt,x,y); octx.restore(); }
+  if(G.post) G.post(s,cam,td,dt);
+  hdVignette(G.vig?G.vig(s):.28,G.vigRGB);
+  if(S.fade>.001){ if(G.fadeBlack){ octx.fillStyle='rgba(0,0,0,'+S.fade+')'; octx.fillRect(0,0,W,H); }
+    else { const cx=S.mode==='title'?W/2:clamp(S.x-cam,30,W-30), cy=S.y-30*scl(S.y), r=Math.max(0,(1-S.fade)*Math.hypot(W,H));
+      octx.save(); octx.beginPath(); octx.rect(0,0,W,H); octx.moveTo(cx+r,cy); octx.arc(cx,cy,r,0,Math.PI*2,true); octx.fillStyle=G.irisCol||'#2b1d3a'; octx.fill('evenodd');
+      if(r>2){ octx.beginPath(); octx.arc(cx,cy,r,0,Math.PI*2); octx.lineWidth=1.5; octx.strokeStyle=G.irisRim||'rgba(255,210,63,.8)'; octx.stroke(); } octx.restore(); } }
+}
+/* ---------- dialogue ---------- */
+const D={ q:[], cb:null, text:'', shown:0, active:false, opts:null };
+const dlgEl=$('dlg'), dlgText=$('dlgText'), dlgOpts=$('dlgOpts'), moreEl=$('more');
+
+function say(lines,cb){ if(typeof lines==='string') lines=[lines]; D.q=lines.map(tr); D.cb=cb||null; D.active=true; D.opts=null; nextLine(); }
+function nextLine(){ if(!D.q.length){ D.active=false; dlgEl.hidden=true; const cb=D.cb; D.cb=null; if(cb) cb(); return; }
+  D.text=ptSet(D.q.shift()); D.shown=0; dlgText.textContent=''; dlgOpts.innerHTML=''; dlgEl.hidden=false; moreEl.style.visibility='hidden'; }
+function advance(){ if(!D.active||D.opts) return; if(D.shown<D.text.length){ D.shown=D.text.length; dlgText.textContent=D.text; } else nextLine(); }
+function choose(prompt,opts){ prompt=tr(prompt); ptSet(null); D.active=true; D.text=prompt; D.shown=prompt.length; D.opts=opts; D.q=[]; dlgText.textContent=prompt; dlgOpts.innerHTML=''; dlgEl.hidden=false; moreEl.style.visibility='hidden';
+  opts.forEach(o=>{ const b=document.createElement('button'); b.textContent=tr(o.t); b.addEventListener('click',e=>{ e.stopPropagation(); D.opts=null; D.active=false; dlgEl.hidden=true; dlgOpts.innerHTML=''; o.f(); }); dlgOpts.appendChild(b); }); }
+let whT=0; function whisper(t){ const el=$('whisper'); el.textContent=tr(t); el.classList.add('show'); clearTimeout(whT); whT=setTimeout(()=>el.classList.remove('show'),1700); }
+let tipT=0; function tip(t,ms){ const el=$('tip'); el.textContent=tr(t); el.classList.add('show'); clearTimeout(tipT); tipT=setTimeout(()=>el.classList.remove('show'),ms||6000); }
+
+
+/* ---------- flow ---------- */
+function fadeTo(v,d,cb){ S.fadeFrom=S.fade; S.fadeTo=v; S.fadeDur=d; S.fadeT=0; S.fadeCb=cb||null; }
+function place(id,from){ const s=SC[id], e=s.entries[from]||s.entries.start||Object.values(s.entries)[0]; S.scene=id; S.x=e[0]; S.y=e[1]; S.dir=e[2]; S.face=e[3]||1; S.path=[]; S.onArrive=null; S.cam=clamp(S.x-W/2,0,s.w-W); if(G.onPlace) G.onPlace(id); }
+function enter(id,from){ place(id,from); A.amb(); if(S.mode==='play') music(G.musicFor(id)); save(); }
+function go(id,from,cb){ if(S.trans) return; S.trans=1; closeInv();
+  fadeTo(1,.4,()=>{ enter(id,from); fadeTo(0,.5,()=>{ S.trans=0; const s=SC[id]; if(s.onEnter) s.onEnter(); if(cb) cb(); }); }); }
+
+/* ---------- save & prefs ---------- */
+const KEY=G.key+'-save-v1', PREF=G.key+'-prefs-v1';
+function save(){ if(S.mode!=='play'||(G.noSave&&G.noSave())) return; try{ localStorage.setItem(KEY,JSON.stringify({scene:S.scene,x:S.x,y:S.y,inv:S.inv,F})); }catch(e){} }
+function load(){ try{ const v=localStorage.getItem(KEY); return v?JSON.parse(v):null; }catch(e){ return null; } }
+function clearSave(){ try{ localStorage.removeItem(KEY); }catch(e){} }
+function loadPrefs(){ try{ return JSON.parse(localStorage.getItem(PREF))||{}; }catch(e){ return {}; } }
+let TS=1.3, FXFULL=true;
+function savePrefs(){ try{ localStorage.setItem(PREF,JSON.stringify({ts:TS,sound:A.on,lang:LANG,fx:FXFULL,portraits:typeof PORTRAITS!=='undefined'?PORTRAITS:true,voice:typeof VOICE!=='undefined'?VOICE.on:true})); }catch(e){} }
+function setTS(v){ TS=v; stage.style.setProperty('--ts',v); document.querySelectorAll('#tsRow button').forEach(b=>b.setAttribute('aria-pressed',String(+b.dataset.ts===v))); savePrefs(); }
+function setFX(on){ FXFULL=on; document.querySelectorAll('#fxRow button').forEach(b=>b.setAttribute('aria-pressed',String((b.dataset.fx==='1')===on))); fit(); savePrefs(); }
+function setLang(l){ LANG=l; document.documentElement.lang=l; document.title=tr(G.title);
+  document.querySelectorAll('[data-i18n]').forEach(el=>el.textContent=tr(el.dataset.i18n));
+  document.querySelectorAll('[data-i18n-label]').forEach(el=>el.setAttribute('aria-label',tr(el.dataset.i18nLabel)));
+  document.querySelectorAll('#lgRow button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.lg===l)));
+  $('sSound').textContent=tr(G.soundLabel||'Ήχος:')+' '+tr(A.on?'ναι':'όχι'); if($('score')) showScore(false); if(G.onLang) G.onLang(); savePrefs(); }
+
+/* ---------- input ---------- */
+function toLow(e){ const r=OUT.getBoundingClientRect(); return [(e.clientX-r.left)/r.width*W,(e.clientY-r.top)/r.height*H]; }
+OUT.addEventListener('pointermove',e=>{ if(e.pointerType!=='mouse') return; S.mouseOn=true; const [x,y]=toLow(e); S.mouse={x,y};
+  const h=(S.mode==='play'&&!D.active)?hotAt(x+S.cam,y):null; S.hover=h; const el=$('hover');
+  if(h){ el.textContent=tr(typeof h.n==='function'?h.n():h.n); el.style.left=(x/W*100)+'%'; el.style.top=(y/H*100)+'%'; el.hidden=false; } else el.hidden=true; });
+OUT.addEventListener('pointerleave',()=>{ S.mouseOn=false; $('hover').hidden=true; });
+OUT.addEventListener('contextmenu',e=>e.preventDefault());
+OUT.addEventListener('pointerdown',e=>{ A.init(); if(!$('menu').hidden){ $('menu').hidden=true; return; }
+  if(e.pointerType==='mouse'&&e.button===2){ e.preventDefault(); if(!D.active) cycleVerb(); return; }
+  if(e.pointerType!=='mouse') S.mouseOn=false; const [x,y]=toLow(e); clickAt(x,y,e.pointerType!=='mouse'); });
+$('dlg').addEventListener('pointerdown',e=>{ if(e.target.closest('button')) return; e.stopPropagation(); A.init(); advance(); });
+document.querySelectorAll('.vb[data-v]').forEach(b=>b.addEventListener('click',e=>{ e.stopPropagation(); A.init(); if(D.active) return; setVerb(b.dataset.v); sfx('blip'); }));
+$('bInv').addEventListener('click',e=>{ e.stopPropagation(); A.init(); invEl.hidden?openInv():closeInv(); });
+$('bClose').addEventListener('click',e=>{ e.stopPropagation(); closeInv(); });
+$('bExam').addEventListener('click',e=>{ e.stopPropagation(); if(!S.sel) return; const it=ITEMS[S.sel]; closeInv(); say(typeof it.d==='function'?it.d():it.d); });
+addEventListener('keydown',e=>{ const k=e.key;
+  if(k===' '||k==='Enter'){ e.preventDefault(); if(D.active) advance(); }
+  else if(k>='1'&&k<='5'){ setVerb(VERBS[+k-1]); }
+  else if(k==='i'||k==='I'){ invEl.hidden?openInv():closeInv(); } else if(k==='Escape'){ closeInv(); $('settings').hidden=true; } });
+$('bMenu').addEventListener('click',e=>{ e.stopPropagation(); A.init(); $('menu').hidden=!$('menu').hidden; });
+$('mTitle').addEventListener('click',e=>{ e.stopPropagation(); $('menu').hidden=true; toTitle(); });
+function openSettings(){ closeInv(); $('menu').hidden=true; $('sSound').textContent=tr('Ήχος:')+' '+tr(A.on?'ναι':'όχι'); $('settings').hidden=false; }
+$('mSet').addEventListener('click',e=>{ e.stopPropagation(); openSettings(); });
+$('tSet').addEventListener('click',e=>{ e.stopPropagation(); A.init(); openSettings(); });
+document.querySelectorAll('#tsRow button').forEach(b=>b.addEventListener('click',e=>{ e.stopPropagation(); setTS(+b.dataset.ts); }));
+document.querySelectorAll('#lgRow button').forEach(b=>b.addEventListener('click',e=>{ e.stopPropagation(); setLang(b.dataset.lg); }));
+document.querySelectorAll('#ptRow button').forEach(b=>b.addEventListener('click',e=>{ e.stopPropagation(); setPortraits(b.dataset.pt==='1'); }));
+document.querySelectorAll('#fxRow button').forEach(b=>b.addEventListener('click',e=>{ e.stopPropagation(); setFX(b.dataset.fx==='1'); }));
+$('sSound').addEventListener('click',e=>{ e.stopPropagation(); A.init(); A.setOn(!A.on); $('sSound').textContent=tr('Ήχος:')+' '+tr(A.on?'ναι':'όχι'); savePrefs(); });
+$('sFull').addEventListener('click',e=>{ e.stopPropagation(); const el=document.documentElement; try{ const p=(el.requestFullscreen||el.webkitRequestFullscreen||function(){}).call(el); if(p&&p.then) p.then(()=>{ try{ screen.orientation.lock('landscape').catch(()=>{}); }catch(_){} }).catch(()=>{}); }catch(_){} });
+$('sClose').addEventListener('click',e=>{ e.stopPropagation(); $('settings').hidden=true; });
+$('settings').addEventListener('pointerdown',e=>e.stopPropagation());
+
+
+function setUI(on){ if($('vbar')) $('vbar').hidden=!on; if(G.setUI) G.setUI(on); if(!on){ $('hover').hidden=true; closeInv(); } }
+function toTitle(){ S.mode='title'; closeInv(); D.active=false; D.opts=null; dlgEl.hidden=true; $('end').hidden=true; $('title').hidden=false; setUI(false);
+  $('tCont').hidden=!load(); place(G.titleScene[0],G.titleScene[1]); S.fade=0; S.lock=0; S.trans=0; S.dance=0; A.amb(); music(G.titleMusic); if(G.onTitle) G.onTitle(); }
+function startGame(data){ A.init(); $('title').hidden=true; $('end').hidden=true; S.fade=1; S.mode='play'; S.lock=0; S.dance=0; timers.length=0; POP.length=0;
+  if(data){ F=data.F||{}; S.inv=data.inv||[]; const sc=G.resume?G.resume(data):data.scene; place(sc,'x'); if(sc===data.scene){ S.x=data.x; S.y=data.y; } S.cam=clamp(S.x-W/2,0,SC[S.scene].w-W); A.amb(); music(G.musicFor(S.scene)); }
+  else { G.newGame(); }
+  setUI(true); S.sel=null; renderInv(); if(VERBS.includes('walk')) setVerb('walk'); if($('score')) showScore(false); music(G.musicFor(S.scene));
+  if(!data) G.intro(); else if(G.welcomeBack) G.welcomeBack();
+  fadeTo(0,.8); }
+$('tNew').addEventListener('click',e=>{ e.stopPropagation(); startGame(null); });
+$('tCont').addEventListener('click',e=>{ e.stopPropagation(); startGame(load()); });
+$('endB').addEventListener('click',e=>{ e.stopPropagation(); toTitle(); });
+
+/* ---------- update ---------- */
+function update(dt){
+  for(let i=timers.length-1;i>=0;i--){ timers[i].t-=dt; if(timers[i].t<=0){ const f=timers[i].fn; timers.splice(i,1); f(); } }
+  if(S.fadeDur){ S.fadeT+=dt; const k=Math.min(1,S.fadeT/S.fadeDur); S.fade=S.fadeFrom+(S.fadeTo-S.fadeFrom)*k; if(k>=1){ S.fadeDur=0; const cb=S.fadeCb; S.fadeCb=null; if(cb) cb(); } }
+  if(G.dlgTick) G.dlgTick(dt); else if(D.active&&!D.opts&&D.shown<D.text.length){ const b=Math.floor(D.shown/4); D.shown=Math.min(D.text.length,D.shown+dt*55); dlgText.textContent=D.text.slice(0,Math.floor(D.shown)); if(Math.floor(D.shown/4)!==b) sfx('type'); }
+  if(!G.dlgTick) moreEl.style.visibility=D.active&&!D.opts&&D.shown>=D.text.length?'visible':'hidden';
+  if(typeof ptDraw==='function') ptDraw(); musicTick(dt); S.shk=Math.max(0,S.shk-dt);
+  const s=SC[S.scene]; S.moving=false;
+  if(S.mode==='play'&&S.path.length&&(!D.active||S.dance)&&!S.trans&&!S.frozen){
+    const [tx,ty]=S.path[0], dx=tx-S.x, dy=ty-S.y, nx=dx, ny=dy/.62, L=Math.hypot(nx,ny), step=(G.speed||54)*scl(S.y)*dt;
+    if(L<=step){ S.x=tx; S.y=ty; S.path.shift(); if(!S.path.length){ const cb=S.onArrive; S.onArrive=null; if(cb) cb(); } }
+    else { S.x+=nx/L*step; S.y+=ny/L*step*.62; S.moving=true; }
+    if(Math.abs(dx)>Math.abs(dy)*1.1){ S.dir='side'; S.face=dx>0?1:-1; } else if(Math.abs(dy)>.5) S.dir=dy>0?'front':'back';
+    const b=Math.floor(S.phase/Math.PI); S.phase+=dt*10; if(Math.floor(S.phase/Math.PI)!==b){ sfx('step'); const c=(G.dust||{})[S.scene]; if(c&&FXFULL) puff(S.x,S.y,c,2); } }
+  if(S.mode==='play'&&G.update) G.update(dt,s);
+  if(S.mode==='title') S.cam=clamp((s.w-W)/2+Math.sin(T*.1)*((s.w-W)/2),0,s.w-W);
+  else { const tx=clamp(S.x-W/2,0,s.w-W); S.cam+=(tx-S.cam)*Math.min(1,dt*4); }
+}
+
+/* ---------- render ---------- */
+function render(dt){
+  const s=SC[S.scene], cam=Math.round(S.cam), sx=S.shk>0?Math.round((Math.random()-.5)*2*S.shkA):0, sy=S.shk>0?Math.round((Math.random()-.5)*S.shkA):0;
+  ctx.setTransform(1,0,0,1,0,0); ctx.fillStyle='#000'; ctx.fillRect(0,0,W,H); ctx.translate(-cam+sx,sy);
+  ctx.drawImage(s.img,0,0); if(s.anim) s.anim(ctx,dt);
+  const L=s.props().slice();
+  if(S.mode!=='title'&&!S.hidePlayer){ const k=scl(S.y); L.push({y:S.y,draw(g){ actor(g,G.playerFn(),S.x,S.y,k,S.dir==='side'&&S.face<0,!!s.night); }}); }
+  if(G.extra) G.extra(L,s);
+  L.sort((a,b)=>a.y-b.y); for(const p of L) p.draw(ctx);
+  for(let i=PFX.length-1;i>=0;i--){ const p=PFX[i]; p.t+=dt; if(p.t>=p.max){ PFX.splice(i,1); continue; } p.x+=p.vx*dt; p.y+=p.vy*dt; p.vy+=(p.g!==undefined?p.g:14)*dt; ctx.globalAlpha=(1-p.t/p.max)*.8; const r=Math.round(p.r*(1+p.t)); R(ctx,p.x-r/2,p.y-r/2,r,r,p.c); ctx.globalAlpha=1; }
+  if(TAP){ TAP.t-=dt; if(TAP.t<=0) TAP=null; else { const r=Math.round((.35-TAP.t)*24); ctx.globalAlpha=TAP.t*2.4; ctx.strokeStyle=G.tapCol||'#ffffff'; ctx.lineWidth=1; ctx.beginPath(); ctx.ellipse(TAP.x,TAP.y,r+.5,r*.35+.5,0,0,7); ctx.stroke(); ctx.globalAlpha=1; } }
+  if(s.over) s.over(ctx,dt);
+  if(G.overWorld) G.overWorld(ctx,s,dt);
+  ctx.setTransform(1,0,0,1,0,0);
+  if(G.lowPost) G.lowPost(ctx,s,dt);
+  let lights=[], dark=0; if(s.dark){ dark=s.dark*(G.darkMul?G.darkMul(s):1); lights=s.lights?s.lights().slice():[]; const pl=G.playerLight&&G.playerLight(s); if(pl) lights.push(pl); }
+  if(S.mouseOn&&S.mouse&&S.mode==='play'&&!D.active&&$('settings').hidden&&VIC[S.verb]) drawCursor(ctx,S.mouse.x,S.mouse.y);
+  composite(dt,cam,lights,dark);
+}
+
+/* ---------- loop & layout ---------- */
+for(const k in SC){ const s=SC[k]; s.id=k; const c=document.createElement('canvas'); c.width=s.w; c.height=H; const g=c.getContext('2d'); s.bg(g,s.w); s.img=c; buildGrid(s); }
+VERBS.concat(['bag','menu']).forEach(v=>{ const c=document.querySelector('[data-icon="'+v+'"]'); if(c&&VIC[v]) iconInto(c,VIC[v]); });
+let last=performance.now();
+function loop(now){ const dt=clamp((now-last)/1000,0,.05); last=now; T+=dt; update(dt); render(dt); requestAnimationFrame(loop); }
+function fit(){ const wr=$('wrap'), k=Math.min(wr.clientWidth/W,wr.clientHeight/H), w=Math.floor(W*k), h=Math.floor(H*k);
+  stage.style.width=w+'px'; stage.style.height=h+'px'; stage.style.setProperty('--u',(h/180)+'px');
+  const dpr=Math.min(FXFULL?2:1,window.devicePixelRatio||1), sc=Math.max(1,Math.min(6,Math.round(w*dpr/W))); OW=W*sc; OH=H*sc; if(OUT.width!==OW||OUT.height!==OH){ OUT.width=OW; OUT.height=OH; } }
+addEventListener('resize',fit); if(window.visualViewport) visualViewport.addEventListener('resize',fit);
+addEventListener('orientationchange',()=>setTimeout(fit,250));
+document.addEventListener('visibilitychange',()=>{ if(document.hidden){ if(A.c) A.c.suspend(); if(typeof VOICE!=='undefined') VOICE.stop(); } else if(A.c) A.c.resume(); });
+(()=>{ const pr=loadPrefs(); if(pr.sound===false) A.on=false; setTS([1,1.3,1.6,2].includes(pr.ts)?pr.ts:1.3); setLang(pr.lang==='en'?'en':'el'); if(typeof setPortraits==='function') setPortraits(pr.portraits!==false); if(typeof setVoice==='function') setVoice(pr.voice!==false); setFX(pr.fx!==false); })();
+fit(); toTitle(); requestAnimationFrame(loop);
+
+</script>
+
+
+
+
+<script id="cine">
+/* ================= CINE — engine-independent cutscene player =================
+   Same cutscenes in every version of a game (v1 / v2 / pseudo-3D): it overlays #stage, draws its own pixel-art
+   shots at 320×180 plus smooth HD light, letterbox bars, subtitles (LANG el/en), music pad, skip & tap-to-advance.
+   Hooks: intro = before "New game", mid = first time a scene/flag is reached, ending = before the end screen. */
+const CINE=(()=>{
+  const W2=320,H2=180, OX=160, OY=120, wb=document.createElement('canvas'); wb.width=640; wb.height=640; const lg=wb.getContext('2d'); lg.imageSmoothingEnabled=false;
+  const low=document.createElement('canvas'); low.width=W2; low.height=H2; const l2=low.getContext('2d'); l2.imageSmoothingEnabled=false;
+  let el,cv2,o,cap,skipB,shots=null,i=0,t=0,done=null,raf=0,last=0,k=1,fade=1,bars=0,ac=null,mus=null,prevGain=null,busy=false,T2=0;
+  const prev=document.createElement('canvas'), pg2=prev.getContext('2d'); let xf=0;
+  const grain=[0,1,2].map(()=>{ const c=document.createElement('canvas'); c.width=160; c.height=90; const x=c.getContext('2d'), id=x.createImageData(160,90); for(let j=0;j<id.data.length;j+=4){ const v=Math.random()*255; id.data[j]=id.data[j+1]=id.data[j+2]=v; id.data[j+3]=Math.random()<.5?22:0; } x.putImageData(id,0,0); return c; });
+  const ease=p=>p<.5?2*p*p:1-Math.pow(-2*p+2,2)/2;
+  const L=a=>(typeof LANG!=='undefined'&&LANG==='en')?a[1]:a[0];
+  function build(){ const st=document.getElementById('stage')||document.body; el=document.createElement('div'); el.id='cine';
+    el.style.cssText='position:absolute;inset:0;z-index:80;background:#000;display:none;touch-action:none;overflow:hidden;';
+    cv2=document.createElement('canvas'); cv2.style.cssText='position:absolute;inset:0;width:100%;height:100%;'; el.appendChild(cv2); o=cv2.getContext('2d');
+    cap=document.createElement('div'); cap.style.cssText='position:absolute;left:8%;right:8%;bottom:3%;text-align:center;color:#fff;font-size:calc(var(--u,2px)*7*var(--ts,1));line-height:1.35;text-shadow:0 0 calc(var(--u,2px)*3) #000,0 0 calc(var(--u,2px)*1) #000;opacity:0;transition:opacity .5s;pointer-events:none;';
+    el.appendChild(cap); skipB=document.createElement('button'); skipB.style.cssText='position:absolute;right:2%;top:3%;background:rgba(0,0,0,.45);color:#fff;border:1px solid rgba(255,255,255,.5);border-radius:99px;padding:calc(var(--u,2px)*1.6) calc(var(--u,2px)*5);font:inherit;font-size:calc(var(--u,2px)*5.2);cursor:pointer;';
+    el.appendChild(skipB); st.appendChild(el);
+    skipB.addEventListener('pointerdown',e=>{ e.stopPropagation(); e.preventDefault(); finish(); });
+    el.addEventListener('pointerdown',e=>{ e.stopPropagation(); e.preventDefault(); next(); });
+    ['click','pointerup','touchstart'].forEach(ev=>el.addEventListener(ev,e=>e.stopPropagation()));
+    addEventListener('keydown',e=>{ if(!busy) return; e.stopImmediatePropagation(); e.preventDefault(); if(e.key==='Escape') finish(); else if(e.key===' '||e.key==='Enter'||e.key==='ArrowRight') next(); },true);
+    addEventListener('resize',fit); }
+  function fit(){ if(!el) return; const r=el.getBoundingClientRect(), d=Math.min(2,devicePixelRatio||1); cv2.width=Math.max(320,Math.round(r.width*d)); cv2.height=Math.max(180,Math.round(r.height*d)); k=cv2.width/W2; prev.width=cv2.width; prev.height=cv2.height; }
+  function snap(){ pg2.clearRect(0,0,prev.width,prev.height); pg2.drawImage(cv2,0,0); xf=1; }
+  function audio(mood){ try{ ac=(typeof A!=='undefined'&&A.c)?A.c:(ac||new (window.AudioContext||window.webkitAudioContext)()); if(ac.state==='suspended') ac.resume(); }catch(e){ ac=null; return; }
+    if(typeof A!=='undefined'&&A.m&&A.c){ prevGain=A.on; A.m.gain.setTargetAtTime(0,A.c.currentTime,.2); }
+    const g=ac.createGain(); g.gain.value=0; g.gain.setTargetAtTime(.9,ac.currentTime,.8); g.connect(ac.destination); mus={g,nodes:[],mood,next:0,step:0}; }
+  const MOODS={sea:[[57,64,69,76],[55,62,67,74],[53,60,65,72],[52,59,64,71]],horror:[[45,52,55,60],[44,51,55,59],[45,52,57,60],[46,53,56,61]],sunny:[[60,64,67,72],[65,69,72,77],[62,65,69,74],[67,71,74,79]],
+    police:[[55,62,67,70],[53,60,65,69],[51,58,63,67],[50,57,62,65]],tale:[[60,64,67,72],[57,60,64,69],[65,69,72,77],[67,71,74,79]],dark:[[38,45,50,53],[37,44,49,52],[38,45,50,53],[41,48,53,56]],hope:[[60,67,72,76],[57,64,69,72],[65,72,77,81],[67,74,79,83]]};
+  const mf=m=>440*Math.pow(2,(m-69)/12);
+  function tone(f,at,dur,type,vol){ if(!ac||!mus) return; const os=ac.createOscillator(), g=ac.createGain(); os.type=type; os.frequency.value=f; g.gain.setValueAtTime(0,at); g.gain.linearRampToValueAtTime(vol,at+Math.min(.6,dur*.3)); g.gain.exponentialRampToValueAtTime(.0001,at+dur); os.connect(g); g.connect(mus.g); os.start(at); os.stop(at+dur+.05); }
+  function musicTick(){ if(!ac||!mus) return; const now=ac.currentTime; if(now<mus.next-.1) return; const ch=MOODS[mus.mood]||MOODS.hope, c=ch[mus.step%ch.length], dur=2.6;
+    c.forEach((m,j)=>tone(mf(m),now+.02,dur+.6,j?'sine':'triangle',j?.018:.03)); for(let j=0;j<4;j++) tone(mf(c[(j+1)%4]+12),now+.3+j*.6,.7,'sine',.012); mus.next=now+dur; mus.step++; }
+  function stopAudio(){ if(mus&&ac){ const g=mus.g; g.gain.setTargetAtTime(0,ac.currentTime,.3); setTimeout(()=>{ try{ g.disconnect(); }catch(e){} },1500); } mus=null; if(typeof A!=='undefined'&&A.m&&A.c&&prevGain!==null){ A.setOn(A.on); } prevGain=null; }
+  function play(list,cb,mood){ if(!el) build(); if(busy){ cb&&cb(); return; } shots=list; i=0; t=0; xf=0; done=cb; busy=true; bars=0; fade=1; el.style.display='block'; fit(); skipB.textContent=L(['Παράλειψη ▸▸','Skip ▸▸']); setCap(); try{ audio(mood||'hope'); }catch(e){} last=performance.now(); cancelAnimationFrame(raf); raf=requestAnimationFrame(loop); }
+  function setCap(){ const s=shots[i]; cap.style.opacity=0; setTimeout(()=>{ if(!shots||shots[i]!==s) return; cap.innerHTML=''; if(s.who){ const b=document.createElement('b'); b.textContent=L(s.who)+' '; b.style.color=s.whoCol||'#ffe066'; cap.appendChild(b); } cap.appendChild(document.createTextNode(s.cap?L(s.cap):'')); cap.style.opacity=s.cap?1:0; },250); }
+  function next(){ if(!busy) return; if(t<.35) return; snap(); i++; t=0; if(i>=shots.length) return finish(); setCap(); }
+  function finish(){ if(!busy) return; busy=false; cancelAnimationFrame(raf); stopAudio(); let a=1; const out=()=>{ a-=.06; el.style.opacity=a; if(a>0) requestAnimationFrame(out); else { el.style.display='none'; el.style.opacity=1; shots=null; const cb=done; done=null; cb&&cb(); } }; out(); }
+  function loop(now){ if(!busy) return; const dt=Math.max(0,Math.min(.05,(now-last)/1000)); last=now; t+=dt; T2+=dt; const s=shots[i]; if(t>=s.d){ snap(); i++; t=0; if(i>=shots.length) return finish(); setCap(); }
+    const sh=shots[i], p=Math.min(1,t/sh.d); musicTick(); bars=Math.min(1,bars+dt*1.5);
+    let cx=160,cy=90,cz=1; if(sh.cam){ const e=ease(p), a=sh.cam[0], b=sh.cam[1]||a; cx=a[0]+(b[0]-a[0])*e; cy=a[1]+(b[1]-a[1])*e; cz=a[2]+(b[2]-a[2])*e; if(!sh.free){ cx=Math.max(160/cz,Math.min(320-160/cz,cx)); cy=Math.max(90/cz,Math.min(180-90/cz,cy)); } } let sx=0,sy=0; if(sh.shake){ const m=typeof sh.shake==='function'?sh.shake(t,p):sh.shake; sx=(Math.random()-.5)*m; sy=(Math.random()-.5)*m; }
+    lg.setTransform(1,0,0,1,0,0); lg.globalAlpha=1; lg.globalCompositeOperation='source-over'; lg.fillStyle='#000'; lg.fillRect(0,0,640,640); lg.setTransform(1,0,0,1,OX,OY); try{ sh.low&&sh.low(lg,t,p); }catch(e){ console.error(e); } lg.setTransform(1,0,0,1,0,0); lg.globalAlpha=1;
+    const sw=W2/cz, shh=H2/cz; l2.fillStyle='#000'; l2.fillRect(0,0,W2,H2); l2.drawImage(wb,OX+cx-sw/2-sx/cz,OY+cy-shh/2-sy/cz,sw,shh,0,0,W2,H2);
+    o.setTransform(1,0,0,1,0,0); o.imageSmoothingEnabled=false; o.globalAlpha=1; o.globalCompositeOperation='source-over'; o.drawImage(low,0,0,cv2.width,cv2.height); o.setTransform(k*cz,0,0,k*cz,k*(160-cx*cz+sx),k*(90-cy*cz+sy)); o.imageSmoothingEnabled=true;
+    try{ sh.hd&&sh.hd(o,t,p); }catch(e){ console.error(e); } o.setTransform(k,0,0,k,0,0); o.globalAlpha=1; o.globalCompositeOperation='source-over';
+    try{ sh.ui&&sh.ui(o,t,p); }catch(e){ console.error(e); }
+    if(sh.grade){ o.save(); o.globalCompositeOperation=sh.grade[2]||'soft-light'; o.fillStyle='rgba('+sh.grade[0]+','+sh.grade[1]+')'; o.fillRect(0,0,W2,H2); o.restore(); }
+    if(sh.vig!==0) CK.vign(o,sh.vig||.42); if(sh.grain!==0){ o.save(); o.globalAlpha=.55; o.drawImage(grain[Math.floor(T2*24)%3],0,0,W2,H2); o.restore(); }
+    if(xf>0){ const tr=sh.tr||'cross'; if(tr==='cross'){ o.setTransform(1,0,0,1,0,0); o.globalAlpha=xf; o.drawImage(prev,0,0); o.globalAlpha=1; o.setTransform(k,0,0,k,0,0); } xf=Math.max(0,xf-dt*(1/(sh.xd||.9))); if(tr==='flash') CK.flash(o,xf); }
+    const fi=sh.fi===undefined?(i===0?.8:0):sh.fi, fo=sh.fo===undefined?(i===shots.length-1?.8:0):sh.fo, a=Math.max(t<fi?1-t/fi:0, t>sh.d-fo?(t-(sh.d-fo))/fo:0); if(a>0){ o.globalCompositeOperation='source-over'; o.fillStyle='rgba(0,0,0,'+Math.min(1,a)+')'; o.fillRect(0,0,W2,H2); }
+    o.fillStyle='#000'; const bh=18*bars; o.fillRect(0,0,W2,bh); o.fillRect(0,H2-bh,W2,bh);
+    raf=requestAnimationFrame(loop); }
+  return {play,busy:()=>busy,L};
+})();
+
+/* ---------- drawing kit (low-res 320×180, integer pixels) ---------- */
+const CK={
+  R:(g,x,y,w,h,c)=>{ g.fillStyle=c; g.fillRect(Math.round(x),Math.round(y),Math.round(w),Math.round(h)); },
+  disc(g,x,y,r,c){ g.fillStyle=c; for(let dy=-r;dy<=r;dy++){ const w=Math.round(Math.sqrt(r*r-dy*dy)); g.fillRect(Math.round(x-w),Math.round(y+dy),w*2+1,1); } },
+  ell(g,x,y,rx,ry,c){ g.fillStyle=c; for(let dy=-ry;dy<=ry;dy++){ const w=Math.round(rx*Math.sqrt(1-(dy*dy)/(ry*ry||1))); g.fillRect(Math.round(x-w),Math.round(y+dy),w*2+1,1); } },
+  sky(g,y0,y1,cols){ const n=cols.length-1; for(let y=y0;y<y1;y++){ const f=(y-y0)/(y1-y0)*n, i=Math.min(n-1,Math.floor(f)), u=f-i; const a=CK.hex(cols[i]), b=CK.hex(cols[i+1]); g.fillStyle='rgb('+Math.round(a[0]+(b[0]-a[0])*u)+','+Math.round(a[1]+(b[1]-a[1])*u)+','+Math.round(a[2]+(b[2]-a[2])*u)+')'; g.fillRect(0,y,320,1); } },
+  hex:h=>[parseInt(h.slice(1,3),16),parseInt(h.slice(3,5),16),parseInt(h.slice(5,7),16)],
+  hills(g,base,amp,fr,col,ph,w){ g.fillStyle=col; for(let x=0;x<(w||320);x++){ const h=amp*(.6+.4*Math.sin(x*fr+ph)+.25*Math.sin(x*fr*3.1+ph*2)); g.fillRect(x,Math.round(base-h),1,Math.round(h)+200); } },
+  rnd(seed){ let s=seed>>>0||1; return ()=>((s=(s*1664525+1013904223)>>>0)/4294967296); },
+  skyline(g,base,seed,col,win,off){ const r=CK.rnd(seed); let x=-((off||0)%40); while(x<330){ const w=12+r()*22, h=20+r()*50; CK.R(g,x,base-h,w,h+200,col); if(win) for(let yy=base-h+4;yy<base-4;yy+=6) for(let xx=x+3;xx<x+w-3;xx+=5) if(r()<.35) CK.R(g,xx,yy,2,3,win); x+=w+1; } },
+  stars(g,n,t,seed){ const r=CK.rnd(seed||7); for(let i=0;i<n;i++){ const x=r()*320, y=r()*90, a=.5+.5*Math.sin(t*2+i); g.globalAlpha=a; CK.R(g,x,y,1,1,'#fff'); } g.globalAlpha=1; },
+  sea(g,y0,cols,t,glit){ CK.sky(g,y0,180,cols); if(glit){ for(let i=0;i<60;i++){ const x=(i*53+t*20*(i%3+1))%330, y=y0+3+(i*17)%(180-y0-4); CK.R(g,x,y,3+(i%3),1,glit); } } },
+  rain(g,t,n,col){ g.fillStyle=col||'rgba(180,200,230,.6)'; for(let i=0;i<(n||120);i++){ const x=(i*37+t*60)%340-10, y=(i*91+t*420)%200-10; g.fillRect(Math.round(x),Math.round(y),1,4); } },
+  fig(g,x,y,h,col,o={}){ const hw=Math.max(2,Math.round(h*.12)); CK.R(g,x-hw,y-h*.62,hw*2,h*.42,col); CK.R(g,x-hw+1,y-h*.22,hw-1,h*.22,col); CK.R(g,x+1,y-h*.22,hw-1,h*.22,col); CK.disc(g,x,y-h*.75,Math.max(2,Math.round(h*.11)),o.head||col); if(o.hair) CK.R(g,x-hw,y-h*.88,hw*2,Math.max(2,h*.08),o.hair); if(o.long) CK.R(g,x-hw-1,y-h*.82,3,h*.4,o.hair||col); },
+  face(g,x,y,s,o){ const S=v=>Math.round(v*s); CK.R(g,x-S(9),y-S(11),S(18),S(22),o.skin); CK.R(g,x-S(9),y-S(11),S(3),S(22),o.skinD||o.skin); if(o.hair){ CK.R(g,x-S(11),y-S(15),S(22),S(7),o.hair); if(o.long){ CK.R(g,x-S(13),y-S(11),S(4),S(26),o.hair); CK.R(g,x+S(9),y-S(11),S(4),S(26),o.hair); } }
+    const bl=o.blink; CK.R(g,x-S(5),y-S(2),S(3),bl?1:S(3),o.eye||'#1a1a2a'); CK.R(g,x+S(2),y-S(2),S(3),bl?1:S(3),o.eye||'#1a1a2a'); if(!bl){ CK.R(g,x-S(5),y-S(2),1,1,'#fff'); CK.R(g,x+S(2),y-S(2),1,1,'#fff'); } if(o.beard) CK.R(g,x-S(8),y+S(4),S(16),S(9),o.beard); CK.R(g,x-S(3),y+S(6),S(6),1,o.mouth||'#8a3a3a'); if(o.tear) CK.R(g,x-S(5),y+S(1)+((o.tear*20)%S(8)),1,2,'#bfe8ff'); },
+  title(o,txt,y,size,col,a){ o.save(); o.globalAlpha=a===undefined?1:a; o.textAlign='center'; o.font='700 '+size+'px "EB Garamond", "Comfortaa", serif'; o.lineWidth=size/5; o.strokeStyle='rgba(0,0,0,.8)'; o.strokeText(txt,160,y); o.fillStyle=col||'#fff'; o.fillText(txt,160,y); o.restore(); },
+  glow(o,x,y,r,rgb,a){ const gr=o.createRadialGradient(x,y,0,x,y,r); gr.addColorStop(0,'rgba('+rgb+','+a+')'); gr.addColorStop(1,'rgba('+rgb+',0)'); o.save(); o.globalCompositeOperation='lighter'; o.fillStyle=gr; o.fillRect(x-r,y-r,r*2,r*2); o.restore(); },
+  beams(o,t,rgb,a,n){ o.save(); o.globalCompositeOperation='lighter'; for(let i=0;i<(n||6);i++){ const x=i*60-20+Math.sin(t*.5+i)*14, w=14+6*Math.sin(t+i); const gr=o.createLinearGradient(0,0,0,180); gr.addColorStop(0,'rgba('+rgb+','+a+')'); gr.addColorStop(1,'rgba('+rgb+',0)'); o.fillStyle=gr; o.beginPath(); o.moveTo(x,0); o.lineTo(x+w,0); o.lineTo(x+w+60,180); o.lineTo(x+30,180); o.fill(); } o.restore(); },
+  vign(o,a,rgb){ const gr=o.createRadialGradient(160,90,60,160,90,200); gr.addColorStop(0,'rgba('+(rgb||'0,0,0')+',0)'); gr.addColorStop(1,'rgba('+(rgb||'0,0,0')+','+a+')'); o.fillStyle=gr; o.fillRect(0,0,320,180); },
+  tint(o,rgb,a,mode){ o.save(); o.globalCompositeOperation=mode||'soft-light'; o.fillStyle='rgba('+rgb+','+a+')'; o.fillRect(0,0,320,180); o.restore(); },
+  flash(o,a){ if(a>0){ o.fillStyle='rgba(255,255,255,'+a+')'; o.fillRect(0,0,320,180); } },
+  portrait(g,id,x,y,s,talk,blink){ if(typeof PTD==='undefined'||!PTD[id]) return false; const c=CK._pc||(CK._pc=document.createElement('canvas')); c.width=42; c.height=42; const x2=c.getContext('2d'); x2.imageSmoothingEnabled=false; try{ PTD[id](x2,!!talk,!!blink); }catch(e){ return false; } g.imageSmoothingEnabled=false; g.drawImage(c,Math.round(x-21*s),Math.round(y-21*s),Math.round(42*s),Math.round(42*s)); return true; },
+  bokeh(o,t,n,rgb,a,seed){ const r=CK.rnd(seed||5); o.save(); o.globalCompositeOperation='lighter'; for(let i=0;i<n;i++){ const x=(r()*360+t*(4+r()*10))%360-20, y=r()*180+Math.sin(t*.7+i)*6, rr=3+r()*9; const gr=o.createRadialGradient(x,y,0,x,y,rr); gr.addColorStop(0,'rgba('+rgb+','+(a*(.5+.5*Math.sin(t*1.3+i)))+')'); gr.addColorStop(.7,'rgba('+rgb+','+(a*.3)+')'); gr.addColorStop(1,'rgba('+rgb+',0)'); o.fillStyle=gr; o.fillRect(x-rr,y-rr,rr*2,rr*2); } o.restore(); },
+  rim(o,x,y,w,h,rgb,a){ o.save(); o.globalCompositeOperation='lighter'; const gr=o.createLinearGradient(x,y,x+w,y); gr.addColorStop(0,'rgba('+rgb+','+a+')'); gr.addColorStop(.25,'rgba('+rgb+',0)'); o.fillStyle=gr; o.fillRect(x,y,w,h); o.restore(); },
+  card(o,txt,y,size,col,a,glow){ o.save(); o.globalAlpha=a===undefined?1:a; o.textAlign='center'; o.font='700 '+size+'px "EB Garamond","Comfortaa",serif'; if(glow){ o.shadowColor='rgba('+glow+',.9)'; o.shadowBlur=size*.8; } o.fillStyle=col||'#fff'; o.fillText(txt,160,y); o.shadowBlur=0; o.restore(); },
+};
+
+/* ---------- hooks: intro before New game · mid at a key point · ending before the end screen ---------- */
+function cineInstall(cfg){ const $$=id=>document.getElementById(id); let bypass=false;
+  document.addEventListener('click',e=>{ const b=e.target.closest&&e.target.closest('#tNew'); if(!b||bypass||CINE.busy()) return; e.stopImmediatePropagation(); e.preventDefault(); try{ if(typeof A!=='undefined'&&A.init) A.init(); }catch(_){}
+    CINE.play(cfg.intro,()=>{ bypass=true; b.click(); bypass=false; },cfg.introMood); },true);
+  setInterval(()=>{ if(CINE.busy()||typeof S==='undefined'||S.mode!=='play'||typeof F==='undefined'||!F||F.__cm) return; if(cfg.midWhen()){ F.__cm=1; CINE.play(cfg.mid,()=>{},cfg.midMood); } },300);
+  const end=$$('end'); if(end) new MutationObserver(()=>{ if(end.hidden||end.dataset.cine==='1'||end.classList.contains('over')) return; end.dataset.cine='1'; end.style.visibility='hidden';
+    CINE.play(cfg.ending(),()=>{ end.style.visibility=''; },cfg.endMood); }).observe(end,{attributes:true,attributeFilter:['hidden']});
+  const tn=$$('tNew'); if(tn) tn.addEventListener('click',()=>{ if(end) end.dataset.cine='0'; }); }
+
+(()=>{
+/* ===== cutscenes · Απογραφή · Λουκουμάς · Περιπολικό 7 · Κοκκινοσκουφίτσα ===== */
+const C=CK;
+function tower(g,x,base,h,col){ C.R(g,x-7,base-h,14,h,col); C.R(g,x-8,base-h-3,16,3,col); for(let i=0;i<3;i++) C.R(g,x-5+i*4,base-h+8,2,3,'#ffd890'); }
+function whiteHouses(g,base,seed,day){ const r=C.rnd(seed); for(let i=0;i<14;i++){ const x=150+i*12+r()*6, y=base-i%4*6-r()*10, w=10+r()*6; C.R(g,x,y-10,w,12,day?'#f4f0e8':'#c8c0c8'); C.R(g,x+2,y-7,2,3,day?'#3a7ad8':'#ffd890'); if(i%4===0) { C.disc(g,x+w/2,y-12,3,'#3a7ad8'); } } }
+function lightning(o,t,period){ const ph=t%period; return ph<.08||(ph>.18&&ph<.24)?.55:0; }
+function carSide(g,x,y,col,lights){ C.R(g,x,y-8,40,8,col); C.R(g,x+8,y-14,22,7,col); C.R(g,x+10,y-13,8,5,'#9ad0f0'); C.R(g,x+20,y-13,8,5,'#9ad0f0'); C.disc(g,x+8,y,4,'#1a1a1a'); C.disc(g,x+32,y,4,'#1a1a1a'); if(lights){ C.R(g,x+14,y-16,4,2,lights[0]); C.R(g,x+20,y-16,4,2,lights[1]); } }
+
+function CS_apografi(){ const rainSky=['#05070e','#0c1220','#141c30'];
+  return { introMood:'horror', midMood:'horror', endMood:'horror', midWhen:()=>S.scene==='dream',
+  intro:[
+    {d:6.5,cap:['Θεσσαλονίκη, 1987. Βρέχει τρεις μέρες χωρίς σταματημό.','Thessaloniki, 1987. It has rained for three days without stopping.'],
+     low(g,t){ C.sky(g,0,130,rainSky); C.skyline(g,128,3,'#0a0e18','#5a4a2a'); tower(g,60,128,44,'#0e1220'); C.sea(g,128,['#0a1222','#04070e'],t,'#2a3448'); C.rain(g,t,160); },
+     hd(o,t,p){ C.flash(o,lightning(o,t,3.2)); C.title(o,CINE.L(['ΑΠΟΓΡΑΦΗ','INVENTORY']),70,26,'#e8d8b8',Math.min(1,t/1.5)); C.vign(o,.6); }},
+    {d:5.5,cap:['Ο Λευτέρης Σταθάκης, δικαστικός εκτιμητής, είχε μια τελευταία δουλειά για σήμερα.','Lefteris Stathakis, a court appraiser, had one last job for the day.'],
+     low(g,t,p){ C.sky(g,0,100,rainSky); C.R(g,200,30,90,80,'#14121a'); C.R(g,236,70,18,40,'#0a080e'); for(const x of [212,268]) C.R(g,x,50,12,14,'#2a2418'); C.R(g,0,110,320,70,'#0c0e14'); for(let i=0;i<20;i++) C.R(g,i*17,140,10,1,'#2a3040'); const x=20+p*150; C.fig(g,x,150,34,'#08080c'); C.R(g,x-10,112,20,3,'#101018'); C.R(g,x,112,1,6,'#101018'); C.R(g,60,60,3,60,'#1a1a22'); C.rain(g,t,140); },
+     hd(o,t,p){ C.glow(o,61,62,40,'255,210,140',.4); C.glow(o,218,57,10,'255,200,120',.25); C.flash(o,lightning(o,t+1.3,4)); C.vign(o,.6); }},
+    {d:5.5,cap:['«Εντολή απογραφής. Οικία Σταθάκη.» Το ίδιο επώνυμο με το δικό του. Σύμπτωση, σκέφτηκε.','"Inventory order. Stathakis residence." The same surname as his own. A coincidence, he thought.'],
+     low(g,t,p){ C.R(g,0,0,320,180,'#1a140e'); const s=1+p*.12; g.save(); g.translate(160,90); g.scale(s,s); g.translate(-160,-90); C.R(g,90,30,140,120,'#e8dcc0'); C.R(g,90,30,140,14,'#d8c8a0'); for(let i=0;i<9;i++) C.R(g,102,56+i*9,90-(i%3)*20,2,'#6a5a4a'); C.R(g,180,128,40,10,'#8a2a2a'); C.R(g,70,120,40,30,'#c8a080'); g.restore(); },
+     hd(o){ C.glow(o,160,80,120,'255,220,160',.18); C.vign(o,.7); }},
+    {d:6,cap:['Μέσα, όλα ήταν σκεπασμένα με σεντόνια. Μόνο ένα πράγμα δεν είχε σκεπάσει κανείς: το ρολόι. Σταματημένο στις 3:17.','Inside, everything was covered in sheets. Only one thing had been left uncovered: the clock. Stopped at 3:17.'],
+     low(g,t,p){ C.R(g,0,0,320,180,'#0a0806'); const s=1+p*.35; g.save(); g.translate(160,80); g.scale(s,s); C.R(g,-26,-70,52,150,'#3a2414'); C.disc(g,0,-36,22,'#e8dcc0'); C.disc(g,0,-36,2,'#1a1a1a'); g.strokeStyle='#1a1a1a'; g.lineWidth=2; g.beginPath(); g.moveTo(0,-36); g.lineTo(0,-36-14); g.moveTo(0,-36); g.lineTo(Math.cos(1.5)*10,-36+Math.sin(1.5)*10*-.2+8); g.stroke(); for(let i=0;i<12;i++){ const a=i/12*6.28; C.R(g,Math.cos(a)*18-1,-36+Math.sin(a)*18-1,2,2,'#3a2a1a'); } C.R(g,-2,-8,4,40,'#a88040'); C.disc(g,0,34,7,'#c8a050'); g.restore(); },
+     hd(o,t){ C.glow(o,160,44,60,'255,200,120',.2); C.vign(o,.8); }},
+  ],
+  mid:[
+    {d:4.5,cap:['Το ρολόι χτυπάει. Μία… δύο… τρεις…','The clock strikes. One… two… three…'],low(g,t){ C.R(g,0,0,320,180,'#140404'); const a=Math.sin(t*3)*.6; g.save(); g.translate(160,10); g.rotate(a); C.R(g,-2,0,4,120,'#a88040'); C.disc(g,0,124,14,'#c8a050'); g.restore(); },hd(o,t){ C.tint(o,'200,20,20',.5,'multiply'); C.glow(o,160,120,80,'255,60,40',.25+.15*Math.sin(t*6)); C.vign(o,.85); }},
+    {d:4.5,cap:['Οι τοίχοι τεντώνονται. Ο διάδρομος δεν τελειώνει.','The walls stretch. The corridor never ends.'],low(g,t,p){ C.R(g,0,0,320,180,'#1a0606'); for(let i=0;i<14;i++){ const k=((i/14)+(t*.25))%1, s=Math.pow(k,2.2), w=320*s, h=180*s; g.strokeStyle=i%2?'#4a1010':'#2a0808'; g.lineWidth=Math.max(1,s*4); g.strokeRect(160-w/2,90-h/2,w,h); } },hd(o){ C.tint(o,'160,0,0',.35,'multiply'); C.vign(o,.9); }},
+    {d:4.5,cap:['Στο βάθος, κάποιος κρατάει ένα κερί. Τον περίμενε.','At the far end, someone holds a candle. Waiting for him.'],low(g,t){ C.R(g,0,0,320,180,'#0a0202'); C.fig(g,160,130,30,'#000'); },hd(o,t){ C.glow(o,163,96,30+4*Math.sin(t*9),'255,170,90',.6); C.vign(o,.9); }},
+  ],
+  ending:()=>[
+    {d:5.5,cap:['Το πρωί, η βροχή σταμάτησε. Για πρώτη φορά μετά από μέρες, ο ουρανός ρόδισε.','In the morning, the rain stopped. For the first time in days, the sky turned pink.'],low(g,t,p){ C.sky(g,0,130,['#3a3a6a','#c87a8a','#ffc8a0']); C.skyline(g,128,3,'#2a2030','#ffd890'); tower(g,60,128,44,'#2a2030'); C.sea(g,128,['#c88a9a','#4a3a5a'],t,'#ffe0c0'); },hd(o,t,p){ C.glow(o,250,124,90,'255,200,150',.4*p); }},
+    {d:5,cap:['Ο Λευτέρης κλείδωσε την πόρτα πίσω του. Η απογραφή είχε τελειώσει.','Lefteris locked the door behind him. The inventory was done.'],low(g,t,p){ C.sky(g,0,100,['#8a7aa8','#e8b8a8']); C.R(g,200,30,90,80,'#3a3040'); C.R(g,236,70,18,40,p>.3?'#1a141a':'#5a4a3a'); C.R(g,0,110,320,70,'#4a4450'); C.fig(g,236-p*160,150,34,'#1a1620'); }},
+    {d:6,cap:['Κάποια πράγματα δεν απογράφονται. Τα κουβαλάς μαζί σου.','Some things can\'t be inventoried. You carry them with you.'],low(g,t){ C.R(g,0,0,320,180,'#0a0806'); g.save(); g.translate(160,80); C.disc(g,0,0,40,'#e8dcc0'); g.strokeStyle='#1a1a1a'; g.lineWidth=3; const a=-1.57+t*.6; g.beginPath(); g.moveTo(0,0); g.lineTo(Math.cos(a)*30,Math.sin(a)*30); g.moveTo(0,0); g.lineTo(Math.cos(1.6)*18,Math.sin(1.6)*18); g.stroke(); g.restore(); },hd(o,t){ C.glow(o,160,80,90,'255,220,160',.25); C.title(o,CINE.L(['Τέλος','The End']),160,14,'#e8d8b8',Math.min(1,t/3)); C.vign(o,.7); }},
+  ]}; }
+
+function CS_loukoumas(){ return { introMood:'sunny', midMood:'sunny', endMood:'sunny', midWhen:()=>S.scene==='disco',
+  intro:[
+    {d:6,cap:['Αιγαίο, καλοκαίρι 1988.','The Aegean, summer 1988.'],low(g,t,p){ C.sky(g,0,100,['#3a98ff','#b2e2ff']); C.hills(g,100,26,.02,'#c8b890',1); whiteHouses(g,92,5,true); C.sea(g,100,['#2b8de8','#1a5ab8'],t,'#ffffff'); const x=-60+p*150; C.R(g,x,112,70,10,'#f4f4f4'); C.R(g,x+8,104,40,8,'#f4f4f4'); C.R(g,x+30,96,8,8,'#e8463a'); C.R(g,x,120,70,3,'#1a3a8a'); for(let i=0;i<3;i++){ const bx=60+i*70+Math.sin(t*2+i)*10, by=40+i*8+Math.sin(t*3+i)*4; C.R(g,bx-4,by,4,1,'#fff'); C.R(g,bx+1,by,4,1,'#fff'); } },
+     hd(o,t){ C.glow(o,262,26,50,'255,240,180',.6); C.title(o,CINE.L(['Ο Λουκουμάς στο Αλμυρίκι','Loukoumas on Almyriki']),64,18,'#ffd23f',Math.min(1,t/1.5)); }},
+    {d:6,cap:['Ο Τάκης Λουκουμάς, λογιστής, ήρθε για ήλιο, θάλασσα… και έρωτα.','Takis Loukoumas, accountant, came for sun, sea… and love.'],low(g,t,p){ C.sky(g,0,180,['#7ac8ff','#d8f0ff']); C.R(g,0,120,320,60,'#f4f4f4'); C.R(g,0,118,320,3,'#1a3a8a'); C.fig(g,150,150,46,'#3a3a46',{head:'#eab58c',hair:'#2a1a12'}); C.R(g,166,128,16,14,'#8a4a2a'); const sx=p<.5?200-p*80:160+(p-.5)*400, sy=p<.5?60+p*60:90-(p-.5)*160; C.R(g,sx-6,sy,6,2,'#fff'); C.R(g,sx+1,sy,6,2,'#fff'); C.R(g,sx,sy+1,3,3,'#fff'); if(p>.5) C.disc(g,sx+2,sy+6,3,'#d8a050'); else C.disc(g,142,126,3,'#d8a050'); }},
+    {d:5,cap:['Και το Σάββατο: ο μεγάλος διαγωνισμός χορού. Η Δανάη θα είναι εκεί.','And on Saturday: the big dance contest. Danae will be there.'],low(g,t,p){ C.R(g,0,0,320,180,'#f4f0e8'); g.save(); const s=1+p*.1; g.translate(160,90); g.scale(s,s); g.translate(-160,-90); C.R(g,90,20,140,140,'#e0338a'); C.R(g,100,30,120,120,'#ffd23f'); C.R(g,110,40,100,20,'#2b1d3a'); for(let i=0;i<5;i++){ C.disc(g,130+i*15,110,5+Math.sin(t*4+i)*2,['#e8463a','#3a7ad8','#3fae4a','#ff8a2a','#9a5ab8'][i]); } g.restore(); },hd(o,t){ C.title(o,CINE.L(['ΔΙΑΓΩΝΙΣΜΟΣ ΧΟΡΟΥ','DANCE CONTEST']),56,12,'#ffd23f',1); }},
+  ],
+  mid:[
+    {d:5,cap:['Ο ήλιος βούτηξε στη θάλασσα. Το Αλμυρίκι άναψε.','The sun dipped into the sea. Almyriki lit up.'],low(g,t,p){ const c=p<.5?['#ff8a4a','#ffc070']:['#1a1a4a','#5a3a7a']; C.sky(g,0,100,c); C.hills(g,100,26,.02,p<.5?'#8a6a5a':'#1a1a2a',1); whiteHouses(g,92,5,p<.5); C.sea(g,100,p<.5?['#e87a4a','#5a3a7a']:['#1a1a3a','#0a0a1a'],t,p<.5?'#ffd090':'#ffd890'); },hd(o,t,p){ if(p<.5) C.glow(o,250,98-p*40,40,'255,180,90',.6); else C.glow(o,230,80,60,'255,80,200',.3*Math.sin(t*6)+.3); }},
+    {d:5,cap:['Στη ντισκοτέκ, οι μπάλες-καθρέφτες γύρισαν. Ήρθε η ώρα.','At the disco, the mirror balls began to spin. It was time.'],low(g,t){ C.R(g,0,0,320,180,'#140a24'); for(let i=0;i<8;i++) for(let j=0;j<5;j++) C.R(g,40+i*30,110+j*14,28,12,['#e0338a','#3a7ad8','#ffd23f','#3fae4a'][(i+j+Math.floor(t*4))%4]); C.disc(g,160,30,12,'#c8c8d8'); },hd(o,t){ for(let i=0;i<6;i++){ const a=t*1.5+i; C.glow(o,160+Math.cos(a)*120,90+Math.sin(a*1.3)*50,30,['255,80,200','80,180,255','255,230,80'][i%3],.35); } C.glow(o,160,30,24,'255,255,255',.5); }},
+  ],
+  ending:()=>[
+    {d:6,cap:['Πυροτεχνήματα πάνω από τον κόλπο. Το νησί χειροκροτούσε.','Fireworks over the bay. The whole island was cheering.'],low(g,t){ C.sky(g,0,110,['#0a0a2a','#2a1a4a']); C.hills(g,110,24,.02,'#0a0a1a',1); whiteHouses(g,104,5,false); C.sea(g,110,['#1a1a3a','#05050f'],t,'#ffd890'); },hd(o,t){ for(let i=0;i<5;i++){ const ph=(t*.7+i*.37)%1, x=40+i*60, y=30+(i%2)*20; for(let k=0;k<12;k++){ const a=k/12*6.28; C.glow(o,x+Math.cos(a)*ph*30,y+Math.sin(a)*ph*30+ph*ph*10,5,['255,80,120','255,220,80','120,200,255'][i%3],(1-ph)*.8); } } }},
+    {d:6,cap:['Ο Τάκης κέρδισε τον διαγωνισμό. Και κάτι πολύ πιο σημαντικό.','Takis won the contest. And something far more important.'],low(g,t){ C.R(g,0,0,320,180,'#140a24'); for(let i=0;i<8;i++) for(let j=0;j<4;j++) C.R(g,40+i*30,124+j*14,28,12,['#e0338a','#3a7ad8','#ffd23f','#3fae4a'][(i+j+Math.floor(t*4))%4]); const b=Math.sin(t*6)*3; C.fig(g,145,124+b,50,'#2b1d3a',{head:'#eab58c',hair:'#2a1a12'}); C.fig(g,175,124-b,46,'#e0338a',{head:'#f0c8a0',hair:'#ffd23f',long:true}); },hd(o,t){ C.glow(o,160,30,30,'255,255,255',.4); C.glow(o,160,90,60,'255,120,200',.25); C.title(o,CINE.L(['Τέλος','The End']),40,16,'#ffd23f',Math.min(1,t/3)); }},
+  ]}; }
+
+function CS_peripoliko(){ return { introMood:'police', midMood:'police', endMood:'police', midWhen:()=>S.scene==='street',
+  intro:[
+    {d:6,cap:['Ακτή, 1989. Πέντε και μισή το πρωί.','Akti, 1989. Half past five in the morning.'],low(g,t,p){ C.sky(g,0,120,['#1a2a5a','#8a7aa8','#ffb08a']); C.skyline(g,120,9,'#2a2a4a','#ffe090'); C.R(g,0,120,320,60,'#4a4a5a'); C.R(g,110,70,100,50,'#5a6a8a'); C.R(g,110,66,100,6,'#3a4a6a'); C.R(g,140,74,40,8,'#f4f4f4'); C.R(g,150,96,20,24,'#2a3a5a'); },hd(o,t){ o.save(); o.font='700 6px sans-serif'; o.textAlign='center'; o.fillStyle='#1a2a6a'; o.fillText(CINE.L(['ΑΣΤΥΝΟΜΙΑ','POLICE']),160,80.5); o.restore(); C.title(o,CINE.L(['Περιπολικό 7','Patrol Car 7']),40,22,'#ffffff',Math.min(1,t/1.5)); C.glow(o,300,118,70,'255,190,130',.35); }},
+    {d:5.5,cap:['Η πρώτη βάρδια του αστυφύλακα Άρη Μαυρίδη.','Officer Aris Mavridis\'s first shift.'],low(g,t,p){ C.R(g,0,0,320,180,'#2a3a5a'); g.save(); g.translate(160,90); const s=1.2+p*.3; g.scale(s,s); C.disc(g,0,0,30,'#c8a040'); C.disc(g,0,0,24,'#e8c860'); C.R(g,-6,-12,12,24,'#1a2a6a'); C.R(g,-3,-6,6,3,'#ffffff'); g.restore(); },hd(o,t){ const x=(t*60)%400-40; C.glow(o,x,70,30,'255,255,255',.5); C.title(o,'7',100,22,'#ffffff',.9); }},
+    {d:5,cap:['Κανονισμός, υπομονή, ψυχραιμία. Και κανένα λάθος.','Regulations, patience, composure. And no mistakes.'],low(g,t,p){ C.R(g,0,0,320,180,'#1a1a22'); for(let i=0;i<6;i++){ C.R(g,30+i*45,40,40,110,i===3?'#5a6a7a':'#3a4a5a'); C.R(g,62+i*45,90,3,8,'#c8c8c8'); } C.R(g,0,150,320,30,'#2a2a30'); },hd(o,t){ const on=t>1&&(t>1.6||Math.sin(t*40)>0); if(on){ C.glow(o,160,10,140,'220,240,255',.35); } C.title(o,'7',70,10,'#ffffff',1); }},
+  ],
+  mid:[
+    {d:5.5,cap:['Περιπολικό 7, σε περιπολία. Το κέντρο ακούει.','Patrol Car 7, on patrol. Dispatch is listening.'],low(g,t,p){ C.sky(g,0,110,['#5a9ad8','#c8e0f0']); C.skyline(g,110,4,'#8a9ab8','#ffffff',t*30); C.R(g,0,110,320,70,'#4a4a52'); for(let i=0;i<10;i++) C.R(g,(i*40-t*120)%360+360-40,142,20,2,'#e8e8e8'); carSide(g,130,150,'#f4f4f4',['#ff3030','#3060ff']); C.R(g,130,144,40,2,'#1a3a8a'); },hd(o,t){ const a=Math.sin(t*12)>0; C.glow(o,146,134,30,a?'255,40,40':'40,80,255',.6); }},
+  ],
+  ending:()=>[
+    {d:6,cap:['Το περιπολικό γύρισε στο τμήμα με τη δύση του ήλιου.','The patrol car came back to the station at sunset.'],low(g,t){ C.sky(g,0,120,['#2a2a5a','#c86a6a','#ffb070']); C.skyline(g,120,9,'#2a2030','#ffe090'); C.R(g,0,120,320,60,'#3a3440'); C.R(g,110,70,100,50,'#4a4a6a'); carSide(g,40,150,'#e8e8e8'); },hd(o){ C.glow(o,260,118,80,'255,170,110',.4); }},
+    {d:6,cap:['Αναφορά υπογεγραμμένη. Ο κανονισμός τηρήθηκε. Τέλος βάρδιας.','Report signed. Regulations followed. End of shift.'],low(g,t,p){ C.R(g,0,0,320,180,'#3a2a1a'); C.R(g,90,30,140,120,'#f0e8d8'); for(let i=0;i<9;i++) C.R(g,104,46+i*9,100-(i%3)*18,2,'#4a4a5a'); if(p>.4){ g.save(); g.translate(190,128); g.rotate(-.2); C.R(g,-24,-8,48,16,'rgba(40,60,160,.75)'); g.restore(); } },hd(o,t){ C.title(o,CINE.L(['Τέλος βάρδιας','End of shift']),24,12,'#ffffff',Math.min(1,t/2)); }},
+  ]}; }
+
+function CS_kokkino(){ return { introMood:'tale', midMood:'tale', endMood:'tale', midWhen:()=>S.scene==='forest',
+  intro:[
+    {d:5.5,cap:['Μια φορά κι έναν καιρό…','Once upon a time…'],low(g,t,p){ C.R(g,0,0,320,180,'#8a5a3a'); for(let i=0;i<12;i++) C.R(g,0,i*16,320,1,'#7a4a2a'); const w=Math.max(4,140*(1-Math.max(0,p-.6)*2.5)); C.R(g,160-w/2-4,26,w+8,130,'#5a1a1a'); C.R(g,160-w/2,30,w,122,'#c8302a'); if(w>60) C.disc(g,160,80,22,'#e8e0d0'); },hd(o,t,p){ if(p<.6) C.title(o,CINE.L(['Η Κοκκινοσκουφίτσα','Little Red Riding Hood']),130,13,'#ffe8b0',1); C.glow(o,160,70,120,'255,220,160',.15); }},
+    {d:6,cap:['…ζούσε ένα κοριτσάκι που φορούσε πάντα μια κόκκινη κάπα.','…there lived a little girl who always wore a red cape.'],low(g,t,p){ C.sky(g,0,110,['#8fd5ff','#e2f6ff']); C.hills(g,110,20,.02,'#7ac860',2); C.R(g,0,110,320,70,'#86cc5c'); C.R(g,40,70,50,40,'#f4e8d0'); g.fillStyle='#c8302a'; g.beginPath(); g.moveTo(34,72); g.lineTo(65,48); g.lineTo(96,72); g.fill(); C.R(g,58,86,12,24,'#8a5a2a'); for(let i=0;i<14;i++) C.disc(g,(i*29)%320,130+(i*13)%40,2,['#ff6a8a','#ffe066','#ffffff'][i%3]); const x=120+p*80; C.fig(g,x,150,30,'#e0262f',{head:'#ffe3cf',hair:'#e0262f'}); },hd(o){ C.glow(o,280,30,60,'255,240,180',.5); }},
+    {d:5,cap:['Μια μέρα, η μαμά της είπε: «Η γιαγιά είναι άρρωστη. Πήγαινέ της κουλουράκια.»','One day, her mum said: "Grandma is poorly. Take her some cookies."'],low(g,t){ C.R(g,0,0,320,180,'#f4e8d0'); C.R(g,0,130,320,50,'#c98a4f'); C.fig(g,120,140,56,'#3fae6e',{head:'#ffe3cf',hair:'#8a4a2a'}); C.fig(g,190,140,34,'#e0262f',{head:'#ffe3cf',hair:'#e0262f'}); C.R(g,200,118,14,10,'#c8903a'); },hd(o){ C.glow(o,160,60,100,'255,220,160',.2); }},
+  ],
+  mid:[
+    {d:5,cap:['Το δάσος ήταν μεγάλο και πράσινο, γεμάτο πουλάκια και πεταλούδες.','The forest was big and green, full of birds and butterflies.'],low(g,t){ C.R(g,0,0,320,180,'#3a7a4a'); for(let i=0;i<9;i++){ C.R(g,i*38,20,12,160,'#5a3a2a'); C.disc(g,i*38+6,30,26,'#2f6a3a'); } C.R(g,0,140,320,40,'#5a9a4a'); for(let i=0;i<4;i++){ const x=(i*80+t*30)%340, y=100+Math.sin(t*3+i)*10; C.R(g,x,y,3,2,'#ffe066'); C.R(g,x+3,y-1,2,4,'#ff8ab0'); } },hd(o,t){ C.beams(o,t,'255,240,170',.18,6); }},
+    {d:5,cap:['Μα πίσω από έναν θάμνο, δύο κίτρινα μάτια παρακολουθούσαν… Ποιος να ’ναι άραγε;','But behind a bush, two yellow eyes were watching… Who could it be?'],low(g,t){ C.R(g,0,0,320,180,'#1a3a2a'); C.ell(g,160,110,90,40,'#2a5a3a'); C.ell(g,140,100,60,30,'#346a44'); const bl=(t%2.4)<.15; C.R(g,140,96,8,bl?1:6,'#ffd23f'); C.R(g,166,96,8,bl?1:6,'#ffd23f'); if(!bl){ C.R(g,143,98,2,3,'#1a1a1a'); C.R(g,169,98,2,3,'#1a1a1a'); } },hd(o){ C.glow(o,157,99,30,'255,220,80',.25); C.vign(o,.6); }},
+  ],
+  ending:()=>[
+    {d:6,cap:['Και όλοι μαζί έκαναν ένα μεγάλο πάρτι στο σπιτάκι της γιαγιάς!','And they all had a big party at Grandma\'s cottage!'],low(g,t){ C.R(g,0,0,320,180,'#f4d8b0'); C.R(g,0,130,320,50,'#c98a4f'); const b=Math.sin(t*6)*3; C.fig(g,90,150+b,30,'#e0262f',{head:'#ffe3cf',hair:'#e0262f'}); C.fig(g,140,150-b,46,'#9a5ab8',{head:'#ffe3cf',hair:'#e8e8e8'}); C.fig(g,195,150+b,56,'#7a5a2a',{head:'#ffe3cf',hair:'#7a4a2a'}); C.fig(g,250,150-b,44,'#8a8a9a',{head:'#9a9aaa'}); for(let i=0;i<40;i++){ const x=(i*29+t*30*(i%3+1))%320, y=(i*47+t*60)%180; C.R(g,x,y,2,2,['#e0262f','#ffd23f','#3fae6e','#4aa8ff'][i%4]); } },hd(o){ C.glow(o,160,40,100,'255,230,160',.3); }},
+    {d:5,cap:['Και ο λύκος; Έμαθε να ζητάει συγγνώμη. Και να τρώει κουλουράκια.','And the wolf? He learned to say sorry. And to eat cookies.'],low(g,t,p){ C.R(g,0,0,320,180,'#8a5a3a'); const w=Math.max(4,140*Math.min(1,p*1.6)); C.R(g,160-w/2-4,26,w+8,130,'#5a1a1a'); C.R(g,160-w/2,30,w,122,'#c8302a'); },hd(o,t,p){ if(p>.5) C.title(o,CINE.L(['Τέλος','The End']),96,18,'#ffe8b0',Math.min(1,(p-.5)*3)); }},
+  ]}; }
+
+cineInstall(CS_peripoliko());
+})();
+</script>
+</body>
+</html>

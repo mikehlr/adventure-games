@@ -1,0 +1,1339 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<meta name="theme-color" content="#000000">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<title>Η Κοκκινοσκουφίτσα · point & click</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+  --ink:#2b1d3a; --paper:#fffbe8; --pink:#e0338a; --sun:#ffd23f; --sea:#1f74d0; --line:rgba(43,29,58,.9); --bg:#2b1d3a;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){ --ink:#2b1d3a; --paper:#fffbe8; --bg:#2b1d3a; } }
+:root[data-theme="dark"]{ --ink:#2b1d3a; --paper:#fffbe8; --bg:#2b1d3a; }
+html{scroll-padding-top:env(safe-area-inset-top,0px);}
+html,body{height:100%;margin:0;background:var(--bg);overflow:hidden;}
+body{box-sizing:border-box;padding-left:env(safe-area-inset-left,0px);padding-right:env(safe-area-inset-right,0px);
+  touch-action:none;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;-webkit-tap-highlight-color:transparent;
+  font-family:'Comfortaa','Trebuchet MS','Verdana',sans-serif;font-weight:700;color:var(--ink);}
+#wrap{width:100%;height:100%;display:flex;align-items:center;justify-content:center;}
+#stage{position:relative;overflow:hidden;background:#000;--u:2px;--ts:1;}
+#cv{position:absolute;inset:0;width:100%;height:100%;image-rendering:pixelated;image-rendering:crisp-edges;}
+button{font:inherit;color:inherit;-webkit-appearance:none;appearance:none;cursor:pointer;}
+button:focus-visible{outline:2px solid var(--pink);outline-offset:2px;}
+
+#score{position:absolute;left:50%;top:calc(var(--u)*5);transform:translateX(-50%);background:var(--ink);color:var(--sun);
+  padding:calc(var(--u)*1.6) calc(var(--u)*6);border-radius:99px;font-size:calc(var(--u)*5.6*var(--ts));white-space:nowrap;pointer-events:none;}
+#score.bump{animation:bump .5s ease;}
+@keyframes bump{30%{transform:translateX(-50%) scale(1.25);background:var(--pink);color:#fff;}}
+
+#dlg{position:absolute;left:50%;top:calc(var(--u)*18);transform:translateX(-50%);width:min(94%,calc(68% + (var(--ts) - 1) * 46%));
+  max-height:calc(100% - var(--u)*56);overflow-y:auto;background:var(--paper);border:calc(var(--u)*1.2) solid var(--ink);
+  box-shadow:0 0 0 calc(var(--u)*1.2) var(--pink),calc(var(--u)*2) calc(var(--u)*3) 0 calc(var(--u)*1.2) rgba(43,29,58,.45);
+  padding:calc(var(--u)*5) calc(var(--u)*8) calc(var(--u)*6);text-align:center;border-radius:calc(var(--u)*2);}
+#dlg[hidden]{display:none;}
+#dlg:not([hidden]){animation:dlgIn .18s ease-out;}
+@keyframes dlgIn{from{opacity:0;transform:translateX(-50%) translateY(calc(var(--u)*-4)) scale(.96);}}
+#dlgText{margin:0;font-size:calc(var(--u)*7*var(--ts));line-height:1.45;min-height:1.45em;text-wrap:pretty;}
+#dlgOpts{display:flex;flex-direction:column;gap:calc(var(--u)*2.5);margin-top:calc(var(--u)*5);}
+#dlgOpts:empty{display:none;}
+#dlgOpts button{background:#fff;border:calc(var(--u)*.8) solid var(--ink);border-radius:calc(var(--u)*2);padding:calc(var(--u)*2.5) calc(var(--u)*4);font-size:calc(var(--u)*6.4*var(--ts));}
+#dlgOpts button:active{background:var(--sun);}
+#dlg.pt{display:flex;align-items:center;gap:calc(var(--u)*6);text-align:left;width:min(96%,calc(82% + (var(--ts) - 1) * 36%));padding-left:calc(var(--u)*5);}
+#pt{display:none;flex:none;flex-direction:column;align-items:center;gap:calc(var(--u)*1.6);}
+#dlg.pt #pt{display:flex;}
+#ptc{width:calc(var(--u)*42);height:calc(var(--u)*42);image-rendering:pixelated;image-rendering:crisp-edges;border:calc(var(--u)*1) solid var(--ink);border-radius:calc(var(--u)*1.5);box-shadow:0 0 0 calc(var(--u)*.9) var(--pink);background:#fff;}
+#ptn{font-size:calc(var(--u)*5*var(--ts));background:var(--ink);color:var(--sun);border-radius:99px;padding:calc(var(--u)*.6) calc(var(--u)*3.4);white-space:nowrap;max-width:calc(var(--u)*56);overflow:hidden;text-overflow:ellipsis;}
+#dlgBody{flex:1;min-width:0;}
+#more{position:absolute;right:calc(var(--u)*4);bottom:calc(var(--u)*1.5);font-size:calc(var(--u)*5);color:var(--pink);animation:bob 1s ease-in-out infinite;}
+@keyframes bob{50%{transform:translateY(2px);}}
+
+#whisper{position:absolute;left:0;right:0;top:40%;text-align:center;font-size:calc(var(--u)*12*var(--ts));color:var(--sun);
+  -webkit-text-stroke:calc(var(--u)*.6) var(--ink);text-shadow:calc(var(--u)*1.5) calc(var(--u)*1.5) 0 var(--pink);opacity:0;transition:opacity .4s, transform .4s;transform:scale(.8);pointer-events:none;}
+#whisper.show{opacity:1;transform:scale(1);}
+
+#hint{position:absolute;left:50%;bottom:calc(var(--u)*6);transform:translateX(-50%);max-width:calc(44% + (var(--ts) - 1) * 10%);text-align:center;
+  font-size:calc(var(--u)*6*var(--ts));background:var(--paper);border:calc(var(--u)*.8) solid var(--ink);border-radius:99px;padding:calc(var(--u)*1.4) calc(var(--u)*5);
+  pointer-events:none;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+#hint:empty{display:none;}
+#tip{position:absolute;left:50%;bottom:calc(var(--u)*20);transform:translateX(-50%);width:min(80%,calc(52% + (var(--ts) - 1) * 40%));text-align:center;
+  font-size:calc(var(--u)*5.6*var(--ts));color:#fff;text-shadow:0 0 calc(var(--u)*2) var(--ink),0 0 calc(var(--u)*1) var(--ink);pointer-events:none;transition:opacity .6s;opacity:0;}
+#tip.show{opacity:1;}
+
+.ctl{position:absolute;width:calc(var(--u)*30);height:calc(var(--u)*30);border-radius:50%;background:rgba(255,251,232,.78);
+  border:calc(var(--u)*1) solid var(--ink);display:flex;align-items:center;justify-content:center;padding:0;touch-action:none;
+  box-shadow:calc(var(--u)*1) calc(var(--u)*1.5) 0 rgba(43,29,58,.5);}
+.ctl svg{width:44%;height:44%;fill:none;stroke:var(--ink);stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round;}
+.ctl.held{background:var(--sun);transform:translateY(1px);}
+.ctl b{font-size:calc(var(--u)*12);line-height:1;}
+#bL{left:calc(var(--u)*6);bottom:calc(var(--u)*6);}
+#bR{left:calc(var(--u)*40);bottom:calc(var(--u)*6);}
+#bA{right:calc(var(--u)*6);bottom:calc(var(--u)*6);width:calc(var(--u)*34);height:calc(var(--u)*34);background:rgba(255,210,63,.7);}
+#bA.live{background:var(--sun);}
+#bB{right:calc(var(--u)*44);bottom:calc(var(--u)*24);width:calc(var(--u)*26);height:calc(var(--u)*26);background:rgba(224,51,138,.75);color:#fff;}
+#bB b{font-size:calc(var(--u)*10);}
+#bInv{right:calc(var(--u)*6);top:calc(var(--u)*5);width:calc(var(--u)*24);height:calc(var(--u)*24);}
+#bMenu{left:calc(var(--u)*6);top:calc(var(--u)*5);width:calc(var(--u)*22);height:calc(var(--u)*22);}
+#sel{position:absolute;right:calc(var(--u)*6);bottom:calc(var(--u)*46);max-width:42%;display:flex;align-items:center;gap:calc(var(--u)*3);
+  padding:calc(var(--u)*1.6) calc(var(--u)*5) calc(var(--u)*1.6) calc(var(--u)*2);font-size:calc(var(--u)*6*var(--ts));white-space:nowrap;
+  background:var(--paper);border:calc(var(--u)*.9) solid var(--pink);border-radius:calc(var(--u)*3);}
+#sel[hidden]{display:none;}
+#sel canvas{width:calc(var(--u)*14);height:calc(var(--u)*14);flex:none;image-rendering:pixelated;}
+#sel span{overflow:hidden;text-overflow:ellipsis;}
+#sel.pop{animation:pop .25s ease;}
+@keyframes pop{0%{transform:scale(.8)}100%{transform:none}}
+
+#inv{position:absolute;left:0;right:0;top:0;padding:calc(var(--u)*7) calc(var(--u)*36) calc(var(--u)*6);background:var(--paper);
+  border-bottom:calc(var(--u)*1.2) solid var(--ink);box-shadow:0 calc(var(--u)*1.2) 0 var(--pink);}
+#inv[hidden]{display:none;}
+#slots{display:flex;gap:calc(var(--u)*3);flex-wrap:wrap;justify-content:center;min-height:calc(var(--u)*22);}
+.slot{width:calc(var(--u)*22);height:calc(var(--u)*22);padding:calc(var(--u)*3);background:#fff;border:calc(var(--u)*.8) solid var(--ink);border-radius:calc(var(--u)*2);}
+.slot.on{background:var(--sun);border-color:var(--pink);}
+.slot canvas{width:100%;height:100%;image-rendering:pixelated;display:block;}
+#invBar{display:flex;align-items:center;justify-content:center;gap:calc(var(--u)*5);margin-top:calc(var(--u)*4);flex-wrap:wrap;}
+#invCap{font-size:calc(var(--u)*6.2*var(--ts));min-height:1.3em;text-align:center;}
+#invBar button{background:#fff;border:calc(var(--u)*.8) solid var(--ink);border-radius:99px;padding:calc(var(--u)*1.5) calc(var(--u)*6);font-size:calc(var(--u)*5.8*var(--ts));}
+#invBar button:disabled{opacity:.35;}
+
+#menu{position:absolute;left:calc(var(--u)*6);top:calc(var(--u)*30);display:flex;flex-direction:column;gap:calc(var(--u)*2);}
+#menu[hidden]{display:none;}
+#menu button{background:var(--paper);border:calc(var(--u)*.8) solid var(--ink);border-radius:calc(var(--u)*2);padding:calc(var(--u)*2.5) calc(var(--u)*7);font-size:calc(var(--u)*6.2*var(--ts));text-align:left;}
+
+.screen{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:flex-end;padding:0 calc(var(--u)*16) calc(var(--u)*12);
+  background:linear-gradient(90deg,rgba(43,29,58,.72) 0%,rgba(43,29,58,.3) 55%,rgba(43,29,58,0) 80%);color:#fff;}
+.screen[hidden]{display:none;}
+#title h1{margin:0;font-weight:700;font-size:calc(var(--u)*20);line-height:1;color:var(--sun);
+  -webkit-text-stroke:calc(var(--u)*.7) var(--ink);text-shadow:calc(var(--u)*2.5) calc(var(--u)*2.5) 0 var(--pink);letter-spacing:-.01em;}
+#title h1 b{font-weight:700;display:inline-block;}
+#title h1 .v2{display:inline-block;vertical-align:top;margin-left:calc(var(--u)*3);font-style:normal;font-size:calc(var(--u)*7);background:var(--pink);color:#fff;-webkit-text-stroke:0;text-shadow:none;border:calc(var(--u)*.8) solid var(--ink);border-radius:99px;padding:calc(var(--u)*1) calc(var(--u)*4);transform:rotate(-8deg);}
+#title h1 span{display:block;font-size:calc(var(--u)*9);color:#fff;-webkit-text-stroke:0;text-shadow:calc(var(--u)*1.5) calc(var(--u)*1.5) 0 var(--ink);margin-top:calc(var(--u)*3);}
+#title nav{display:flex;flex-direction:column;align-items:flex-start;gap:calc(var(--u)*3);margin-top:calc(var(--u)*8);}
+#title nav button{background:var(--paper);color:var(--ink);border:calc(var(--u)*.9) solid var(--ink);border-radius:99px;padding:calc(var(--u)*2) calc(var(--u)*9);
+  font-size:calc(var(--u)*7.4*var(--ts));box-shadow:calc(var(--u)*1.5) calc(var(--u)*1.5) 0 var(--pink);}
+#title nav button:active{transform:translate(1px,1px);box-shadow:none;}
+#title nav button[hidden]{display:none;}
+#title small{font-size:calc(var(--u)*5*var(--ts));margin-top:calc(var(--u)*6);opacity:.9;}
+#end{background:linear-gradient(#ff8a3d,#e0338a 60%,#6b2a8a);justify-content:center;align-items:center;text-align:center;padding:calc(var(--u)*10) calc(16% - (var(--ts) - 1) * 16%);overflow-y:auto;}
+#end h2{margin:0 0 calc(var(--u)*6);font-size:calc(var(--u)*18);color:var(--sun);-webkit-text-stroke:calc(var(--u)*.7) var(--ink);text-shadow:calc(var(--u)*2.5) calc(var(--u)*2.5) 0 var(--ink);}
+#end p{font-size:calc(var(--u)*7*var(--ts));line-height:1.5;margin:0 0 calc(var(--u)*3.5);opacity:0;animation:rise 1.4s ease forwards;text-shadow:0 calc(var(--u)*.6) 0 rgba(43,29,58,.6);}
+#end button{margin-top:calc(var(--u)*5);background:var(--paper);color:var(--ink);border:calc(var(--u)*.9) solid var(--ink);border-radius:99px;padding:calc(var(--u)*2) calc(var(--u)*9);
+  font-size:calc(var(--u)*6.6*var(--ts));opacity:0;animation:rise 1.4s ease forwards;}
+@keyframes rise{to{opacity:1;}}
+
+#settings{position:absolute;inset:0;background:var(--paper);display:flex;flex-direction:column;justify-content:center;padding:0 12%;gap:calc(var(--u)*4);z-index:5;}
+#settings[hidden]{display:none;}
+#settings h3{margin:0;font-size:calc(var(--u)*13);color:var(--pink);}
+#settings .lab{margin:0;font-size:calc(var(--u)*6);opacity:.75;}
+#tsRow,#lgRow,#ptRow,#fxRow{display:flex;gap:calc(var(--u)*3);}
+#tsRow button,#lgRow button,#ptRow button,#fxRow button{flex:1;background:#fff;border:calc(var(--u)*.8) solid var(--ink);border-radius:calc(var(--u)*2);padding:calc(var(--u)*2.5) 0;line-height:1;}
+#tsRow button[aria-pressed="true"],#lgRow button[aria-pressed="true"],#ptRow button[aria-pressed="true"],#fxRow button[aria-pressed="true"]{background:var(--sun);border-color:var(--pink);}
+#tsPrev{margin:0;font-size:calc(var(--u)*7*var(--ts));line-height:1.4;min-height:2.8em;}
+#settings .row{display:flex;gap:calc(var(--u)*3);flex-wrap:wrap;}
+#settings .row button{background:#fff;border:calc(var(--u)*.8) solid var(--ink);border-radius:99px;padding:calc(var(--u)*2.5) calc(var(--u)*8);font-size:calc(var(--u)*6.4);}
+
+#rotate{position:fixed;inset:0;background:var(--bg);color:var(--sun);display:none;flex-direction:column;align-items:center;justify-content:center;gap:24px;
+  font-size:20px;text-align:center;padding:0 12%;z-index:9;}
+#rotate i{display:block;width:34px;height:58px;border:3px solid var(--sun);border-radius:7px;animation:turn 2.4s ease-in-out infinite;}
+@keyframes turn{0%,30%{transform:rotate(0)}60%,100%{transform:rotate(-90deg)}}
+@media (orientation:portrait) and (max-width:900px){#rotate{display:flex;}}
+@media (prefers-reduced-motion:reduce){#more,#rotate i{animation:none;}}
+</style>
+<style>
+#vbar{position:absolute;left:0;right:0;top:0;height:calc(var(--u)*24);display:flex;align-items:center;gap:calc(var(--u)*2.5);padding:0 calc(var(--u)*4);
+  background:linear-gradient(#4a3a6a,#2b1d3a);border-bottom:calc(var(--u)*1) solid var(--sun);box-shadow:0 calc(var(--u)*1) 0 rgba(0,0,0,.35);z-index:2;}
+#vbar[hidden]{display:none;}
+.vb{width:calc(var(--u)*24);height:calc(var(--u)*20);flex:none;background:#5a4a7a;border:calc(var(--u)*.8) solid #140a24;border-radius:calc(var(--u)*2);
+  box-shadow:inset 0 calc(var(--u)*1) 0 rgba(255,255,255,.18),inset 0 calc(var(--u)*-1) 0 rgba(0,0,0,.3);padding:calc(var(--u)*1.6) calc(var(--u)*3);display:flex;align-items:center;justify-content:center;}
+.vb canvas{width:100%;height:100%;image-rendering:pixelated;image-rendering:crisp-edges;display:block;}
+.vb.on{background:var(--sun);box-shadow:inset 0 calc(var(--u)*-1) 0 rgba(0,0,0,.25),0 0 0 calc(var(--u)*.8) #fff;}
+.vb:disabled{opacity:.35;}
+.vb:active{transform:translateY(1px);}
+#vbar .sep{width:calc(var(--u)*.8);height:calc(var(--u)*16);background:rgba(255,255,255,.18);flex:none;}
+#score{flex:1;text-align:center;color:var(--sun);font-size:calc(var(--u)*6.2*var(--ts));white-space:nowrap;position:static;transform:none;background:none;padding:0;}
+#score.bump{animation:sbump .6s ease;}
+@keyframes sbump{30%{color:#fff;transform:scale(1.2);}}
+#hover{position:absolute;transform:translate(-50%,calc(var(--u)*10));background:rgba(43,29,58,.88);color:var(--sun);font-size:calc(var(--u)*5.4*var(--ts));padding:calc(var(--u)*1) calc(var(--u)*4);border-radius:99px;pointer-events:none;white-space:nowrap;z-index:1;}
+#hover[hidden]{display:none;}
+#hint{position:absolute;left:50%;top:calc(var(--u)*28);bottom:auto;transform:translateX(-50%);background:var(--paper);border:calc(var(--u)*.8) solid var(--ink);border-radius:99px;padding:calc(var(--u)*1.2) calc(var(--u)*5);
+  font-size:calc(var(--u)*5.6*var(--ts));opacity:0;transition:opacity .25s;pointer-events:none;white-space:nowrap;max-width:none;}
+#hint.show{opacity:1;}
+#cv{cursor:none;}
+@media (hover:none){#cv{cursor:auto;}}
+#dlg{top:calc(var(--u)*34);}
+#inv{top:calc(var(--u)*24);}
+#menu{top:calc(var(--u)*28);left:auto;right:calc(var(--u)*4);}
+#tip{bottom:calc(var(--u)*8);}
+#title h1 .v2{display:inline-block;vertical-align:top;margin-left:calc(var(--u)*3);font-style:normal;font-size:calc(var(--u)*6);background:var(--pink);color:#fff;-webkit-text-stroke:0;text-shadow:none;border:calc(var(--u)*.8) solid var(--ink);border-radius:99px;padding:calc(var(--u)*1) calc(var(--u)*4);transform:rotate(-8deg);}
+#title h1 b{display:inline-block;}
+</style>
+<style>
+#dlg.pt{}
+#fxRow{display:flex;gap:calc(var(--u)*3);}
+#fxRow button{flex:1;background:#fff;border:calc(var(--u)*.8) solid var(--ink);border-radius:calc(var(--u)*2);padding:calc(var(--u)*2.5) 0;line-height:1;}
+#fxRow button[aria-pressed="true"]{background:var(--sun);border-color:var(--pink);}
+
+:root{
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+  --ink:#4a2c2a; --paper:#fff8ec; --red:#e0262f; --leaf:#5cb85c; --sun:#ffd34d; --sky:#9fdcff; --wood:#b07a4a; --bg:#5a9e3e;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){ --ink:#4a2c2a; --paper:#fff8ec; --bg:#5a9e3e; } }
+:root[data-theme="dark"]{ --ink:#4a2c2a; --paper:#fff8ec; --bg:#5a9e3e; }
+html{scroll-padding-top:env(safe-area-inset-top,0px);}
+html,body{height:100%;margin:0;background:var(--bg);overflow:hidden;}
+body{box-sizing:border-box;padding-left:env(safe-area-inset-left,0px);padding-right:env(safe-area-inset-right,0px);
+  touch-action:none;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;-webkit-tap-highlight-color:transparent;
+  font-family:'Comfortaa','Trebuchet MS',sans-serif;font-weight:700;color:var(--ink);}
+#wrap{width:100%;height:100%;display:flex;align-items:center;justify-content:center;}
+#stage{position:relative;overflow:hidden;background:#000;--u:2px;--ts:1;border-radius:calc(var(--u)*4);}
+#cv{position:absolute;inset:0;width:100%;height:100%;image-rendering:pixelated;image-rendering:crisp-edges;}
+button{font:inherit;color:inherit;-webkit-appearance:none;appearance:none;cursor:pointer;}
+button:focus-visible{outline:3px solid var(--sun);outline-offset:2px;}
+
+.round{position:absolute;width:calc(var(--u)*24);height:calc(var(--u)*24);border-radius:50%;background:var(--paper);border:calc(var(--u)*1.2) solid var(--ink);
+  display:flex;align-items:center;justify-content:center;padding:0;box-shadow:0 calc(var(--u)*1.5) 0 rgba(74,44,42,.35);}
+.round svg{width:55%;height:55%;fill:none;stroke:var(--ink);stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round;}
+.round:active{transform:translateY(2px);box-shadow:none;}
+#bSet{left:calc(var(--u)*5);top:calc(var(--u)*5);}
+#bSay{right:calc(var(--u)*5);top:calc(var(--u)*5);background:var(--sun);}
+#stars{position:absolute;left:50%;top:calc(var(--u)*5);transform:translateX(-50%);background:var(--paper);border:calc(var(--u)*1.2) solid var(--ink);border-radius:99px;
+  padding:calc(var(--u)*1.5) calc(var(--u)*6);font-size:calc(var(--u)*7);white-space:nowrap;pointer-events:none;display:flex;align-items:center;gap:calc(var(--u)*2);}
+#stars i{font-style:normal;color:#f2b500;font-size:1.2em;line-height:1;}
+#stars.pop{animation:pop .6s ease;}
+@keyframes pop{30%{transform:translateX(-50%) scale(1.35);}}
+
+#basket{position:absolute;right:calc(var(--u)*4);bottom:calc(var(--u)*3);display:flex;gap:calc(var(--u)*3);padding:calc(var(--u)*2.5) calc(var(--u)*4);
+  background:#c98a4f;border:calc(var(--u)*1.2) solid var(--ink);border-radius:calc(var(--u)*6);box-shadow:inset 0 calc(var(--u)*-2) 0 #a86e3a;min-width:calc(var(--u)*30);min-height:calc(var(--u)*24);justify-content:center;}
+#basket[hidden]{display:none;}
+#basket:empty::before{content:'🧺';font-size:calc(var(--u)*14);line-height:calc(var(--u)*24);opacity:.6;}
+.it{width:calc(var(--u)*26);height:calc(var(--u)*26);background:var(--paper);border:calc(var(--u)*1) solid var(--ink);border-radius:calc(var(--u)*4);padding:calc(var(--u)*2);transition:transform .15s;}
+.it canvas{width:100%;height:100%;image-rendering:pixelated;display:block;}
+.it.on{background:var(--sun);transform:translateY(calc(var(--u)*-4)) scale(1.12);border-color:var(--red);}
+
+#dlg{position:absolute;left:50%;top:calc(var(--u)*34);transform:translateX(-50%);width:min(94%,calc(74% + (var(--ts) - 1) * 40%));
+  max-height:calc(100% - var(--u)*70);overflow-y:auto;background:var(--paper);border:calc(var(--u)*1.4) solid var(--ink);border-radius:calc(var(--u)*6);
+  box-shadow:0 calc(var(--u)*2) 0 rgba(74,44,42,.35);padding:calc(var(--u)*5) calc(var(--u)*8) calc(var(--u)*6);text-align:center;}
+#dlg[hidden]{display:none;}
+#who{display:inline-block;margin:0 0 calc(var(--u)*2);padding:calc(var(--u)*1) calc(var(--u)*5);border-radius:99px;color:#fff;font-size:calc(var(--u)*5.6*var(--ts));}
+#who:empty{display:none;}
+#dlgText{margin:0;font-size:calc(var(--u)*8*var(--ts));line-height:1.4;min-height:1.4em;text-wrap:pretty;}
+#dlgOpts{display:flex;flex-direction:column;gap:calc(var(--u)*3);margin-top:calc(var(--u)*5);}
+#dlgOpts:empty{display:none;}
+#dlgOpts button{background:#fff;border:calc(var(--u)*1.2) solid var(--ink);border-radius:calc(var(--u)*5);padding:calc(var(--u)*3) calc(var(--u)*5);font-size:calc(var(--u)*7.4*var(--ts));box-shadow:0 calc(var(--u)*1.5) 0 rgba(74,44,42,.3);}
+#dlgOpts button:active{background:var(--sun);}
+#more{position:absolute;right:calc(var(--u)*5);bottom:calc(var(--u)*2);font-size:calc(var(--u)*6);color:var(--red);animation:bob 1s ease-in-out infinite;}
+@keyframes bob{50%{transform:translateY(3px);}}
+#speak{position:absolute;left:calc(var(--u)*5);bottom:calc(var(--u)*2);font-size:calc(var(--u)*6);opacity:0;}
+#speak.on{opacity:1;animation:wave .6s ease-in-out infinite;}
+@keyframes wave{50%{transform:scale(1.25);}}
+
+#sparkle{position:absolute;left:0;right:0;top:38%;text-align:center;font-size:calc(var(--u)*13*var(--ts));color:var(--sun);-webkit-text-stroke:calc(var(--u)*.7) var(--ink);
+  text-shadow:0 calc(var(--u)*2) 0 var(--ink);opacity:0;transform:scale(.6);transition:opacity .35s,transform .35s;pointer-events:none;}
+#sparkle.show{opacity:1;transform:scale(1);}
+
+.screen{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:calc(var(--u)*8);
+  background:radial-gradient(ellipse at center,rgba(255,248,236,.0) 0%,rgba(255,248,236,.0) 30%,rgba(90,158,62,.55) 100%);}
+.screen[hidden]{display:none;}
+#title h1{margin:0;font-size:calc(var(--u)*22);line-height:1;color:var(--red);-webkit-text-stroke:calc(var(--u)*.8) #fff;
+  text-shadow:0 calc(var(--u)*2.5) 0 var(--ink),0 0 calc(var(--u)*10) rgba(255,255,255,.8);}
+#title p{margin:calc(var(--u)*3) 0 0;font-size:calc(var(--u)*7*var(--ts));color:#fff;text-shadow:0 calc(var(--u)*1) 0 var(--ink);}
+#title nav{display:flex;gap:calc(var(--u)*4);margin-top:calc(var(--u)*8);flex-wrap:wrap;justify-content:center;}
+#title nav button,#end button{background:var(--sun);border:calc(var(--u)*1.4) solid var(--ink);border-radius:99px;padding:calc(var(--u)*3) calc(var(--u)*10);
+  font-size:calc(var(--u)*9*var(--ts));box-shadow:0 calc(var(--u)*2.5) 0 var(--ink);}
+#title nav button.sec{background:var(--paper);font-size:calc(var(--u)*7*var(--ts));}
+#title nav button:active,#end button:active{transform:translateY(3px);box-shadow:0 0 0 var(--ink);}
+#title nav button[hidden]{display:none;}
+#end{background:linear-gradient(#ffe9b8,#ffc9d6);}
+#end h2{margin:0 0 calc(var(--u)*4);font-size:calc(var(--u)*16);color:var(--red);-webkit-text-stroke:calc(var(--u)*.6) #fff;text-shadow:0 calc(var(--u)*2) 0 var(--ink);}
+#end .st{font-size:calc(var(--u)*14);color:#f2b500;letter-spacing:.05em;margin-bottom:calc(var(--u)*4);text-shadow:0 calc(var(--u)*1) 0 var(--ink);}
+#end p{margin:0 0 calc(var(--u)*3);font-size:calc(var(--u)*7.4*var(--ts));line-height:1.45;max-width:80%;}
+#end button{margin-top:calc(var(--u)*4);}
+
+#settings{position:absolute;inset:0;background:var(--paper);display:flex;flex-direction:column;justify-content:center;padding:0 10%;gap:calc(var(--u)*3.5);z-index:5;overflow-y:auto;}
+#settings[hidden]{display:none;}
+#settings h3{margin:0;font-size:calc(var(--u)*12);color:var(--red);}
+#settings .lab{margin:0;font-size:calc(var(--u)*6);opacity:.8;}
+.row{display:flex;gap:calc(var(--u)*3);flex-wrap:wrap;}
+.row button{flex:1;background:#fff;border:calc(var(--u)*1) solid var(--ink);border-radius:calc(var(--u)*4);padding:calc(var(--u)*2.6) calc(var(--u)*3);font-size:calc(var(--u)*6.4);line-height:1.1;}
+.row button[aria-pressed="true"]{background:var(--sun);border-color:var(--red);}
+#voiceNote{margin:0;font-size:calc(var(--u)*5.2);opacity:.85;line-height:1.4;}
+#voiceNote:empty{display:none;}
+
+#rotate{position:fixed;inset:0;background:var(--bg);color:#fff;display:none;flex-direction:column;align-items:center;justify-content:center;gap:24px;font-size:20px;text-align:center;padding:0 12%;z-index:9;}
+#rotate i{display:block;width:34px;height:58px;border:3px solid #fff;border-radius:7px;animation:turn 2.4s ease-in-out infinite;}
+@keyframes turn{0%,30%{transform:rotate(0)}60%,100%{transform:rotate(-90deg)}}
+@media (orientation:portrait) and (max-width:900px){#rotate{display:flex;}}
+@media (prefers-reduced-motion:reduce){#more,#rotate i,#speak.on{animation:none;}}
+
+#cv{cursor:pointer;} #stars[hidden],#basket[hidden]{display:none!important;} #vbar{display:none!important;} #hint{display:none;}
+#dlg{top:calc(var(--u)*34);text-align:center;}
+#title h1 .v2{display:block;width:max-content;margin:calc(var(--u)*3) auto 0;font-size:calc(var(--u)*6);background:var(--sun);color:var(--ink);-webkit-text-stroke:0;text-shadow:none;border:calc(var(--u)*.8) solid var(--ink);border-radius:99px;padding:calc(var(--u)*1) calc(var(--u)*5);}
+#fxRow button{flex:1;}
+
+</style>
+</head>
+<body>
+<div id="wrap">
+<div id="stage">
+  <canvas id="cv" width="320" height="180"></canvas>
+  <div id="hover" hidden></div>
+  <div id="whisper"></div>
+  <div id="hint"></div>
+  <div id="tip"></div>
+  <div id="stars" hidden><i>★</i><span id="starN">0</span></div>
+  <button class="round" id="bSet" aria-label="Ρυθμίσεις"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1 7 17M17 7l2.1-2.1"/></svg></button>
+  <button class="round" id="bSay" aria-label="Πες το ξανά"><svg viewBox="0 0 24 24"><path d="M4 9v6h4l5 4V5L8 9H4Z"/><path d="M16 9a4 4 0 0 1 0 6M18.5 6.5a7.5 7.5 0 0 1 0 11"/></svg></button>
+  <div id="basket" hidden></div>
+  <div id="sparkle"></div>
+  <div id="vbar" hidden><button id="bInv" hidden></button><button id="bMenu" hidden></button><div id="score" hidden></div></div>
+  <div id="menu" hidden>
+    <button id="mSet" data-i18n="Ρυθμίσεις">Ρυθμίσεις</button>
+    <button id="mTitle" data-i18n="Στην αρχική">Στην αρχική</button>
+  </div>
+  <div id="inv" hidden>
+    <div id="slots"></div>
+    <div id="invBar">
+      <div id="invCap"></div>
+      <button id="bExam" disabled data-i18n="Εξέταση">Εξέταση</button>
+      <button id="bClose" data-i18n="Κλείσιμο">Κλείσιμο</button>
+    </div>
+  </div>
+  <div id="dlg" hidden><div id="who"></div><p id="dlgText"></p><div id="dlgOpts"></div><span id="speak">🔊</span><span id="more">▼</span></div>
+
+  <div class="screen" id="title">
+    <h1 data-i18n="Η Κοκκινοσκουφίτσα">Η Κοκκινοσκουφίτσα</h1>
+    <h1 style="font-size:0;margin:0"><em class="v2">point &amp; click</em></h1>
+    <p data-i18n="Ένα παραμύθι που παίζεις με τα δαχτυλάκια σου">Ένα παραμύθι που παίζεις με τα δαχτυλάκια σου</p>
+    <nav>
+      <button id="tNew" data-i18n="Παίξε!">Παίξε!</button>
+      <button id="tCont" class="sec" hidden data-i18n="Συνέχεια">Συνέχεια</button>
+      <button id="tSet" class="sec" data-i18n="Ρυθμίσεις">Ρυθμίσεις</button>
+    </nav>
+  </div>
+  <div id="settings" hidden role="dialog">
+    <h3 data-i18n="Ρυθμίσεις">Ρυθμίσεις</h3>
+    <p class="lab" data-i18n="Μέγεθος γραμμάτων">Μέγεθος γραμμάτων</p>
+    <div id="tsRow">
+      <button data-ts="1" style="font-size:calc(var(--u)*7)">Α</button>
+      <button data-ts="1.3" style="font-size:calc(var(--u)*9)">Α</button>
+      <button data-ts="1.6" style="font-size:calc(var(--u)*11)">Α</button>
+      <button data-ts="2" style="font-size:calc(var(--u)*13)">Α</button>
+    </div>
+    <p class="lab" data-i18n="Γλώσσα">Γλώσσα</p>
+    <div id="lgRow"><button data-lg="el" style="font-size:calc(var(--u)*6.4)">Ελληνικά</button><button data-lg="en" style="font-size:calc(var(--u)*6.4)">English</button></div>
+    <p class="lab" data-i18n="Φωνή που διαβάζει την ιστορία">Φωνή που διαβάζει την ιστορία</p>
+    <div class="row" id="vRow"><button data-v="1" data-i18n="Ναι">Ναι</button><button data-v="0" data-i18n="Όχι">Όχι</button><button id="vTest" data-i18n="Δοκιμή φωνής">Δοκιμή φωνής</button></div>
+    <p id="voiceNote"></p>
+    <p class="lab" data-i18n="Οπτικά εφέ">Οπτικά εφέ</p>
+    <div id="fxRow"><button data-fx="1" style="font-size:calc(var(--u)*6.4)" data-i18n="Πλήρη">Πλήρη</button><button data-fx="0" style="font-size:calc(var(--u)*6.4)" data-i18n="Ελαφριά">Ελαφριά</button></div>
+    <div class="row">
+      <button id="sSound">Μουσική: ναι</button>
+      <button id="sFull" data-i18n="Πλήρης οθόνη">Πλήρης οθόνη</button>
+      <button id="sClose" data-i18n="Κλείσιμο">Κλείσιμο</button>
+    </div>
+  </div>
+  <div class="screen" id="end" hidden>
+    <h2 id="endH" data-i18n="Τέλος!">Τέλος!</h2>
+    <div class="st" id="endStars"></div><div id="endT"></div>
+    <p data-i18n="Κι έζησαν αυτοί καλά κι εμείς καλύτερα!">Κι έζησαν αυτοί καλά κι εμείς καλύτερα!</p>
+    <button id="endB" data-i18n="Ξανά από την αρχή">Ξανά από την αρχή</button>
+  </div>
+</div>
+</div>
+<div id="rotate"><i></i><span data-i18n="Γύρισε το κινητό οριζόντια.">Γύρισε το κινητό οριζόντια.</span></div>
+<script>
+'use strict';
+/* ============================================================
+   Ο ΛΟΥΚΟΥΜΑΣ — point & click edition (Sierra SCI style, 2.5D)
+   Everything (art, perspective floors, sprites, music) is generated in code.
+   ============================================================ */
+let LANG='el';
+let lastHint='';
+const EN={"Καλάθι με πίτα": "Basket with pie", "Ένα καλάθι με ζεστή μηλόπιτα για τη γιαγιά.": "A basket with a warm apple pie for Grandma.", "Κουλουράκια": "Cookies", "Μυρωδάτα κουλουράκια με ζάχαρη.": "Sweet-smelling sugar cookies.", "Λουλούδια": "Flowers", "Ένα μπουκέτο λουλούδια για τη γιαγιά.": "A bunch of flowers for Grandma.", "Καρότο": "Carrot", "Ένα μεγάλο, πορτοκαλί καρότο.": "A big orange carrot.", "Φραουλίτσες": "Wild strawberries", "Κόκκινες, γλυκές φραουλίτσες του δάσους.": "Little red, sweet wild strawberries.", "Σφυρίχτρα": "Whistle", "Μια ξύλινη σφυρίχτρα. Φιιιιιτ!": "A wooden whistle. Wheeeee!", "Κοκκινοσκουφίτσα": "Little Red Riding Hood", "Μαμά": "Mum", "Λύκος": "Wolf", "Γιαγιά": "Grandma", "Λαγουδάκι": "Bunny", "Ξυλοκόπος": "Woodcutter", "Αυτή η συσκευή δεν υποστηρίζει ανάγνωση φωνής. Η ιστορία συνεχίζει με άγγιγμα.": "This device can't read text aloud. The story continues with a tap.", "Φωνή:": "Voice:", "για πιο φυσική φωνή, κατέβασε τη «βελτιωμένη» ελληνική φωνή από τις ρυθμίσεις του κινητού.": "for a more natural voice, download an enhanced voice in your phone's settings.", "Δεν βρέθηκε ελληνική φωνή. Πρόσθεσε ελληνική φωνή από τις ρυθμίσεις του κινητού (Προσβασιμότητα → Εκφώνηση).": "No voice found for this language. Add one in your phone's settings (Accessibility → Spoken Content).", "Κόκκινη κάπα": "Red cape", "Η κρεμάστρα είναι άδεια. Η κάπα είναι πάνω σου!": "The hook is empty. The cape is on you!", "Η Κοκκινοσκουφίτσα φοράει την αγαπημένη της κόκκινη κάπα.": "Little Red Riding Hood puts on her favourite red cape.", "Κοκκινοσκουφίτσα: «Τι ωραία που είναι!»": "Little Red: \"How lovely it is!\"", "Τραπέζι": "Table", "Πάνω στο τραπέζι μυρίζει ζεστή μηλόπιτα!": "The table smells of warm apple pie!", "Ας ρωτήσουμε τη μαμά τι να κάνουμε.": "Let's ask Mum what to do.", "Η Κοκκινοσκουφίτσα βάζει και κουλουράκια στο καλάθι.": "Little Red Riding Hood puts some cookies in the basket too.", "Κοκκινοσκουφίτσα: «Η γιαγιά τα λατρεύει!»": "Little Red: \"Grandma loves them!\"", "Το τραπέζι είναι άδειο. Όλα τα καλούδια είναι στο καλάθι!": "The table is empty. All the treats are in the basket!", "Γατούλα": "Kitty", "Νιάου! Η γατούλα χουζουρεύει δίπλα στη φωτιά.": "Meow! The kitty is snoozing by the fire.", "Μαμά: «Καλημέρα, αγάπη μου! Η γιαγιά είναι λίγο άρρωστη.»": "Mum: \"Good morning, sweetheart! Grandma is a little bit poorly.\"", "Μαμά: «Φόρεσε πρώτα την κόκκινη κάπα σου. Είναι κρεμασμένη δίπλα στο ράφι.»": "Mum: \"First put on your red cape. It's hanging by the shelf.\"", "Μαμά: «Τι όμορφη που είσαι! Πάρε αυτό το καλάθι με τη μηλόπιτα για τη γιαγιά.»": "Mum: \"Don't you look lovely! Take this basket with apple pie to Grandma.\"", "Μαμά: «Βάλε μέσα και κουλουράκια από το τραπέζι.»": "Mum: \"Put some cookies from the table in it too.\"", "Μαμά: «Μην ξεχάσεις τα κουλουράκια στο τραπέζι!»": "Mum: \"Don't forget the cookies on the table!\"", "Μαμά: «Να προσέχεις! Μη μιλάς με αγνώστους και μη φεύγεις από το μονοπάτι.»": "Mum: \"Be careful! Don't talk to strangers and don't leave the path.\"", "Κοκκινοσκουφίτσα: «Το υπόσχομαι, μαμά!»": "Little Red: \"I promise, Mum!\"", "Πόρτα": "Door", "Μαμά: «Περίμενε! Πρώτα ετοιμάζουμε το καλάθι για τη γιαγιά.»": "Mum: \"Wait! First we get Grandma's basket ready.\"", "Κοκκινοσκουφίτσα: «Το υπόσχομαι, μαμά! Γεια σου!»": "Little Red: \"I promise, Mum! Bye!\"", "Σπίτι": "Home", "Λουλουδάκι": "Little flower", "Εδώ ήταν το καρότο.": "This is where the carrot was.", "Ωπ! Η Κοκκινοσκουφίτσα τραβάει ένα μεγάλο καρότο από το χώμα!": "Oops! Little Red Riding Hood pulls a big carrot out of the ground!", "Λαγουδάκι: «Ευχαριστώ, φίλη μου! Το μονοπάτι για τη γιαγιά είναι από εκεί!»": "Bunny: \"Thank you, my friend! The path to Grandma's is that way!\"", "Λαγουδάκι: «Ουουου… Πεινάω πολύ και δεν βρίσκω ούτε ένα καρότο!»": "Bunny: \"Boo hoo… I'm so hungry and I can't find a single carrot!\"", "Κοκκινοσκουφίτσα: «Έχω ένα καρότο στο καλάθι μου!»": "Little Red: \"I've got a carrot in my basket!\"", "Κοκκινοσκουφίτσα: «Μην κλαις, λαγουδάκι! Θα σου βρω εγώ ένα.»": "Little Red: \"Don't cry, little bunny! I'll find you one.\"", "Λαγουδάκι: «Ένα καρότο! Ευχαριστώ, ευχαριστώ!»": "Bunny: \"A carrot! Thank you, thank you!\"", "Το λαγουδάκι χοροπηδάει από τη χαρά του και ανοίγει δρόμο μέσα από τους θάμνους!": "The bunny hops with joy and opens a path through the bushes!", "Θάμνοι": "Bushes", "Οι θάμνοι είναι πολύ πυκνοί. Δεν μπορούμε να περάσουμε.": "The bushes are too thick. We can't get through.", "Μήπως ξέρει κάποιος ένα μυστικό περασματάκι;": "Does anyone know a secret little path?", "Ένα λουλουδάκι για τη γιαγιά! Ας μαζέψουμε κι άλλα.": "One little flower for Grandma! Let's pick some more.", "Δύο λουλουδάκια! Ακόμα ένα!": "Two little flowers! One more!", "Τρία λουλουδάκια! Τι όμορφο μπουκέτο!": "Three little flowers! What a pretty bunch!", "Πίσω στο λιβάδι": "Back to the meadow", "Τις μαζέψαμε όλες!": "We picked them all!", "Φραουλίτσες του δάσους! Μπαίνουν κι αυτές στο καλάθι.": "Wild strawberries! Into the basket they go.", "Ρυάκι": "Stream", "Το ρυάκι κελαρύζει κάτω από το γεφυράκι. Γλου γλου γλου!": "The stream babbles under the little bridge. Glug glug glug!", "Στο σπίτι της γιαγιάς": "To Grandma's house", "Ξαφνικά, πίσω από ένα δέντρο, εμφανίζεται ένας μεγάλος γκρίζος λύκος!": "Suddenly, from behind a tree, out comes a big grey wolf!", "Λύκος: «Καλημέρα, μικρούλα! Πού πηγαίνεις με αυτό το ωραίο καλάθι;»": "Wolf: \"Good morning, little one! Where are you going with that lovely basket?\"", "Τι λέει η Κοκκινοσκουφίτσα;": "What does Little Red Riding Hood say?", "«Η μαμά λέει να μη μιλάω με αγνώστους!»": "\"Mum says not to talk to strangers!\"", "Κοκκινοσκουφίτσα: «Η μαμά λέει να μη μιλάω με αγνώστους!»": "Little Red: \"Mum says not to talk to strangers!\"", "Μπράβο! Έτσι είπε η μαμά.": "Well done! That's what Mum said.", "Λύκος: «Χμ! Μυρίζει μηλόπιτα… Θα πάει σίγουρα στη γιαγιά της!»": "Wolf: \"Hmm! I smell apple pie… I bet she's going to her grandma's!\"", "Και ο λύκος τρέχει γρήγορα μέσα στο δάσος!": "And the wolf runs off quickly into the forest!", "«Πάω στη γιαγιά μου!»": "\"I'm going to my grandma's!\"", "Κοκκινοσκουφίτσα: «Πάω στη γιαγιά μου, στο σπιτάκι με τα λουλούδια!»": "Little Red: \"I'm going to my grandma's, the little house with the flowers!\"", "Λύκος: «Α, στη γιαγιά! Τι ωραία… Πρέπει να φύγω! Γεια!»": "Wolf: \"Oh, to Grandma's! How nice… I have to go! Bye!\"", "Ωχ! Η μαμά είπε να μη μιλάμε με αγνώστους. Την επόμενη φορά θα το θυμόμαστε!": "Oops! Mum said not to talk to strangers. Next time we'll remember!", "Πίσω στο δάσος": "Back to the forest", "Ξυλοκόπος: «Αν χρειαστείς βοήθεια, φύσα τη σφυρίχτρα. Θα είμαι εδώ!»": "Woodcutter: \"If you need help, blow the whistle. I'll be right here!\"", "Ξυλοκόπος: «Γεια σου, Κοκκινοσκουφίτσα! Πας στη γιαγιά σου;»": "Woodcutter: \"Hello, Little Red Riding Hood! Going to your grandma's?\"", "Ξυλοκόπος: «Είδα έναν λύκο να τρέχει προς τα εδώ. Πάρε αυτή τη σφυρίχτρα.»": "Woodcutter: \"I saw a wolf running this way. Take this whistle.\"", "Ξυλοκόπος: «Αν χρειαστείς βοήθεια, φύσα τη δυνατά και θα έρθω αμέσως!»": "Woodcutter: \"If you need help, blow it hard and I'll come right away!\"", "Κοτούλες": "Hens", "Κοκοκό! Οι κοτούλες της γιαγιάς ψάχνουν σποράκια.": "Cluck cluck! Grandma's hens are looking for seeds.", "Πόρτα της γιαγιάς": "Grandma's door", "Ας πούμε πρώτα καλημέρα στον ξυλοκόπο!": "Let's say good morning to the woodcutter first!", "Τοκ τοκ τοκ!": "Knock knock knock!", "Λύκος με ψιλή φωνή: «Ποιος είναι;»": "Wolf, in a squeaky voice: \"Who's there?\"", "Κοκκινοσκουφίτσα: «Εγώ είμαι, γιαγιά! Σου έφερα μηλόπιτα!»": "Little Red: \"It's me, Grandma! I brought you apple pie!\"", "Λύκος με ψιλή φωνή: «Τράβα το κορδονάκι και μπες μέσα, χρυσό μου!»": "Wolf, in a squeaky voice: \"Pull the little string and come in, my dear!\"", "Χμμ… Η φωνή της γιαγιάς ακούγεται λίγο παράξενη.": "Hmm… Grandma's voice sounds a bit strange.", "Έξω": "Outside", "Όχι τώρα! Πρέπει να βοηθήσουμε τη γιαγιά!": "Not now! We have to help Grandma!", "Ντουλάπα": "Wardrobe", "Γιαγιά: «Τι καλά που ήρθες, κοριτσάκι μου!»": "Grandma: \"I'm so glad you came, my little one!\"", "Η ντουλάπα τρέμει λίγο… και ακούγεται ένα σιγανό «σσσς!»": "The wardrobe is shaking a little… and there's a quiet \"shhh!\"", "Ποιος να είναι μέσα;": "Who could be inside?", "Η Κοκκινοσκουφίτσα ανοίγει τη ντουλάπα…": "Little Red Riding Hood opens the wardrobe…", "Γιαγιά: «Εδώ είμαι! Κρύφτηκα από τον λύκο!»": "Grandma: \"Here I am! I hid from the wolf!\"", "Κοκκινοσκουφίτσα: «Γιαγιά μου!»": "Little Red: \"Grandma!\"", "Γιαγιά και εγγονούλα αγκαλιάζονται σφιχτά.": "Grandma and granddaughter give each other a big hug.", "Γιαγιά: «Λουλούδια για μένα; Τι όμορφα! Σ’ ευχαριστώ, χρυσό μου!»": "Grandma: \"Flowers for me? How pretty! Thank you, my dear!\"", "Γιαγιά;": "Grandma?", "Λύκος: «Ευχαριστώ για τα κουλουράκια! Είναι τα καλύτερα του κόσμου!»": "Wolf: \"Thank you for the cookies! They're the best in the world!\"", "Ο λύκος γλείφεται και κοιτάζει το καλάθι.": "The wolf licks his lips and looks at the basket.", "Ποιος μπορεί να μας βοηθήσει; Τι μας έδωσε ο ξυλοκόπος;": "Who can help us? What did the woodcutter give us?", "Λύκος: «Συγγνώμη… Δεν θα κάνω πια σκανταλιές.»": "Wolf: \"Sorry… I won't be naughty any more.\"", "Πού να είναι άραγε η γιαγιά; Ακούω κάτι μέσα στη ντουλάπα!": "Where could Grandma be? I can hear something inside the wardrobe!", "Λύκος: «Πεινάω τόσο πολύ… Από χθες δεν έχω φάει τίποτα.»": "Wolf: \"I'm so hungry… I haven't eaten anything since yesterday.\"", "Μήπως έχουμε κάτι νόστιμο στο καλάθι για τον λύκο;": "Do we have something tasty in the basket for the wolf?", "Πρώτα ας βρούμε τη γιαγιά!": "Let's find Grandma first!", "Λύκος: «Μμμ, φραουλίτσες! Νόστιμες! Αλλά… μήπως έχεις και κουλουράκια;»": "Wolf: \"Mmm, strawberries! Yummy! But… do you have any cookies too?\"", "Η μηλόπιτα είναι για τη γιαγιά! Μήπως έχουμε κάτι άλλο για τον λύκο;": "The apple pie is for Grandma! Do we have something else for the wolf?", "Παράθυρο": "Window", "Από το παράθυρο φαίνεται το δάσος και ο ήλιος που λάμπει.": "Through the window you can see the forest and the shining sun.", "Λαμπίτσα": "Little lamp", "Μια μικρή λάμπα σκορπάει ζεστό φως στο δωμάτιο.": "A little lamp spreads warm light around the room.", "Το δωμάτιο της γιαγιάς. Η «γιαγιά» είναι ξαπλωμένη στο κρεβάτι, με το σκουφάκι της.": "Grandma's bedroom. \"Grandma\" is lying in bed, wearing her nightcap.", "Κάτι δεν πάει καλά… Ας πλησιάσουμε!": "Something's not right… Let's go closer!", "«Γιαγιά, τι μεγάλα μάτια που έχεις!»": "\"Grandma, what big eyes you have!\"", "Λύκος με ψιλή φωνή: «Για να σε βλέπω καλύτερα, παιδί μου!»": "Wolf, in a squeaky voice: \"All the better to see you with, my dear!\"", "«Γιαγιά, τι μεγάλα αυτιά που έχεις!»": "\"Grandma, what big ears you have!\"", "Λύκος με ψιλή φωνή: «Για να σε ακούω καλύτερα, παιδί μου!»": "Wolf, in a squeaky voice: \"All the better to hear you with, my dear!\"", "«Γιαγιά, τι μεγάλη μύτη που έχεις!»": "\"Grandma, what a big nose you have!\"", "Λύκος με ψιλή φωνή: «Για να μυρίζω καλύτερα τη μηλόπιτα, παιδί μου!»": "Wolf, in a squeaky voice: \"All the better to smell the apple pie with, my dear!\"", "Κοκκινοσκουφίτσα: ": "Little Red: ", "Κοκκινοσκουφίτσα: «Γιαγιά, και τι μεγάλο στόμα που έχεις!»": "Little Red: \"Grandma, and what a big mouth you have!\"", "Λύκος: «Για να φάω… ΤΗ ΜΗΛΟΠΙΤΑ ΣΟΥ!»": "Wolf: \"All the better to eat… YOUR APPLE PIE!\"", "Ο λύκος πετάγεται από το κρεβάτι! Δεν είναι η γιαγιά, είναι ο λύκος!": "The wolf jumps out of bed! It isn't Grandma, it's the wolf!", "Γρήγορα! Τι μας έδωσε ο ξυλοκόπος; Διάλεξε τη σφυρίχτρα από το καλάθι!": "Quick! What did the woodcutter give us? Pick the whistle from the basket!", "Φιιιιιιιτ! Τι δυνατή σφυρίχτρα!": "Wheeeeee! What a loud whistle!", "Φιιιιιιιτ!": "Wheeeeee!", "Μπαμ! Η πόρτα ανοίγει και μπαίνει ο ξυλοκόπος!": "Bang! The door opens and in comes the woodcutter!", "Ξυλοκόπος: «Τι γίνεται εδώ, κύριε Λύκε;»": "Woodcutter: \"What's going on here, Mr Wolf?\"", "Λύκος: «Ωχ… Συγγνώμη… Απλώς πεινούσα πολύ…»": "Wolf: \"Oh… Sorry… I was just very hungry…\"", "Ο λύκος μαζεύεται ντροπαλός σε μια γωνίτσα.": "The wolf shuffles shyly into a corner.", "Η Κοκκινοσκουφίτσα δίνει στον λύκο τα κουλουράκια.": "Little Red Riding Hood gives the wolf the cookies.", "Λύκος: «Για μένα; Κανείς δεν μου έχει φερθεί ποτέ τόσο καλά!»": "Wolf: \"For me? Nobody has ever been so kind to me!\"", "Λύκος: «Συγγνώμη που σας τρόμαξα. Υπόσχομαι να είμαι καλός λύκος!»": "Wolf: \"Sorry I scared you. I promise to be a good wolf!\"", "Γιαγιά: «Ελάτε όλοι! Η μηλόπιτα είναι ζεστή. Ας φάμε όλοι μαζί!»": "Grandma: \"Come, everyone! The apple pie is warm. Let's all eat together!\"", "Και έτσι, η γιαγιά, η Κοκκινοσκουφίτσα, ο ξυλοκόπος και ο λύκος έφαγαν μηλόπιτα και τραγούδησαν όλο το απόγευμα.": "And so Grandma, Little Red Riding Hood, the woodcutter and the wolf ate apple pie and sang all afternoon.", "Κι έζησαν αυτοί καλά κι εμείς καλύτερα!": "And they all lived happily ever after!", "Ας φορέσουμε την κόκκινη κάπα! Πάτα την κρεμάστρα.": "Let's put on the red cape! Tap the hook.", "Ας μιλήσουμε με τη μαμά!": "Let's talk to Mum!", "Ας βάλουμε κουλουράκια στο καλάθι! Πάτα το τραπέζι.": "Let's put cookies in the basket! Tap the table.", "Πάμε στη γιαγιά! Πάτα την πόρτα.": "Let's go to Grandma's! Tap the door.", "Ας μαζέψουμε λουλουδάκια για τη γιαγιά!": "Let's pick little flowers for Grandma!", "Το λαγουδάκι είναι λυπημένο. Ας το βοηθήσουμε!": "The bunny is sad. Let's help!", "Βλέπεις κάτι πορτοκαλί στο χώμα;": "Can you see something orange in the ground?", "Το λαγουδάκι μάς άνοιξε δρόμο! Πάμε δεξιά!": "The bunny opened a path for us! Let's go right!", "Ας συνεχίσουμε στο μονοπάτι.": "Let's keep going along the path.", "Πάμε δεξιά, στο σπίτι της γιαγιάς!": "Let's go right, to Grandma's house!", "Ας πούμε καλημέρα στον ξυλοκόπο!": "Let's say good morning to the woodcutter!", "Κάτι κουνιέται μέσα στη ντουλάπα!": "Something is moving inside the wardrobe!", "Ας πλησιάσουμε τη «γιαγιά» στο κρεβάτι.": "Let's go closer to \"Grandma\" in the bed.", "Διάλεξε τη σφυρίχτρα από το καλάθι και πάτα τον λύκο!": "Pick the whistle from the basket and tap the wolf!", "Ας ζητήσουμε βοήθεια!": "Let's ask for help!", "Ο λύκος πεινάει. Δώσ’ του τα κουλουράκια από το καλάθι!": "The wolf is hungry. Give him the cookies from the basket!", "Πάτα όπου θέλεις να πάει η Κοκκινοσκουφίτσα!": "Tap wherever you want Little Red Riding Hood to go!", "Η Κοκκινοσκουφίτσα": "Little Red Riding Hood", "Μουσική:": "Music:", "ναι": "on", "όχι": "off", "Χμμ, όχι εδώ. Ας δοκιμάσουμε κάτι άλλο!": "Hmm, not here. Let's try something else!", "Όχι αυτό. Μήπως κάτι άλλο;": "Not that one. Maybe something else?", "Ωπ! Δεν ταιριάζει εδώ.": "Oops! That doesn't go here.", "Γεια σου! Εγώ είμαι η φωνή που θα σου διαβάζει το παραμύθι.": "Hello! I'm the voice that will read you the fairy tale.", "Μια φορά κι έναν καιρό, ήταν ένα κοριτσάκι που όλοι το έλεγαν Κοκκινοσκουφίτσα.": "Once upon a time, there was a little girl everyone called Little Red Riding Hood.", "Πάτα πάνω στα πράγματα και στους φίλους της για να τη βοηθήσεις!": "Tap on things and on her friends to help her!", "Καλώς ήρθες πάλι! Ας συνεχίσουμε το παραμύθι.": "Welcome back! Let's carry on with the story.", "Ένα παραμύθι που παίζεις με τα δαχτυλάκια σου": "A fairy tale you play with your fingers", "Παίξε!": "Play!", "Συνέχεια": "Continue", "Ρυθμίσεις": "Settings", "Φωνή που διαβάζει την ιστορία": "Voice that reads the story", "Ναι": "Yes", "Όχι": "No", "Δοκιμή φωνής": "Test voice", "Μέγεθος γραμμάτων": "Text size", "Γλώσσα": "Language", "Πλήρης οθόνη": "Full screen", "Στην αρχή": "Back to start", "Κλείσιμο": "Close", "Τέλος!": "The End!", "Ξανά από την αρχή": "Play again", "Γύρισε το κινητό οριζόντια.": "Turn your phone sideways.", "Πόντοι:": "Points:", "Πάτα": "Tap", "Τι ωραίο!": "How lovely!", "Περπάτα": "Walk", "Κοίτα": "Look", "Πάρε / Χρησιμοποίησε": "Take / Use", "Μίλα": "Talk", "Χρησιμοποίησε αντικείμενο": "Use item", "Αυτά τα δύο δεν συνδυάζονται.": "These two don't go together.", "Διάλεξε ένα αντικείμενο.": "Pick an item.", "Διάλεξε ένα αντικείμενο. Πάτα δεύτερο για να τα συνδυάσεις.": "Pick an item. Tap a second one to combine them.", "Ήχος:": "Sound:", "Στην αρχική": "Back to title", "Εξέταση": "Examine", "Οπτικά εφέ": "Visual effects", "Πλήρη": "Full", "Ελαφριά": "Light"};
+let T=0; let F={};
+const tr=t=>(LANG==='en'&&EN[t]!==undefined)?EN[t]:t;
+const W=320,H=180;
+const $=id=>document.getElementById(id); const stage=$('stage');
+const OUT=$('cv'), octx=OUT.getContext('2d');
+const cv=document.createElement('canvas'); cv.width=W; cv.height=H; const ctx=cv.getContext('2d'); ctx.imageSmoothingEnabled=false;
+let OW=W, OH=H;
+
+function rng(seed){ let s=seed>>>0; return ()=>{ s=(s*1664525+1013904223)>>>0; return s/4294967296; }; }
+function R(g,x,y,w,h,c){ g.fillStyle=c; g.fillRect(Math.round(x),Math.round(y),Math.round(w),Math.round(h)); }
+function disc(g,cx,cy,r,c){ g.fillStyle=c; for(let dy=-r;dy<=r;dy++){ const dx=Math.floor(Math.sqrt(r*r-dy*dy+r*.6)); g.fillRect(Math.round(cx-dx),Math.round(cy+dy),dx*2+1,1); } }
+function ell(g,cx,cy,rx,ry,c){ g.fillStyle=c; for(let y=-ry;y<=ry;y++){ const w=Math.round(rx*Math.sqrt(Math.max(0,1-(y*y)/((ry+.5)*(ry+.5))))); g.fillRect(Math.round(cx-w),Math.round(cy+y),w*2+1,1); } }
+function line(g,x0,y0,x1,y1,c){ g.fillStyle=c; x0=Math.round(x0);y0=Math.round(y0);x1=Math.round(x1);y1=Math.round(y1);
+  const dx=Math.abs(x1-x0),dy=-Math.abs(y1-y0),sx=x0<x1?1:-1,sy=y0<y1?1:-1; let e=dx+dy;
+  for(let i=0;i<2000;i++){ g.fillRect(x0,y0,1,1); if(x0===x1&&y0===y1)break; const e2=2*e; if(e2>=dy){e+=dy;x0+=sx;} if(e2<=dx){e+=dx;y0+=sy;} } }
+function dith(g,x,y,w,h,c){ g.fillStyle=c; x=Math.round(x); y=Math.round(y); for(let j=0;j<h;j++) for(let i=((x+y+j)&1);i<w;i+=2) g.fillRect(x+i,y+j,1,1); }
+function bands(g,w,y0,y1,cols){ const n=cols.length, bh=(y1-y0)/n; for(let i=0;i<n;i++){ const ya=Math.round(y0+i*bh), yb=Math.round(y0+(i+1)*bh); R(g,0,ya,w,yb-ya,cols[i]); if(i<n-1) dith(g,0,yb-2,w,2,cols[i+1]); } }
+function poly(g,pts,c){ g.fillStyle=c; g.beginPath(); pts.forEach(([x,y],i)=>i?g.lineTo(x,y):g.moveTo(x,y)); g.closePath(); g.fill(); }
+function inPoly(x,y,p){ let c=false; for(let i=0,j=p.length-1;i<p.length;j=i++){ const [xi,yi]=p[i],[xj,yj]=p[j]; if(((yi>y)!==(yj>y))&&(x<(xj-xi)*(y-yi)/(yj-yi)+xi)) c=!c; } return c; }
+const hexA=c=>[1,3,5].map(i=>parseInt(c.slice(i,i+2),16));
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v)); const rand=(a,b)=>a+Math.random()*(b-a); const lerp=(a,b,t)=>a+(b-a)*t;
+const frac=v=>v-Math.floor(v);
+const hash2=(a,b)=>{ let h=(a*374761393+b*668265263)|0; h=(h^(h>>>13))*1274126177; return ((h^(h>>>16))>>>0)/4294967296; };
+function shadowE(g,cx,cy,rw,rh,a){ a=a||.32; cx=Math.round(cx); cy=Math.round(cy); for(let y=-rh;y<=rh;y++){ const ww=Math.round(rw*Math.sqrt(Math.max(0,1-(y*y)/((rh+.5)*(rh+.5))))); for(let x=-ww;x<=ww;x++){ const d=(x*x)/(rw*rw+.01)+(y*y)/(rh*rh+.01);
+  if(d<.5){ g.fillStyle='rgba(43,29,58,'+a+')'; g.fillRect(cx+x,cy+y,1,1); } else if(((cx+x+cy+y)&1)===0){ g.fillStyle='rgba(43,29,58,'+(a*.7)+')'; g.fillRect(cx+x,cy+y,1,1); } } } }
+function cloud(g,x,y,s){ ell(g,x+8*s,y+2*s,12*s,4*s,'#d8ecff'); disc(g,x,y,5*s,'#ffffff'); disc(g,x+8*s,y-3*s,7*s,'#ffffff'); disc(g,x+16*s,y,5*s,'#ffffff'); R(g,x-3*s,y+1*s,24*s,3*s,'#ffffff'); R(g,x-2*s,y+4*s,22*s,1,'#cfe4f8'); }
+/* per-pixel perspective floor: X = sideways world units, Z = depth */
+function floorFill(g,pl,hz,vx,S1,S2,fn){
+  const xs=pl.map(p=>p[0]), ys=pl.map(p=>p[1]);
+  const x0=Math.max(0,Math.floor(Math.min(...xs))), x1=Math.min(g.canvas.width,Math.ceil(Math.max(...xs))), y0=Math.max(0,Math.floor(Math.min(...ys))), y1=Math.min(H,Math.ceil(Math.max(...ys)));
+  const w=x1-x0, id=g.getImageData(x0,y0,w,y1-y0), d=id.data;
+  for(let y=y0;y<y1;y++){ const dz=y-hz+.5; if(dz<=0) continue; const Z=S2/dz;
+    for(let x=x0;x<x1;x++){ if(!inPoly(x+.5,y+.5,pl)) continue; const X=(x+.5-vx)/dz*S1; const c=fn(X,Z,x,y); const i=((y-y0)*w+(x-x0))*4; d[i]=c[0]; d[i+1]=c[1]; d[i+2]=c[2]; d[i+3]=255; } }
+  g.putImageData(id,x0,y0); }
+
+/* ---------- sprite pipeline: draw native sprite, outline, scale with depth ---------- */
+const SPW=48, SPH=80, OX=24, OY=76;
+const spr=document.createElement('canvas'); spr.width=SPW; spr.height=SPH; const SG=spr.getContext('2d');
+const sil=document.createElement('canvas'); sil.width=SPW; sil.height=SPH; const SIG=sil.getContext('2d');
+const spo=document.createElement('canvas'); spo.width=SPW; spo.height=SPH; const SOG=spo.getContext('2d');
+function actor(g,fn,wx,wy,sc,flip,night,noShadow){
+  if(!noShadow) shadowE(g,wx,wy,Math.max(4,Math.round(10*sc)),Math.max(1,Math.round(2.4*sc)),.3);
+  SG.clearRect(0,0,SPW,SPH); SG.save(); SG.translate(OX,OY); if(flip) SG.scale(-1,1); fn(SG); SG.restore();
+  SIG.globalCompositeOperation='source-over'; SIG.clearRect(0,0,SPW,SPH); SIG.drawImage(spr,0,0); SIG.globalCompositeOperation='source-in'; SIG.fillStyle=night?(G.outlineNight||'#0a0414'):(G.outline||'#2b1d3a'); SIG.fillRect(0,0,SPW,SPH);
+  SOG.clearRect(0,0,SPW,SPH); for(const [dx,dy] of [[1,0],[-1,0],[0,1],[0,-1]]) SOG.drawImage(sil,dx,dy); SOG.drawImage(spr,0,0);
+  const q=Math.round(sc*24)/24, w=Math.round(SPW*q), h=Math.round(SPH*q);
+  g.drawImage(spo,Math.round(wx-OX*q),Math.round(wy-OY*q),w,h);
+}
+
+/* ---------- generic NPC painter (side or front) ---------- */
+function person(g,o){
+  const h=o.h||56, wd=o.wide?18:13, sk=o.skin, skD=o.skinD||'rgba(0,0,0,.15)', b=o.bob?-Math.round(Math.abs(Math.sin(T*o.bob))*2):0, blink=((T+(o.seed||0))%3.7)<.13;
+  const legH=Math.round(h*.36), bodyH=Math.round(h*.33), hy=-legH-bodyH-13+b, by=-legH-bodyH+b;
+  if(o.dress){ R(g,-wd/2-1,by+bodyH-3,wd+2,legH*.65,o.bottom); R(g,-wd/2-1,by+bodyH+legH*.6-4,wd+2,1,'rgba(0,0,0,.2)'); R(g,-4,-legH*.4,3,legH*.4-2,sk); R(g,1,-legH*.4,3,legH*.4-2,sk); }
+  else { R(g,-5,-legH,4,legH-2,o.bottom); R(g,1,-legH,4,legH-2,o.bottom); R(g,-5,-legH,1,legH-2,'rgba(0,0,0,.18)'); if(o.bare){ R(g,-5,-legH*.5,4,legH*.5-2,sk); R(g,1,-legH*.5,4,legH*.5-2,sk);} }
+  R(g,-6,-2,6,2,o.shoe||'#3a2420'); R(g,1,-2,6,2,o.shoe||'#3a2420');
+  R(g,-wd/2,by,wd,bodyH+1,o.top); R(g,-wd/2,by,2,bodyH+1,'rgba(0,0,0,.16)'); if(o.stripe) for(let y=by+2;y<by+bodyH;y+=3) R(g,-wd/2,y,wd,1,o.stripe);
+  if(o.apron) R(g,-wd/2+2,by+4,wd-4,bodyH+4,o.apron);
+  if(o.tag) R(g,2,by+3,3,2,'#ffd23f');
+  if(o.arms==='cross'){ R(g,-wd/2-2,by+6,wd+4,4,o.sleeve||o.top); R(g,-wd/2,by+7,wd,2,sk); }
+  else if(o.arms==='up'){ const k=Math.sin(T*9)>0; R(g,-wd/2-3,by-(k?9:3),3,11,sk); R(g,wd/2,by-(k?3:9),3,11,sk); }
+  else if(o.arms==='read'){ R(g,-2,by+5,9,3,sk); R(g,3,by+1,7,6,o.book||'#e8463a'); }
+  else { const sw=o.wave?Math.round(Math.sin(T*6)*2):0; R(g,-wd/2-3,by+1,3,bodyH-2,o.sleeve||o.top); R(g,wd/2,by+1-sw,3,bodyH-2,o.sleeve||o.top); R(g,-wd/2-3,by+bodyH-2,3,3,sk); R(g,wd/2,by+bodyH-2-sw,3,3,sk); }
+  R(g,-2,by-2,5,2,sk); R(g,-2,by-2,5,1,'rgba(0,0,0,.12)');
+  const front=o.view==='front';
+  R(g,-5,hy,11,13,sk); R(g,-5,hy,1,13,'rgba(0,0,0,.14)'); R(g,-4,hy+12,9,1,'rgba(0,0,0,.14)');
+  if(front){ for(const ex of [-3,2]){ R(g,ex,hy+5,2,2,blink?sk:'#fff'); if(!blink) R(g,ex+(ex<0?1:0),hy+5,1,2,'#1a1210'); } R(g,0,hy+6,1,3,'rgba(0,0,0,.18)'); R(g,-6,hy+5,1,3,sk); R(g,6,hy+5,1,3,sk);
+    if(o.blush){ R(g,-4,hy+8,2,1,'#ff8aa8'); R(g,3,hy+8,2,1,'#ff8aa8'); } }
+  else { R(g,3,hy+5,2,2,blink?sk:'#fff'); if(!blink) R(g,4,hy+5,1,2,'#1a1210'); R(g,6,hy+5,2,4,sk); R(g,7,hy+8,1,1,'rgba(0,0,0,.2)'); R(g,-3,hy+5,2,3,'rgba(0,0,0,.15)'); if(o.blush) R(g,2,hy+8,2,1,'#ff8aa8'); }
+  const m=front?-2:2; R(g,m,hy+10,front?5:4,1,o.lips||'rgba(120,40,40,.7)');
+  if(o.must) R(g,front?-3:1,hy+9,front?7:6,2,o.must);
+  if(o.beard) R(g,-4,hy+9,10,5,o.beard);
+  const hc=o.hair;
+  switch(o.hs){
+    case 'bald': R(g,-5,hy+2,2,6,hc); if(front) R(g,4,hy+2,2,6,hc); R(g,-1,hy+1,3,1,'rgba(255,255,255,.35)'); break;
+    case 'short': R(g,-6,hy-2,12,4,hc); R(g,-6,hy+2,2,5,hc); if(front) R(g,4,hy+2,2,4,hc); break;
+    case 'grey': R(g,-6,hy-1,12,3,hc); R(g,-6,hy+2,2,5,hc); R(g,-1,hy-1,1,2,'rgba(0,0,0,.2)'); break;
+    case 'pony': R(g,-6,hy-2,12,4,hc); R(g,-6,hy+2,3,6,hc); if(front){ R(g,4,hy+2,2,6,hc); R(g,-8,hy+3,3,10,hc);} else R(g,-10,hy+2,4,12,hc); R(g,-7,hy+1,2,2,'#e0338a'); break;
+    case 'bun': R(g,-6,hy-2,12,4,hc); R(g,-6,hy+2,2,5,hc); if(front) R(g,4,hy+2,2,5,hc); disc(g,front?0:-6,hy-4,4,hc); R(g,front?3:-3,hy-8,1,6,'#ffd23f'); break;
+    case 'big': for(const [x,y] of [[-9,-4],[-5,-6],[0,-6],[5,-4],[-10,1],[6,1],[-9,6],[6,6]]){ disc(g,x,hy+y,4,hc); } R(g,-3,hy-5,4,1,'rgba(255,255,255,.4)'); break;
+    case 'cap': R(g,-6,hy-3,12,5,o.cap||hc); R(g,front?-6:2,hy+1,front?12:8,2,'rgba(0,0,0,.25)'); if(!front) R(g,5,hy+1,6,2,o.cap||hc); R(g,-6,hy+2,2,4,hc); break;
+  }
+  if(o.glasses==='sun'){ if(front){ R(g,-4,hy+4,9,3,'#111'); R(g,-3,hy+4,2,1,'#5a5a8a'); } else R(g,1,hy+4,7,3,'#111'); }
+  else if(o.glasses){ const c=o.glasses===true?'#3a3a6a':o.glasses; if(front){ R(g,-4,hy+4,4,1,c); R(g,1,hy+4,4,1,c); R(g,-4,hy+7,4,1,c); R(g,1,hy+7,4,1,c);} else { R(g,2,hy+4,4,1,c); R(g,2,hy+7,4,1,c); R(g,-2,hy+5,4,1,c); } }
+  if(o.phones){ R(g,-7,hy+3,3,6,'#222'); R(g,-6,hy-3,12,2,'#222'); if(front) R(g,5,hy+3,3,6,'#222'); }
+  if(o.earring){ R(g,front?-7:-2,hy+9,1,2,'#ffd23f'); if(front) R(g,6,hy+9,1,2,'#ffd23f'); }
+  if(o.wire) line(g,-6,hy+8,-5,by+8,'#9a9aaa');
+}
+/* ---------- shared state ---------- */
+const S={ mode:'title', scene:'', x:160, y:150, dir:'front', face:1, phase:0, moving:false, path:[], onArrive:null, cam:0, inv:[], sel:null, verb:'walk',
+  fade:1, fadeFrom:1, fadeTo:1, fadeT:0, fadeDur:0, fadeCb:null, trans:0, lock:0, dance:0, mouse:null, hover:null, mouseOn:false, shk:0, shkA:0, idle:0 };
+const has=i=>S.inv.includes(i);
+function give(i){ if(!has(i)) S.inv.push(i); renderInv(); }
+function take(i){ S.inv=S.inv.filter(x=>x!==i); if(S.sel===i) setSel(null); renderInv(); }
+const timers=[]; const after=(s,fn)=>timers.push({t:s,fn});
+function shake(d,a){ S.shk=d; S.shkA=a; }
+const POP=[];
+function pts(n,key){ if(F['p_'+key]) return; F['p_'+key]=1; F.score=(F.score||0)+n; sfx('score'); showScore(true); POP.push({x:S.x,y:S.y-62*scl(S.y),t:0,txt:'+'+n}); }
+function showScore(bump){ const el=$('score'); if(!el) return; if(G.noScore){ el.textContent=tr(G.barTitle||''); return; } el.textContent=tr(G.scoreLabel||'Πόντοι:')+' '+(F.score||0)+(G.scoreSep?' '+tr(G.scoreSep)+' ':' / ')+G.maxPts; if(bump){ el.classList.remove('bump'); void el.offsetWidth; el.classList.add('bump'); } }
+function scl(y){ const s=SC[S.scene]; return clamp(lerp(s.sFar,1,(y-s.far)/(s.near-s.far)),s.sFar*.92,1.04); }
+function npcRect(x,b,k){ return [x-10*k,b-62*k,20*k,62*k]; }
+const SC={};
+function room1(g,w,o){ // one-point perspective room shell: back wall [bx0,bx1]x[by0,by1], vanishing point (vx,vy)
+  const {bx0,bx1,by0,by1,vx,vy}=o, sl=(by1-vy)/(vx-bx0), sr=(by1-vy)/(bx1-vx), tl=(by0-vy)/(bx0-vx), tr2=(by0-vy)/(bx1-vx);
+  const ylT=by0-bx0*tl, yrT=by0+(w-bx1)*tr2, ylB=by1+bx0*sl, yrB=by1+(w-bx1)*sr;
+  poly(g,[[0,0],[w,0],[w,yrT],[bx1,by0],[bx0,by0],[0,ylT]],o.ceil);
+  poly(g,[[0,ylT],[bx0,by0],[bx0,by1],[0,ylB]],o.left); poly(g,[[bx1,by0],[w,yrT],[w,yrB],[bx1,by1]],o.right);
+  R(g,bx0,by0,bx1-bx0,by1-by0,o.back);
+  const fl=[[bx0,by1],[bx1,by1],[bx1+(180-by1)/sr,180],[bx0-(180-by1)/sl,180]];
+  if(o.floor) floorFill(g,fl,vy,vx,o.S1||40,o.S2||8000,o.floor);
+  line(g,0,ylT,bx0,by0,o.edge||'rgba(0,0,0,.3)'); line(g,w,yrT,bx1,by0,o.edge||'rgba(0,0,0,.3)'); line(g,bx0,by1,0,ylB,o.edge||'rgba(0,0,0,.3)'); line(g,bx1,by1,w,yrB,o.edge||'rgba(0,0,0,.3)');
+  return {wallL:x=>[ylT+(by0-ylT)*x/bx0, ylB+(by1-ylB)*x/bx0], wallR:x=>[by0+(yrT-by0)*(x-bx1)/(w-bx1), by1+(yrB-by1)*(x-bx1)/(w-bx1)], fl};
+}
+function wallQuad(g,side,x0,x1,f0,f1,W2,c){ // draw a rect on a side wall between x0..x1, at heights f0..f1 (0=top,1=floor)
+  const a=W2(x0), b=W2(x1); poly(g,[[x0,lerp(a[0],a[1],f0)],[x1,lerp(b[0],b[1],f0)],[x1,lerp(b[0],b[1],f1)],[x0,lerp(a[0],a[1],f1)]],c); }
+
+/* ================= Η ΚΟΚΚΙΝΟΣΚΟΥΦΙΤΣΑ · point & click (kids) ================= */
+const G={ key:'kokkinoskoufitsa-pc', title:'Η Κοκκινοσκουφίτσα', maxPts:12, noScore:true, verbs:['act'], VNAME:{act:'Πάτα'}, outline:'#4a2c2a', soundLabel:'Μουσική:',
+  DEF:{look:['Τι ωραίο!'],hand:['Τι ωραίο!'],talk:['Τι ωραίο!']}, NOPE:['Χμμ, όχι εδώ. Ας δοκιμάσουμε κάτι άλλο!','Όχι αυτό. Μήπως κάτι άλλο;','Ωπ! Δεν ταιριάζει εδώ.'],
+  titleScene:['meadow','start'], titleMusic:'walk', musicFor(id){ return id==='home'||id==='bedroom'?'house':'walk'; }, speed:56,
+  dust:{meadow:'#e8d8a8',forest:'#c8b880',outside:'#e8d8a8'}, irisCol:'#fff8ec', irisRim:'rgba(255,211,77,.9)', vigRGB:'90,50,30', vig(){ return .16; }, tapCol:'#ffffff',
+  playerFn(){ return S.party?(g=>girlFront(g,T*8,true,false)):S.dir==='side'?(g=>girlSide(g,S.phase,S.moving)):(g=>girlFront(g,S.phase,S.moving,S.dir==='back')); },
+  newGame(){ F={stars:0}; S.inv=[]; enter('home','start'); },
+  intro(){ say(['Μια φορά κι έναν καιρό, ήταν ένα κοριτσάκι που όλοι το έλεγαν Κοκκινοσκουφίτσα.','Πάτα πάνω στα πράγματα και στους φίλους της για να τη βοηθήσεις!']); },
+  welcomeBack(){ say(['Καλώς ήρθες πάλι! Ας συνεχίσουμε το παραμύθι.']); },
+  onTitle(){ S.party=0; }, onInv(){ renderBasket(); },
+  setUI(on){ ['bSay'].forEach(id=>$(id).style.display=on?'':'none'); $('stars').hidden=!on; basketEl.hidden=!on; if(on) $('starN').textContent=F.stars||0; },
+  smart(sx,sy,touch){ if(!$('settings').hidden) return;
+    if(D.active){ if(!D.opts) advance(); return; }
+    if(S.mode!=='play'||S.lock||S.trans) return;
+    const wx=sx+S.cam, h=hotAt(wx,sy); S.idle=0; sfx('tap');
+    if(h){ const go2=()=>{ faceTo(h); kidInteract(h); }; if(h.at) walkTo(h.at[0],h.at[1],go2); else go2(); }
+    else { tapFx(wx,sy); walkTo(wx,Math.max(sy,SC[S.scene].far)); } },
+  dlgTick(dt){ if(D.active&&!D.opts&&D.shown<D.text.length){ D.shown=Math.min(D.text.length,D.shown+dt*40); dlgText.textContent=D.text.slice(0,Math.floor(D.shown)); }
+    if(D.auto>0){ D.auto-=dt; if(D.auto<=0){ D.auto=0; if(D.active&&!D.opts){ D.shown=D.text.length; nextLine(); } } }
+    moreEl.style.visibility=D.active&&!D.opts&&D.shown>=D.text.length&&!VOICE.speaking?'visible':'hidden'; },
+  update(dt,s){ if(F.wolfRun&&S.wolfX<760&&!D.active) S.wolfX+=dt*130;
+    if(s===SC.forest&&!F.wolfMet&&S.x>250&&!D.active&&!S.trans){ S.path=[]; meetWolf(); }
+    if(!D.active&&!S.lock&&!S.party){ S.idle+=dt; if(S.idle>20){ S.idle=0; say([hintText()]); } } },
+  overWorld(g,s){ const gl=S.mode==='play'&&!D.active&&!S.party?goal():null; if(!gl) return; const h=s.hs.find(q=>q.id===gl); if(!h) return; const r=hRect(h), bx=r[0]+r[2]/2, by=r[1]-6+Math.sin(T*4)*2.5;
+    g.globalAlpha=.9; for(const [dx,dy] of [[0,-3],[0,3],[-3,0],[3,0]]) R(g,bx+dx-1,by+dy-1,2,2,'#ffffff'); R(g,bx-2,by-2,5,5,'#ffd34d'); R(g,bx-1,by-4,3,9,'#ffd34d'); R(g,bx-4,by-1,9,3,'#ffd34d'); R(g,bx,by,1,1,'#ffffff'); g.globalAlpha=1; },
+  hd(s,cam){ if(s.outdoor) hdSun(s.sun[0]-cam*.3,s.sun[1],s.warm||0);
+    if(s===SC.forest) hdAdd(()=>{ for(const wx of [60,170,280,390,480]){ const x=wx-cam+Math.sin(T*.4+wx)*4; hdBeam([[x-6,0],[x+6,0],[x+34,170],[x+10,170]],'255,240,170',.16,.02,0,170); hdGlow(x+22,164,18,'255,240,170',.12); } });
+    if(s===SC.home) hdAdd(()=>{ const f=.8+.2*Math.sin(T*9)*Math.sin(T*5.3); hdGlow(226-cam,100,60,'255,150,60',.32*f); hdGlow(226-cam,100,16,'255,220,120',.4*f); hdBeam([[120-cam,40],[156-cam,40],[176-cam,170],[118-cam,170]],'255,245,200',.14,.02,40,170); });
+    if(s===SC.bedroom) hdAdd(()=>{ hdGlow(264-cam,96,46,'255,220,140',.35); hdBeam([[150-cam,40],[186-cam,40],[200-cam,170],[140-cam,170]],'255,245,200',.14,.02,40,170); if(S.party) hdGlow(170-cam,140,70,'255,210,120',.25); }); },
+  grade(s){ hdGrade('soft-light','255,200,130',s.outdoor?.18:.22); },
+};
+Object.assign(S,{party:0,wolfX:330,idle:0,verb:'act'});
+function kidInteract(h){ S.idle=0;
+  if(S.sel){ const it=S.sel; S.sel=null; renderBasket(); if(h.item&&h.item(it)) return; if(it==='whistle') return blowWhistle(); return say([G.NOPE[(Math.random()*3)|0]]); }
+  if(h.act) h.act(); else if(h.exit) h.exit(); }
+function star(key){ if(F['s_'+key]) return; F['s_'+key]=1; F.stars=(F.stars||0)+1; $('starN').textContent=F.stars; const el=$('stars'); el.classList.remove('pop'); void el.offsetWidth; el.classList.add('pop'); sfx('star'); sparkle('★'); S.idle=0; POP.push({x:S.x,y:S.y-60*scl(S.y),t:0,txt:'★'}); }
+/* ---------- items ---------- */
+const ITEMS={
+  basket:{n:'Καλάθι με πίτα',d:'Ένα καλάθι με ζεστή μηλόπιτα για τη γιαγιά.'},
+  cookies:{n:'Κουλουράκια',d:'Μυρωδάτα κουλουράκια με ζάχαρη.'},
+  flowers:{n:'Λουλούδια',d:'Ένα μπουκέτο λουλούδια για τη γιαγιά.'},
+  carrot:{n:'Καρότο',d:'Ένα μεγάλο, πορτοκαλί καρότο.'},
+  berries:{n:'Φραουλίτσες',d:'Κόκκινες, γλυκές φραουλίτσες του δάσους.'},
+  whistle:{n:'Σφυρίχτρα',d:'Μια ξύλινη σφυρίχτρα. Φιιιιιτ!'},
+};
+const ICON={
+  basket:g=>{ R(g,1,5,10,6,'#c98a4f'); R(g,1,5,10,1,'#e8a868'); R(g,2,4,8,1,'#e0262f'); line(g,2,5,6,1,'#8a5a36'); line(g,10,5,6,1,'#8a5a36'); R(g,4,4,4,1,'#ffd08a'); },
+  cookies:g=>{ disc(g,4,7,3,'#e8b060'); disc(g,8,5,3,'#f0c070'); R(g,3,6,1,1,'#fff'); R(g,8,4,1,1,'#fff'); R(g,5,8,1,1,'#fff'); },
+  flowers:g=>{ R(g,5,6,2,6,'#3f9a3f'); disc(g,3,4,2,'#ff8fb0'); disc(g,8,3,2,'#fff066'); disc(g,6,5,2,'#c8a0ff'); R(g,4,9,4,2,'#ffffff'); },
+  carrot:g=>{ for(let i=0;i<7;i++) R(g,3+i*.6,3+i,4-i*.5,1,'#ff8a2a'); R(g,3,0,1,3,'#3f9a3f'); R(g,5,0,1,3,'#3f9a3f'); R(g,4,1,1,2,'#5cb85c'); },
+  berries:g=>{ disc(g,4,6,2,'#e0262f'); disc(g,8,7,2,'#e0262f'); disc(g,6,9,2,'#ff3a44'); R(g,4,3,1,1,'#3f9a3f'); R(g,8,4,1,1,'#3f9a3f'); },
+  whistle:g=>{ R(g,1,4,8,4,'#c98a4f'); R(g,8,5,3,2,'#c98a4f'); R(g,3,5,2,1,'#5a3a2a'); disc(g,3,8,2,'#a8703e'); },
+};
+function iconCanvas(id){ const c=document.createElement('canvas'); c.width=12; c.height=12; ICON[id](c.getContext('2d')); return c; }
+
+
+
+/* ---------- characters (SCI scale) ---------- */
+const GC={skin:'#ffe3cf',skinD:'#f3d0b8',hair:'#7a4a2a',dress:'#4a7bd8',dressD:'#3a63b8',apron:'#ffffff',cape:'#e0262f',capeD:'#c81e28',shoe:'#5a2e2a'};
+function basketSprite(g,x,y){ R(g,x,y,10,7,'#c98a4f'); R(g,x,y,10,1,'#e8a868'); R(g,x+1,y-1,8,1,'#e0262f'); R(g,x+3,y-1,2,1,'#fff'); line(g,x+1,y,x+5,y-6,'#8a5a36'); line(g,x+9,y,x+5,y-6,'#8a5a36'); }
+function girlSide(g,ph,mv){ const sw=mv?Math.sin(ph):0, l1=Math.round(sw*3), yb=mv?-Math.round(Math.abs(Math.cos(ph))):0, blink=(T%3.2)<.12;
+  for(const [dx,b] of [[-l1,1],[l1,0]]){ R(g,-2+dx,-16+yb,3,12,b?GC.skinD:GC.skin); R(g,-2+dx,-9+yb,3,5,'#ffffff'); R(g,-3+dx,-4+yb,6,4,GC.shoe); }
+  if(F.cape){ R(g,-9,-44+yb,7,30,GC.capeD); R(g,-10,-18+yb,7,4,GC.capeD); }
+  R(g,-8,-32+yb,15,17,GC.dress); R(g,-9,-20+yb,17,4,GC.dress); R(g,-9,-17+yb,17,1,GC.dressD); R(g,-2,-31+yb,7,15,GC.apron);
+  R(g,-6,-40+yb,12,9,'#ffffff'); R(g,-1,-40+yb,2,2,GC.cape);
+  const ax=Math.round(-sw*2); R(g,-8-ax,-39+yb,3,11,GC.skinD);
+  if(has('basket')){ R(g,4,-38+yb,3,8,GC.skin); basketSprite(g,4,-30+yb); } else R(g,4+ax,-39+yb,3,11,GC.skin);
+  R(g,-6,-56+yb,14,16,GC.skin); R(g,-6,-41+yb,14,1,GC.skinD);
+  R(g,3,-50+yb,2,3,blink?GC.skin:'#3a2420'); if(!blink) R(g,3,-50+yb,1,1,'#ffffff'); R(g,5,-45+yb,3,2,'#ff9fb0'); R(g,2,-44+yb,3,1,'#c8505a'); R(g,8,-48+yb,1,2,GC.skinD);
+  if(F.cape){ R(g,-8,-60+yb,16,6,GC.cape); R(g,-9,-56+yb,5,16,GC.cape); R(g,7,-58+yb,2,6,GC.cape); R(g,-7,-61+yb,13,1,'#ff4a52'); R(g,-6,-55+yb,13,2,GC.hair); }
+  else { R(g,-7,-59+yb,15,6,GC.hair); R(g,-8,-55+yb,4,10,GC.hair); R(g,-11,-46+yb,3,9,GC.hair); R(g,-11,-37+yb,3,2,GC.cape); } }
+function girlFront(g,ph,mv,back){ const s=mv?Math.sin(ph):0, la=s>0?Math.round(s*2):0, ra=s<0?Math.round(-s*2):0, yb=mv?-Math.round(Math.abs(Math.cos(ph))):0, blink=(T%3.2)<.12;
+  R(g,-5,-16-la+yb,3,12,GC.skin); R(g,2,-16-ra+yb,3,12,GC.skin); R(g,-5,-9-la+yb,3,5,'#fff'); R(g,2,-9-ra+yb,3,5,'#fff'); R(g,-6,-4-la+yb,5,4,GC.shoe); R(g,1,-4-ra+yb,5,4,GC.shoe);
+  if(F.cape&&!back){ R(g,-11,-42+yb,3,26,GC.capeD); R(g,8,-42+yb,3,26,GC.capeD); }
+  R(g,-9,-32+yb,18,17,GC.dress); R(g,-10,-20+yb,20,4,GC.dress); R(g,-10,-17+yb,20,1,GC.dressD);
+  if(back){ if(F.cape) R(g,-10,-44+yb,20,32,GC.cape); R(g,-7,-58+yb,14,16,F.cape?GC.cape:GC.hair); if(!F.cape){ R(g,-9,-46+yb,3,9,GC.hair); R(g,6,-46+yb,3,9,GC.hair); } return; }
+  R(g,-4,-31+yb,8,15,GC.apron); R(g,-7,-40+yb,14,9,'#fff'); R(g,-1,-40+yb,2,2,GC.cape);
+  R(g,-11,-39+ra+yb,3,11,GC.skin); if(has('basket')) basketSprite(g,7,-31+yb); else R(g,8,-39+la+yb,3,11,GC.skin);
+  R(g,-7,-56+yb,14,16,GC.skin); R(g,-7,-41+yb,14,1,GC.skinD);
+  for(const ex of [-4,2]){ R(g,ex,-50+yb,2,3,blink?GC.skin:'#3a2420'); if(!blink) R(g,ex,-50+yb,1,1,'#fff'); } R(g,-6,-45+yb,2,2,'#ff9fb0'); R(g,4,-45+yb,2,2,'#ff9fb0'); R(g,-1,-44+yb,3,1,'#c8505a');
+  if(F.cape){ R(g,-9,-61+yb,18,7,GC.cape); R(g,-10,-56+yb,4,16,GC.cape); R(g,6,-56+yb,4,16,GC.cape); R(g,-7,-55+yb,14,2,GC.hair); R(g,-8,-62+yb,16,1,'#ff4a52'); }
+  else { R(g,-8,-59+yb,16,6,GC.hair); R(g,-9,-54+yb,3,10,GC.hair); R(g,6,-54+yb,3,10,GC.hair); R(g,-11,-45+yb,3,8,GC.hair); R(g,8,-45+yb,3,8,GC.hair); } }
+function wolfPaint(g,mood){ const k=mood==='run'?Math.round(Math.abs(Math.sin(T*14))*3):Math.round(Math.abs(Math.sin(T*2))); const c='#8a94a3', d='#7d8796', l='#dfe3e8';
+  R(g,-16,-30-k,10,6,c); R(g,-20,-34-k,6,6,c); R(g,-22,-36-k,3,3,'#e8ecf0');
+  R(g,-7,-16,6,16,d); R(g,2,-16,6,16,d); R(g,-8,-2,8,2,'#4a5260'); R(g,1,-2,8,2,'#4a5260');
+  R(g,-9,-44-k,19,30,c); R(g,-3,-40-k,10,22,l); R(g,-12,-42-k,4,16,d); R(g,9,-42-k,4,16,d);
+  R(g,-8,-62-k,17,18,c); R(g,8,-55-k,12,8,c); R(g,10,-48-k,10,2,l); R(g,18,-56-k,3,3,'#2a2a33');
+  R(g,-7,-70-k,5,9,c); R(g,4,-70-k,5,9,c); R(g,-6,-68-k,3,6,'#f5b8c4'); R(g,5,-68-k,3,6,'#f5b8c4');
+  R(g,3,-58-k,4,4,'#fff'); R(g,4,-57-k,2,2,'#2a2a33');
+  if(mood==='sad'){ R(g,2,-60-k,5,1,'#4a5260'); R(g,7,-52-k,1,3,'#7fd0ff'); } else if(mood==='happy'){ R(g,12,-48-k,7,1,'#c8505a'); R(g,13,-47-k,5,1,'#c8505a'); R(g,-6,-58-k,4,2,'#ff9fb0'); }
+  else { R(g,12,-48-k,6,1,'#4a5260'); R(g,13,-47-k,1,1,'#fff'); R(g,16,-47-k,1,1,'#fff'); } }
+function bunnyPaint(g,happy){ const hop=happy?Math.round(Math.abs(Math.sin(T*6))*6):0; g.translate(0,-hop);
+  R(g,-8,-12,14,12,'#ffffff'); disc(g,-8,-8,3,'#ffffff'); R(g,1,-20,10,9,'#ffffff'); R(g,2,-31,3,11,'#ffffff'); R(g,7,-31,3,11,'#ffffff'); R(g,3,-30,1,8,'#ffb8c8'); R(g,8,-30,1,8,'#ffb8c8');
+  R(g,7,-16,1,2,'#2a2a33'); R(g,10,-14,1,1,'#ff7fa0'); if(!happy) R(g,7,-13,1,3,'#7fd0ff'); else R(g,8,-13,2,1,'#c8505a'); }
+function chick(g){ R(g,-4,-6,8,6,'#ffffff'); R(g,2,-9,4,4,'#ffffff'); R(g,3,-10,2,1,'#e0262f'); R(g,6,-7,1,1,'#ffa030'); R(g,4,-8,1,1,'#2a2a33'); R(g,-2,0,1,0,'#ffa030'); }
+
+/* ---------- storybook helpers ---------- */
+function treeP(g,x,y,s){ R(g,x-2*s,y-20*s,4*s,20*s,'#8a5a36'); R(g,x-2*s,y-20*s,1*s,20*s,'#6e4428'); disc(g,x,y-28*s,11*s,'#5cb85c'); disc(g,x-7*s,y-22*s,8*s,'#5cb85c'); disc(g,x+7*s,y-23*s,8*s,'#5cb85c'); disc(g,x-3*s,y-32*s,6*s,'#7fd46e'); disc(g,x+4*s,y-28*s,4*s,'#7fd46e'); }
+function pineP(g,x,y,s,c1,c2){ R(g,x-2,y-10,4,10,'#7a4e2e'); for(let i=0;i<4;i++){ const w=(16-i*3)*s; for(let k=0;k<8*s;k++) R(g,x-w/2*(k/(8*s))-1,y-10-i*7*s-k,w*(k/(8*s))+2,1,k%3?c1:c2); } }
+function grassFloor(g,w,y0,hz,vx,path){ floorFill(g,[[0,y0],[w,y0],[w,180],[0,180]],hz,vx,50,3000,(X,Z,x,y)=>{ if(path&&Math.abs(X-(path(Z)||0))<12) return hash2(x>>1,y>>1)>.8?[220,191,130]:[236,211,154];
+  const n=hash2(x,y); if(n>.985) return [[255,143,176],[255,240,102],[255,255,255],[200,160,255]][(x*7+y)%4]; return n>.6?[116,187,76]:n<.15?[154,216,106]:[134,204,92]; }); }
+function skyHills(g,w,c1,c2){ for(let y=0;y<100;y++){ const k=y/100; R(g,0,y,w,1,'rgb('+Math.round(lerp(c1[0],c2[0],k))+','+Math.round(lerp(c1[1],c2[1],k))+','+Math.round(lerp(c1[2],c2[2],k))+')'); } }
+
+/* ---------- HOME ---------- */
+SC.home={ w:320, far:126, near:176, sFar:.72,
+  bg(g,w){ const RM=room1(g,w,{bx0:60,bx1:260,by0:22,by1:114,vx:160,vy:44,ceil:'#a8703e',left:'#e8bd8a',right:'#e8bd8a',back:'#f2c99a',S1:40,S2:7000,
+      floor:(X,Z)=>{ const fz=Z/4; if(frac(X/14)<.05) return [168,112,62]; return (Math.floor(fz+Math.floor(X/14)*.5)&1)?[201,138,79]:[190,128,70]; }});
+    for(let y=28;y<114;y+=9) R(g,60,y,200,1,'#e0b07c'); for(let x=80;x<260;x+=60) R(g,x,22,4,92,'#d89a62');
+    R(g,120,40,36,30,'#8a5a36'); R(g,122,42,32,26,'#9fdcff'); R(g,122,58,32,10,'#8fd06a'); disc(g,146,48,3,'#fff3a0'); R(g,137,42,2,26,'#8a5a36'); R(g,122,54,32,2,'#8a5a36'); R(g,116,38,8,36,'#ff8fa3'); R(g,152,38,8,36,'#ff8fa3');
+    R(g,70,46,36,3,'#8a5a36'); for(let i=0;i<4;i++) R(g,72+i*8,36,6,10,['#ff9fb0','#9fd0ff','#ffe066','#9ad46a'][i]);
+    R(g,206,60,40,54,'#b8b0a8'); for(let y=62;y<114;y+=7) for(let x=206+((y/7)%2)*6;x<244;x+=12) R(g,x,y,11,6,'#a8a098'); R(g,202,56,48,6,'#8a5a36'); R(g,214,86,24,28,'#3a2a26');
+    const wl=RM.wallL, wr=RM.wallR; wallQuad(g,'L',30,40,.38,.42,wl,'#8a5a36');
+    wallQuad(g,'R',276,306,.32,1,wr,'#2f8f5f'); wallQuad(g,'R',279,303,.35,1,wr,'#3fae6e'); wallQuad(g,'R',282,300,.42,.6,wr,'#9fdcff');
+    floorFill(g,[[110,150],[210,150],[220,172],[100,172]],44,160,40,7000,(X,Z)=>(Math.floor(X/4)&1)?[224,90,100]:[255,138,146]); },
+  walk:[[70,126],[250,126],[300,177],[20,177]], block:[[124,128,72,16]],
+  anim(g){ for(let i=0;i<6;i++){ const f=Math.sin(T*9+i)*2; R(g,218+i*3,104-Math.abs(f)-i%3*2,3,10+f,['#ff8a2a','#ffd34d','#ff5a2a'][i%3]); } },
+  props(){ const L=[];
+    if(!F.cape) L.push({y:116,draw(g){ R(g,34,62,12,22,'#e0262f'); R(g,33,62,14,4,'#ff4a52'); }});
+    L.push({y:146,draw(g){ shadowE(g,160,147,40,3,.2); R(g,122,124,76,4,'#a8703e'); R(g,124,128,4,18,'#8a5a36'); R(g,192,128,4,18,'#8a5a36'); R(g,120,118,80,7,'#ffffff'); for(let x=120;x<200;x+=6) R(g,x,118,3,7,'#e0262f');
+      if(!F.basket){ R(g,140,112,18,5,'#c98a4f'); R(g,140,110,18,2,'#e0262f'); disc(g,149,110,4,'#e8a868'); } if(!F.cookies){ R(g,170,114,16,2,'#ffffff'); disc(g,174,112,2,'#e8b060'); disc(g,179,112,2,'#f0c070'); disc(g,184,112,2,'#e8b060'); } }});
+    L.push({y:118,draw(g){ actor(g,gg=>{ R(gg,-8,-6,14,6,'#f0a050'); R(gg,4,-10,6,6,'#f0a050'); R(gg,4,-12,2,2,'#f0a050'); R(gg,8,-12,2,2,'#f0a050'); R(gg,6,-8,1,1,'#3a2420'); },244,118,.8); }});
+    L.push({y:140,draw(g){ actor(g,gg=>person(gg,{skin:'#ffe3cf',hair:'#7a4a2a',hs:'bun',top:'#3fae6e',bottom:'#3fae6e',apron:'#ffffff',dress:true,view:'front',bob:1.2,blush:true,seed:1}),232,140,scl(140)); }});
+    return L; },
+  hs:[
+    {id:'hook',n:'Κόκκινη κάπα',rect:[28,56,24,32],at:[60,140],face:'left',act(){ if(F.cape) return say(['Η κρεμάστρα είναι άδεια. Η κάπα είναι πάνω σου!']); F.cape=1; star('cape'); say(['Η Κοκκινοσκουφίτσα φοράει την αγαπημένη της κόκκινη κάπα.','Κοκκινοσκουφίτσα: «Τι ωραία που είναι!»']); }},
+    {id:'table',n:'Τραπέζι',rect:[118,104,84,42],at:[160,154],face:'back',act(){
+      if(!F.basket) return say(['Πάνω στο τραπέζι μυρίζει ζεστή μηλόπιτα!','Ας ρωτήσουμε τη μαμά τι να κάνουμε.']);
+      if(!F.cookies){ F.cookies=1; give('cookies'); star('cookies'); return say(['Η Κοκκινοσκουφίτσα βάζει και κουλουράκια στο καλάθι.','Κοκκινοσκουφίτσα: «Η γιαγιά τα λατρεύει!»']); }
+      say(['Το τραπέζι είναι άδειο. Όλα τα καλούδια είναι στο καλάθι!']); }},
+    {id:'cat',n:'Γατούλα',rect:[234,106,18,14],at:[236,130],face:'back',act(){ sfx('meow'); say(['Νιάου! Η γατούλα χουζουρεύει δίπλα στη φωτιά.']); }},
+    {id:'mom',n:'Μαμά',rect:()=>npcRect(232,140,scl(140)),at:[214,148],face:'right',act(){
+      if(!F.cape) return say(['Μαμά: «Καλημέρα, αγάπη μου! Η γιαγιά είναι λίγο άρρωστη.»','Μαμά: «Φόρεσε πρώτα την κόκκινη κάπα σου. Είναι κρεμασμένη δίπλα στο ράφι.»']);
+      if(!F.basket){ F.basket=1; give('basket'); star('basket'); return say(['Μαμά: «Τι όμορφη που είσαι! Πάρε αυτό το καλάθι με τη μηλόπιτα για τη γιαγιά.»','Μαμά: «Βάλε μέσα και κουλουράκια από το τραπέζι.»']); }
+      if(!F.cookies) return say(['Μαμά: «Μην ξεχάσεις τα κουλουράκια στο τραπέζι!»']);
+      say(['Μαμά: «Να προσέχεις! Μη μιλάς με αγνώστους και μη φεύγεις από το μονοπάτι.»','Κοκκινοσκουφίτσα: «Το υπόσχομαι, μαμά!»']); }},
+    {id:'door',n:'Πόρτα',rect:[274,60,36,116],at:[290,156],face:'right',act(){
+      if(!F.basket||!F.cookies) return say(['Μαμά: «Περίμενε! Πρώτα ετοιμάζουμε το καλάθι για τη γιαγιά.»']);
+      if(!F.advice){ F.advice=1; return say(['Μαμά: «Να προσέχεις! Μη μιλάς με αγνώστους και μη φεύγεις από το μονοπάτι.»','Κοκκινοσκουφίτσα: «Το υπόσχομαι, μαμά! Γεια σου!»'],()=>go('meadow','home')); }
+      go('meadow','home'); }},
+  ],
+  entries:{start:[90,150,'front'], meadow:[286,156,'side',-1]} };
+
+/* ---------- MEADOW ---------- */
+SC.meadow={ w:520, far:122, near:176, sFar:.6, outdoor:true, sun:[300,26],
+  bg(g,w){ const r=rng(4); skyHills(g,w,[143,213,255],[226,246,255]); for(let i=0;i<6;i++) cloud(g,20+i*90+r()*30,14+r()*24,1+r()*.4);
+    for(let x=0;x<w;x++){ const h=22+8*Math.sin(x*.012+.4)+4*Math.sin(x*.04); R(g,x,112-h,1,h+8,'#a8dc78'); const h2=12+6*Math.sin(x*.02+2); R(g,x,116-h2,1,h2+8,'#8fd06a'); }
+    R(g,8,76,50,40,'#fff3dd'); poly(g,[[2,78],[33,58],[64,78]],'#e0262f'); R(g,26,94,12,22,'#3fae6e'); R(g,12,86,10,8,'#9fdcff');
+    treeP(g,90,118,1.1); treeP(g,380,114,1); treeP(g,460,116,1.2);
+    grassFloor(g,w,116,30,260,Z=>Math.sin(Z*.08)*10); },
+  walk:[[8,124],[500,124],[512,177],[8,177]], block:[[470,118,50,60]],
+  anim(g){ for(let i=0;i<3;i++){ const bx=(i*180+T*12)%560-20, by=60+Math.sin(T*2+i)*10, f=Math.sin(T*12+i)>0; R(g,bx,by,1,3,'#3a2420'); R(g,bx-(f?3:2),by-1,f?3:2,3,['#ff8fb0','#ffe066','#9fd0ff'][i]); R(g,bx+1,by-1,f?3:2,3,['#ff8fb0','#ffe066','#9fd0ff'][i]); } },
+  props(){ const L=[], FL=[[140,150,'#ff5a8a'],[200,134,'#ffd34d'],[330,160,'#a070ff']];
+    FL.forEach(([fx,fy,c],i)=>{ if(!F['fl'+i]) L.push({y:fy,draw(g){ R(g,fx,fy-12,2,12,'#3f9a3f'); disc(g,fx+1,fy-14,4,c); disc(g,fx+1,fy-14,1,'#fff3a0'); R(g,fx-2,fy-6,3,2,'#3f9a3f'); }}); });
+    if(!F.carrot&&!F.bunny) L.push({y:138,draw(g){ ell(g,262,138,7,2,'#8a5a36'); R(g,261,128,2,8,'#3f9a3f'); R(g,258,129,2,6,'#5cb85c'); R(g,264,129,2,6,'#5cb85c'); R(g,259,136,6,3,'#ff8a2a'); }});
+    L.push({y:146,draw(g){ actor(g,gg=>bunnyPaint(gg,!!F.bunny),F.bunny?412+Math.sin(T*2)*8:412,146,scl(146)); }});
+    if(!F.bunny) L.push({y:176,draw(g){ for(let i=0;i<10;i++){ disc(g,480+(i%3)*14,128+Math.floor(i/3)*14,12,'#3f9a3f'); disc(g,482+(i%3)*14,125+Math.floor(i/3)*14,7,'#5cb85c'); } }});
+    else L.push({y:176,draw(g){ disc(g,470,132,12,'#3f9a3f'); disc(g,514,132,12,'#3f9a3f'); }});
+    return L; },
+  hs:[
+    {id:'back',n:'Σπίτι',rect:[0,60,64,64],at:[24,130],face:'back',act(){ go('home','meadow'); }},
+    {id:'f0',n:'Λουλουδάκι',rect:[132,130,18,22],at:[130,156],face:'right',act(){ pickFlower(0); }},
+    {id:'f1',n:'Λουλουδάκι',rect:[192,114,18,22],at:[190,140],face:'right',act(){ pickFlower(1); }},
+    {id:'f2',n:'Λουλουδάκι',rect:[322,140,18,22],at:[320,166],face:'right',act(){ pickFlower(2); }},
+    {id:'carrot',n:'Καρότο',rect:[252,122,20,20],at:[262,148],face:'back',act(){ if(F.carrot||F.bunny) return say(['Εδώ ήταν το καρότο.']); F.carrot=1; give('carrot'); sfx('pop'); say(['Ωπ! Η Κοκκινοσκουφίτσα τραβάει ένα μεγάλο καρότο από το χώμα!']); }},
+    {id:'bunny',n:'Λαγουδάκι',rect:[396,116,34,32],at:[392,152],face:'right',act(){
+      if(F.bunny) return say(['Λαγουδάκι: «Ευχαριστώ, φίλη μου! Το μονοπάτι για τη γιαγιά είναι από εκεί!»']);
+      F.bunnyMet=1; say(['Λαγουδάκι: «Ουουου… Πεινάω πολύ και δεν βρίσκω ούτε ένα καρότο!»', F.carrot?'Κοκκινοσκουφίτσα: «Έχω ένα καρότο στο καλάθι μου!»':'Κοκκινοσκουφίτσα: «Μην κλαις, λαγουδάκι! Θα σου βρω εγώ ένα.»']); },
+      item(i){ if(i==='carrot'&&!F.bunny){ take('carrot'); F.bunny=1; star('bunny'); sfx('yay'); buildGrid2(); say(['Λαγουδάκι: «Ένα καρότο! Ευχαριστώ, ευχαριστώ!»','Το λαγουδάκι χοροπηδάει από τη χαρά του και ανοίγει δρόμο μέσα από τους θάμνους!']); return true; } }},
+    {id:'bush',n:'Θάμνοι',rect:[466,112,54,66],at:[460,150],face:'right',act(){ if(!F.bunny) return say(['Οι θάμνοι είναι πολύ πυκνοί. Δεν μπορούμε να περάσουμε.','Μήπως ξέρει κάποιος ένα μυστικό περασματάκι;']); go('forest','meadow'); }},
+  ],
+  entries:{start:[200,150,'front'], home:[30,140,'front'], forest:[456,150,'side',-1]} };
+function buildGrid2(){ SC.meadow.block=F.bunny?[]:[[470,118,50,60]]; buildGrid(SC.meadow); }
+function pickFlower(i){ if(F['fl'+i]) return; F['fl'+i]=1; sfx('pop'); const n=[0,1,2].filter(k=>F['fl'+k]).length;
+  if(n===1){ give('flowers'); say(['Ένα λουλουδάκι για τη γιαγιά! Ας μαζέψουμε κι άλλα.']); } else if(n===2) say(['Δύο λουλουδάκια! Ακόμα ένα!']); else { star('flowers'); say(['Τρία λουλουδάκια! Τι όμορφο μπουκέτο!']); } }
+
+/* ---------- FOREST ---------- */
+SC.forest={ w:520, far:122, near:176, sFar:.6, outdoor:true, sun:[60,10],
+  bg(g,w){ const r=rng(8); skyHills(g,w,[184,230,200],[230,246,220]); R(g,0,94,w,26,'#7cc864'); for(let x=0;x<w;x+=3) R(g,x,94+((x*7)%5),2,2,'#6fbf55');
+    for(let i=0;i<16;i++) pineP(g,r()*w,120,1+r()*.6,'#5aa86a','#4a9a5c'); for(let i=0;i<8;i++) treeP(g,20+i*66+r()*20,122,1.2);
+    floorFill(g,[[0,118],[w,118],[w,180],[0,180]],30,260,50,3000,(X,Z,x,y)=>{ if(Z>30&&Z<36){ if(Math.abs(X)<10) return (Math.floor(X/2.5)&1)?[201,138,79]:[168,112,62]; const n=hash2(x,y); return n>.9?[159,220,255]:[90,176,240]; }
+      if(Math.abs(X-Math.sin(Z*.07)*8)<11) return hash2(x>>1,y>>1)>.8?[220,191,130]:[236,211,154]; const n=hash2(x,y); return n>.7?[95,174,72]:n<.12?[134,204,92]:[111,191,85]; });
+    for(const mx of [60,180,400,470]){ R(g,mx-1,154,3,4,'#fff3dd'); R(g,mx-4,151,9,3,'#e0262f'); R(g,mx-2,151,1,1,'#fff'); R(g,mx+2,152,1,1,'#fff'); } },
+  walk:[[8,124],[512,124],[512,177],[8,177]], block:[[110,128,40,16]],
+  anim(g){ for(let i=0;i<4;i++){ const sx=((T*12+i*40)%480); R(g,sx,142+i*3,5,1,'#ffffff'); } },
+  props(){ const L=[];
+    L.push({y:144,draw(g){ disc(g,120,134,10,'#3f9a3f'); disc(g,136,132,11,'#4fa84f'); if(!F.berries) for(let i=0;i<7;i++) disc(g,114+(i*7)%30,128+(i*5)%12,2,'#e0262f'); }});
+    if(!F.wolfRun) L.push({y:150,draw(g){ actor(g,gg=>wolfPaint(gg,'sly'),330,150,scl(150),true); }});
+    else if(S.wolfX<760) L.push({y:150,draw(g){ actor(g,gg=>wolfPaint(gg,'run'),S.wolfX,150,scl(150)); }});
+    return L; },
+  hs:[
+    {id:'back',n:'Πίσω στο λιβάδι',rect:[0,60,10,120],at:[10,152],face:'left',act(){ go('meadow','forest'); }},
+    {id:'berries',n:'Φραουλίτσες',rect:[108,118,40,26],at:[128,152],face:'back',act(){ if(F.berries) return say(['Τις μαζέψαμε όλες!']); F.berries=1; give('berries'); star('berries'); sfx('pop'); say(['Φραουλίτσες του δάσους! Μπαίνουν κι αυτές στο καλάθι.']); }},
+    {id:'stream',n:'Ρυάκι',rect:[0,128,520,14],at:null,act(){ sfx('splash'); say(['Το ρυάκι κελαρύζει κάτω από το γεφυράκι. Γλου γλου γλου!']); }},
+    {id:'wolf',n:'Λύκος',rect:()=>F.wolfRun?[0,0,0,0]:npcRect(330,150,scl(150)),at:[300,154],face:'right',act(){ meetWolf(); }},
+    {id:'next',n:'Στο σπίτι της γιαγιάς',rect:[506,60,14,120],at:[510,150],face:'right',act(){ if(!F.wolfMet) return meetWolf(); go('outside','forest'); }},
+  ],
+  entries:{meadow:[20,150,'side',1], outside:[500,150,'side',-1]} };
+function meetWolf(){ if(F.wolfAsk) return; F.wolfAsk=1; S.path=[]; sfx('wolf');
+  say(['Ξαφνικά, πίσω από ένα δέντρο, εμφανίζεται ένας μεγάλος γκρίζος λύκος!','Λύκος: «Καλημέρα, μικρούλα! Πού πηγαίνεις με αυτό το ωραίο καλάθι;»'],()=>
+    choose('Τι λέει η Κοκκινοσκουφίτσα;',[
+      {t:'«Η μαμά λέει να μη μιλάω με αγνώστους!»',f:()=>{ F.wolfMet=1; star('wolf'); say(['Κοκκινοσκουφίτσα: «Η μαμά λέει να μη μιλάω με αγνώστους!»','Μπράβο! Έτσι είπε η μαμά.','Λύκος: «Χμ! Μυρίζει μηλόπιτα… Θα πάει σίγουρα στη γιαγιά της!»','Και ο λύκος τρέχει γρήγορα μέσα στο δάσος!'],()=>{ S.wolfX=330; F.wolfRun=1; }); }},
+      {t:'«Πάω στη γιαγιά μου!»',f:()=>{ F.wolfMet=1; star('wolf'); say(['Κοκκινοσκουφίτσα: «Πάω στη γιαγιά μου, στο σπιτάκι με τα λουλούδια!»','Λύκος: «Α, στη γιαγιά! Τι ωραία… Πρέπει να φύγω! Γεια!»','Ωχ! Η μαμά είπε να μη μιλάμε με αγνώστους. Την επόμενη φορά θα το θυμόμαστε!','Και ο λύκος τρέχει γρήγορα μέσα στο δάσος!'],()=>{ S.wolfX=330; F.wolfRun=1; }); }},
+    ])); }
+
+/* ---------- OUTSIDE ---------- */
+SC.outside={ w:440, far:122, near:176, sFar:.62, outdoor:true, sun:[360,18], warm:.25,
+  bg(g,w){ const r=rng(12); skyHills(g,w,[255,214,168],[255,241,214]); for(let i=0;i<3;i++) cloud(g,30+i*140,16+r()*20,1.2);
+    for(let x=0;x<w;x++){ const h=18+6*Math.sin(x*.015+1.4); R(g,x,116-h,1,h+6,'#a8dc78'); }
+    R(g,220,50,140,70,'#fff3dd'); for(let y=56;y<120;y+=8) R(g,220,y,140,1,'#f0e0c4'); for(let i=0;i<30;i++) R(g,212+i*2.6,50-i*1.6,156-i*5.2,2,i%2?'#d8403a':'#e0574f'); R(g,320,10,14,30,'#b8b0a8'); R(g,318,8,18,4,'#8a5a36');
+    R(g,276,72,28,48,'#8a5a36'); R(g,278,74,24,46,'#a8703e'); disc(g,290,88,6,'#ffe066'); R(g,297,98,2,2,'#ffd34d');
+    for(const wx of [238,326]){ R(g,wx-2,68,22,22,'#8a5a36'); R(g,wx,70,18,18,'#9fdcff'); R(g,wx+8,70,2,18,'#8a5a36'); R(g,wx-2,90,22,4,'#a8703e'); for(let i=0;i<5;i++){ R(g,wx+i*4,86,2,4,'#3f9a3f'); disc(g,wx+1+i*4,85,1,i%2?'#ff8fb0':'#fff066'); } }
+    for(let x=0;x<200;x+=10){ R(g,x,98,3,22,'#fff3dd'); } R(g,0,104,200,2,'#fff3dd'); R(g,0,112,200,2,'#fff3dd');
+    grassFloor(g,w,120,30,290,()=>0); treeP(g,410,124,1.4); },
+  walk:[[8,124],[432,124],[432,177],[8,177]], block:[[80,126,50,14]],
+  anim(g){ for(let i=0;i<4;i++){ const p=(T*.4+i*.25)%1; g.globalAlpha=.7*(1-p); disc(g,327+Math.sin(T+i)*4,8-p*24,3+Math.round(p*4),'#ffffff'); } g.globalAlpha=1; },
+  props(){ const L=[];
+    L.push({y:138,draw(g){ shadowE(g,104,139,26,3,.2); for(let i=0;i<5;i++){ R(g,82,134-i*6,44,6,'#a8703e'); disc(g,126,137-i*6,3,'#e8c08a'); R(g,82,134-i*6,44,1,'#c88a52'); } }});
+    L.push({y:146,draw(g){ actor(g,gg=>person(gg,{skin:'#ffe3cf',hair:'#7a4a2a',hs:'cap',cap:'#a8703e',top:'#3f9a5a',stripe:'#2f7a46',bottom:'#4a5a8a',beard:'#7a4a2a',view:'front',bob:.8,seed:2}),150,146,scl(146)); }});
+    for(let i=0;i<2;i++) L.push({y:160+i*8,draw(g){ actor(g,chick,380+i*22+Math.sin(T*1.5+i)*6,160+i*8,scl(160)); }});
+    return L; },
+  hs:[
+    {id:'back',n:'Πίσω στο δάσος',rect:[0,60,10,120],at:[10,152],face:'left',act(){ go('forest','outside'); }},
+    {id:'wood',n:'Ξυλοκόπος',rect:()=>npcRect(150,146,scl(146)),at:[168,152],face:'left',act(){
+      if(F.whistle) return say(['Ξυλοκόπος: «Αν χρειαστείς βοήθεια, φύσα τη σφυρίχτρα. Θα είμαι εδώ!»']);
+      F.whistle=1; give('whistle'); star('whistle'); say(['Ξυλοκόπος: «Γεια σου, Κοκκινοσκουφίτσα! Πας στη γιαγιά σου;»','Ξυλοκόπος: «Είδα έναν λύκο να τρέχει προς τα εδώ. Πάρε αυτή τη σφυρίχτρα.»','Ξυλοκόπος: «Αν χρειαστείς βοήθεια, φύσα τη δυνατά και θα έρθω αμέσως!»']); }},
+    {id:'chicks',n:'Κοτούλες',rect:[370,146,46,24],at:[370,170],face:'right',act(){ sfx('cluck'); say(['Κοκοκό! Οι κοτούλες της γιαγιάς ψάχνουν σποράκια.']); }},
+    {id:'door',n:'Πόρτα της γιαγιάς',rect:[274,70,32,50],at:[290,130],face:'back',act(){
+      if(!F.whistle) return say(['Ας πούμε πρώτα καλημέρα στον ξυλοκόπο!']);
+      sfx('knock'); say(['Τοκ τοκ τοκ!','Λύκος με ψιλή φωνή: «Ποιος είναι;»','Κοκκινοσκουφίτσα: «Εγώ είμαι, γιαγιά! Σου έφερα μηλόπιτα!»','Λύκος με ψιλή φωνή: «Τράβα το κορδονάκι και μπες μέσα, χρυσό μου!»','Χμμ… Η φωνή της γιαγιάς ακούγεται λίγο παράξενη.'],()=>go('bedroom','outside')); }},
+  ],
+  entries:{forest:[20,150,'side',1], bedroom:[290,134,'front']} };
+
+/* ---------- BEDROOM ---------- */
+SC.bedroom={ w:320, far:126, near:176, sFar:.72,
+  bg(g,w){ const RM=room1(g,w,{bx0:70,bx1:250,by0:24,by1:114,vx:160,vy:44,ceil:'#c98a4f',left:'#ffe8b8',right:'#ffe8b8',back:'#fff0c8',S1:40,S2:7000,
+      floor:(X,Z)=>{ const fz=Z/4; if(frac(X/14)<.05) return [168,112,62]; return (Math.floor(fz+Math.floor(X/14)*.5)&1)?[201,138,79]:[190,128,70]; }});
+    for(let y=30;y<106;y+=12) for(let x=74+((y/12)%2)*8;x<248;x+=16){ R(g,x,y,2,2,'#ffb8c8'); R(g,x+1,y+2,1,2,'#9ad46a'); } R(g,70,96,180,18,'#ffe3a8'); R(g,70,96,180,2,'#c98a4f');
+    R(g,150,38,36,30,'#8a5a36'); R(g,152,40,32,26,'#9fdcff'); R(g,152,56,32,10,'#8fd06a'); R(g,167,40,2,26,'#8a5a36'); R(g,146,36,8,34,'#ff8fa3'); R(g,182,36,8,34,'#ff8fa3');
+    const wl=RM.wallL; wallQuad(g,'L',8,40,.3,1,wl,'#8a5a36'); wallQuad(g,'L',11,37,.33,1,wl,'#a8703e');
+    R(g,252,90,24,24,'#a8703e'); R(g,256,80,16,10,'#c98a4f'); R(g,258,74,12,4,'#fff3a0'); disc(g,264,72,4,'#fff6c0'); },
+  walk:[[80,126],[240,126],[300,177],[20,177]], block:[[178,118,80,26],[60,128,50,20]],
+  anim(g){},
+  props(){ const L=[], sh=!F.granOut?Math.round(Math.sin(T*20)*(Math.sin(T*1.3)>.6?1:0)):0;
+    L.push({y:150,draw(g){ shadowE(g,84,151,30,3,.2); if(!F.granOut){ R(g,58+sh,62,54,88,'#8a5a36'); R(g,60+sh,64,50,84,'#b07a4a'); R(g,84+sh,64,2,84,'#8a5a36'); disc(g,80+sh,104,2,'#ffd34d'); disc(g,90+sh,104,2,'#ffd34d'); }
+      else { R(g,58,62,54,88,'#8a5a36'); R(g,60,64,24,84,'#4a3020'); R(g,86,64,24,84,'#b07a4a'); R(g,36,64,24,84,'#b07a4a'); } }});
+    L.push({y:144,draw(g){ shadowE(g,218,145,44,3,.2); R(g,176,96,8,48,'#8a5a36'); R(g,250,108,6,36,'#8a5a36'); poly(g,[[182,124],[252,120],[256,140],[178,144]],'#ffffff'); for(let i=0;i<8;i++) for(let j=0;j<2;j++) R(g,184+i*9,126+j*8,9,8,['#ff8fb0','#9fd0ff','#ffe066','#9ad46a','#c8a0ff'][(i+j*2)%5]);
+      if(!F.revealed){ R(g,198,108,18,16,'#8a94a3'); R(g,214,114,12,7,'#8a94a3'); R(g,224,113,3,3,'#2a2a33'); R(g,196,102,22,8,'#ffd6e6'); disc(g,193,104,3,'#ff9fc0'); R(g,208,111,7,4,'#5a3a2a'); R(g,209,112,5,2,'#dff4ff'); R(g,183,118,30,4,'#ffffff'); } }});
+    if(F.revealed) L.push({y:S.party?152:150,draw(g){ actor(g,gg=>wolfPaint(gg,F.friend?'happy':F.woodIn?'sad':'sly'),S.party?200:238,S.party?152:150,scl(150),true); }});
+    if(F.woodIn) L.push({y:156,draw(g){ actor(g,gg=>person(gg,{skin:'#ffe3cf',hair:'#7a4a2a',hs:'cap',cap:'#a8703e',top:'#3f9a5a',stripe:'#2f7a46',bottom:'#4a5a8a',beard:'#7a4a2a',view:S.party?'front':'side',seed:2}),S.party?262:40,156,scl(156)); }});
+    if(F.granOut) L.push({y:158,draw(g){ actor(g,gg=>person(gg,{h:50,skin:'#ffe3cf',hair:'#f4f4f4',hs:'bun',top:'#c8a0ff',bottom:'#7a5aa8',dress:true,glasses:true,blush:true,view:'front',bob:S.party?3:0,seed:3}),S.party?140:110,158,scl(158)); }});
+    if(S.party) L.push({y:170,draw(g){ R(g,150,150,40,4,'#a8703e'); disc(g,170,146,6,'#e8a868'); for(let i=0;i<14;i++){ const cx=(i*41+T*30)%320, cy=(i*23+T*50)%150; R(g,cx,cy,2,3,['#ff5a8a','#ffd34d','#5ab0f0','#8fd06a'][i%4]); } }});
+    return L; },
+  hs:[
+    {id:'out',n:'Έξω',rect:[6,60,34,116],at:[30,160],face:'left',act(){ if(F.revealed&&!F.friend) return say(['Όχι τώρα! Πρέπει να βοηθήσουμε τη γιαγιά!']); go('outside','bedroom'); }},
+    {id:'wardrobe',n:'Ντουλάπα',rect:[56,60,58,90],at:[100,156],face:'back',act(){
+      if(F.granOut) return say(['Γιαγιά: «Τι καλά που ήρθες, κοριτσάκι μου!»']);
+      if(!F.woodIn) return say(['Η ντουλάπα τρέμει λίγο… και ακούγεται ένα σιγανό «σσσς!»','Ποιος να είναι μέσα;']);
+      F.granOut=1; star('gran'); sfx('yay'); say(['Η Κοκκινοσκουφίτσα ανοίγει τη ντουλάπα…','Γιαγιά: «Εδώ είμαι! Κρύφτηκα από τον λύκο!»','Κοκκινοσκουφίτσα: «Γιαγιά μου!»','Γιαγιά και εγγονούλα αγκαλιάζονται σφιχτά.']); },
+      item(i){ if(i==='flowers'&&F.granOut){ take('flowers'); sfx('yay'); say(['Γιαγιά: «Λουλούδια για μένα; Τι όμορφα! Σ’ ευχαριστώ, χρυσό μου!»']); return true; } }},
+    {id:'bed',n:'Γιαγιά;',rect:()=>F.revealed?npcRect(S.party?200:238,150,scl(150)):[180,96,76,48],at:[196,154],face:'right',act(){
+      if(!F.revealed) return askWolf();
+      if(F.friend) return say(['Λύκος: «Ευχαριστώ για τα κουλουράκια! Είναι τα καλύτερα του κόσμου!»']);
+      if(!F.woodIn) return say(['Ο λύκος γλείφεται και κοιτάζει το καλάθι.','Ποιος μπορεί να μας βοηθήσει; Τι μας έδωσε ο ξυλοκόπος;']);
+      if(!F.granOut) return say(['Λύκος: «Συγγνώμη… Δεν θα κάνω πια σκανταλιές.»','Πού να είναι άραγε η γιαγιά; Ακούω κάτι μέσα στη ντουλάπα!']);
+      say(['Λύκος: «Πεινάω τόσο πολύ… Από χθες δεν έχω φάει τίποτα.»','Μήπως έχουμε κάτι νόστιμο στο καλάθι για τον λύκο;']); },
+      item(i){ if(!F.revealed) return false;
+        if(i==='cookies'||i==='berries'){ if(!F.woodIn||!F.granOut){ say(['Πρώτα ας βρούμε τη γιαγιά!']); return true; }
+          if(i==='berries'){ take('berries'); say(['Λύκος: «Μμμ, φραουλίτσες! Νόστιμες! Αλλά… μήπως έχεις και κουλουράκια;»']); return true; }
+          take('cookies'); F.friend=1; star('friend'); finale(); return true; }
+        if(i==='basket'){ say(['Η μηλόπιτα είναι για τη γιαγιά! Μήπως έχουμε κάτι άλλο για τον λύκο;']); return true; } }},
+    {id:'window',n:'Παράθυρο',rect:[146,36,44,34],at:[168,134],face:'back',act(){ say(['Από το παράθυρο φαίνεται το δάσος και ο ήλιος που λάμπει.']); }},
+    {id:'lamp',n:'Λαμπίτσα',rect:[250,68,28,46],at:[262,146],face:'right',act(){ say(['Μια μικρή λάμπα σκορπάει ζεστό φως στο δωμάτιο.']); }},
+  ],
+  entries:{outside:[34,160,'side',1]},
+  onEnter(){ if(!F.bSeen){ F.bSeen=1; say(['Το δωμάτιο της γιαγιάς. Η «γιαγιά» είναι ξαπλωμένη στο κρεβάτι, με το σκουφάκι της.','Κάτι δεν πάει καλά… Ας πλησιάσουμε!']); } } };
+function askWolf(){
+  const left=[['eyes','«Γιαγιά, τι μεγάλα μάτια που έχεις!»','Λύκος με ψιλή φωνή: «Για να σε βλέπω καλύτερα, παιδί μου!»'],['ears','«Γιαγιά, τι μεγάλα αυτιά που έχεις!»','Λύκος με ψιλή φωνή: «Για να σε ακούω καλύτερα, παιδί μου!»'],['nose','«Γιαγιά, τι μεγάλη μύτη που έχεις!»','Λύκος με ψιλή φωνή: «Για να μυρίζω καλύτερα τη μηλόπιτα, παιδί μου!»']].filter(q=>!F['q_'+q[0]]);
+  if(!left.length) return reveal();
+  choose('Τι λέει η Κοκκινοσκουφίτσα;',left.map(q=>({t:q[1],f:()=>{ F['q_'+q[0]]=1; sfx('boing'); say([(LANG==='en'?'Little Red: ':'Κοκκινοσκουφίτσα: ')+tr(q[1]),q[2]],()=>{ if(['eyes','ears','nose'].every(k=>F['q_'+k])) reveal(); else after(.3,askWolf); }); }}))); }
+function reveal(){ F.revealed=1; star('ask'); sfx('wolf'); say(['Κοκκινοσκουφίτσα: «Γιαγιά, και τι μεγάλο στόμα που έχεις!»','Λύκος: «Για να φάω… ΤΗ ΜΗΛΟΠΙΤΑ ΣΟΥ!»','Ο λύκος πετάγεται από το κρεβάτι! Δεν είναι η γιαγιά, είναι ο λύκος!','Γρήγορα! Τι μας έδωσε ο ξυλοκόπος; Διάλεξε τη σφυρίχτρα από το καλάθι!']); }
+function blowWhistle(){ sfx('whistle'); if(S.scene!=='bedroom'||!F.revealed||F.woodIn) return say(['Φιιιιιιιτ! Τι δυνατή σφυρίχτρα!']);
+  F.woodIn=1; star('wood'); say(['Φιιιιιιιτ!','Μπαμ! Η πόρτα ανοίγει και μπαίνει ο ξυλοκόπος!','Ξυλοκόπος: «Τι γίνεται εδώ, κύριε Λύκε;»','Λύκος: «Ωχ… Συγγνώμη… Απλώς πεινούσα πολύ…»','Ο λύκος μαζεύεται ντροπαλός σε μια γωνίτσα.']); }
+function finale(){ sfx('yay'); say(['Η Κοκκινοσκουφίτσα δίνει στον λύκο τα κουλουράκια.','Λύκος: «Για μένα; Κανείς δεν μου έχει φερθεί ποτέ τόσο καλά!»','Λύκος: «Συγγνώμη που σας τρόμαξα. Υπόσχομαι να είμαι καλός λύκος!»','Γιαγιά: «Ελάτε όλοι! Η μηλόπιτα είναι ζεστή. Ας φάμε όλοι μαζί!»'],()=>{
+    S.party=1; S.lock=1; S.x=176; S.y=160; S.dir='front'; music('party'); say(['Και έτσι, η γιαγιά, η Κοκκινοσκουφίτσα, ο ξυλοκόπος και ο λύκος έφαγαν μηλόπιτα και τραγούδησαν όλο το απόγευμα.'],()=>after(1.5,ending)); }); }
+function ending(){ fadeTo(1,1,()=>{ S.mode='end'; $('endStars').textContent='★'.repeat(F.stars||0)+'☆'.repeat(Math.max(0,G.maxPts-(F.stars||0))); $('end').hidden=false; setUI(false); clearSave(); S.lock=0; S.party=0; VOICE.speak(tr('Κι έζησαν αυτοί καλά κι εμείς καλύτερα!'),'narrator'); }); }
+function goal(){ const s=S.scene;
+  if(s==='home') return !F.cape?'hook':!F.basket?'mom':!F.cookies?'table':'door';
+  if(s==='meadow'){ for(let i=0;i<3;i++) if(!F['fl'+i]) return 'f'+i; if(!F.bunnyMet) return 'bunny'; if(!F.bunny) return F.carrot?'bunny':'carrot'; return 'bush'; }
+  if(s==='forest') return !F.wolfMet?'wolf':'next';
+  if(s==='outside') return !F.whistle?'wood':'door';
+  if(s==='bedroom'){ if(!F.revealed||!F.woodIn) return 'bed'; if(!F.granOut) return 'wardrobe'; return F.friend?null:'bed'; } return null; }
+const HINTS={ hook:'Ας φορέσουμε την κόκκινη κάπα! Πάτα την κρεμάστρα.', mom:'Ας μιλήσουμε με τη μαμά!', table:'Ας βάλουμε κουλουράκια στο καλάθι! Πάτα το τραπέζι.', door:'Πάμε στη γιαγιά! Πάτα την πόρτα.',
+  f0:'Ας μαζέψουμε λουλουδάκια για τη γιαγιά!', f1:'Ας μαζέψουμε λουλουδάκια για τη γιαγιά!', f2:'Ας μαζέψουμε λουλουδάκια για τη γιαγιά!', bunny:'Το λαγουδάκι είναι λυπημένο. Ας το βοηθήσουμε!', carrot:'Βλέπεις κάτι πορτοκαλί στο χώμα;', bush:'Το λαγουδάκι μάς άνοιξε δρόμο! Πάμε δεξιά!',
+  wolf:'Ας συνεχίσουμε στο μονοπάτι.', next:'Πάμε δεξιά, στο σπίτι της γιαγιάς!', wood:'Ας πούμε καλημέρα στον ξυλοκόπο!', wardrobe:'Κάτι κουνιέται μέσα στη ντουλάπα!' };
+function hintText(){ const gl=goal(); if(S.scene==='bedroom'){ if(!F.revealed) return 'Ας πλησιάσουμε τη «γιαγιά» στο κρεβάτι.'; if(!F.woodIn) return has('whistle')?'Διάλεξε τη σφυρίχτρα από το καλάθι και πάτα τον λύκο!':'Ας ζητήσουμε βοήθεια!'; if(F.granOut&&!F.friend) return 'Ο λύκος πεινάει. Δώσ’ του τα κουλουράκια από το καλάθι!'; }
+  return HINTS[gl]||'Πάτα όπου θέλεις να πάει η Κοκκινοσκουφίτσα!'; }
+/* ---------- speech (device text-to-speech) ---------- */
+const VOICE={ on:true, voice:null, speaking:false, list:[],
+  supported:()=>'speechSynthesis' in window && 'SpeechSynthesisUtterance' in window,
+  pick(){ if(!this.supported()) return; const vs=speechSynthesis.getVoices(); this.list=vs; const want=LANG==='en'?'en':'el';
+    const score=v=>{ const n=(v.name||'').toLowerCase(); let s=0; if(/natural|neural|premium|enhanced|wavenet/.test(n)) s+=6; if(/google/.test(n)) s+=4; if(/melina|nikos|athina|stefanos|siri/.test(n)) s+=3; if(v.localService) s+=1; if(LANG==='en'&&/en-gb/i.test(v.lang)) s+=1; return s; };
+    const c=vs.filter(v=>(v.lang||'').toLowerCase().replace('_','-').startsWith(want)).sort((a,b)=>score(b)-score(a));
+    this.voice=c[0]||null; updateVoiceNote(); },
+  speak(text,who,onend){
+    if(!this.on||!this.supported()){ onend&&onend(false); return; }
+    try{ if(speechSynthesis.speaking||speechSynthesis.pending) speechSynthesis.cancel(); }catch(e){}
+    const clean=text.replace(/[«»"“”]/g,'').replace(/…/g,', ').replace(/\s+/g,' ').trim();
+    if(!clean){ onend&&onend(false); return; }
+    const u=new SpeechSynthesisUtterance(clean);
+    u.lang=LANG==='en'?'en-GB':'el-GR'; if(this.voice) u.voice=this.voice;
+    const p=PITCH[who]||PITCH.narrator; u.pitch=p[0]; u.rate=p[1]; u.volume=1;
+    const id=++this.seq; this.speaking=true; duck(true); $('speak').classList.add('on');
+    let done=false; const t0=performance.now();
+    const fin=(ok)=>{ if(done||id!==this.seq) return; done=true; this.speaking=false; duck(false); $('speak').classList.remove('on'); onend&&onend(ok); };
+    u.onend=()=>fin(performance.now()-t0>clean.length*25); u.onerror=()=>fin(false); setTimeout(()=>fin(false),(clean.length*110)/p[1]+4000);
+    speechSynthesis.speak(u);
+    if(speechSynthesis.paused) speechSynthesis.resume(); },
+  stop(){ this.seq++; this.speaking=false; duck(false); $('speak').classList.remove('on'); try{ if(this.supported()) speechSynthesis.cancel(); }catch(e){} },
+  seq:0 };
+const PITCH={ narrator:[1.05,.9], girl:[1.45,.98], mom:[1.15,.92], wolf:[.55,.86], wolfgran:[1.35,.82], gran:[1.2,.82], bunny:[1.9,1.05], wood:[.75,.88] };
+const SPEAKERS=[
+  {re:/^(Κοκκινοσκουφίτσα|Little Red):\s*/,who:'girl',el:'Κοκκινοσκουφίτσα',en:'Little Red',c:'#e0262f'},
+  {re:/^(Μαμά|Mum):\s*/,who:'mom',el:'Μαμά',en:'Mum',c:'#3fae6e'},
+  {re:/^(Λύκος με ψιλή φωνή|Wolf, in a squeaky voice):\s*/,who:'wolfgran',el:'Λύκος',en:'Wolf',c:'#6d7787'},
+  {re:/^(Λύκος|Wolf):\s*/,who:'wolf',el:'Λύκος',en:'Wolf',c:'#6d7787'},
+  {re:/^(Γιαγιά|Grandma):\s*/,who:'gran',el:'Γιαγιά',en:'Grandma',c:'#9a5ab8'},
+  {re:/^(Λαγουδάκι|Bunny):\s*/,who:'bunny',el:'Λαγουδάκι',en:'Bunny',c:'#e07aa0'},
+  {re:/^(Ξυλοκόπος|Woodcutter):\s*/,who:'wood',el:'Ξυλοκόπος',en:'Woodcutter',c:'#7a5a2a'},
+];
+function parseLine(t){ for(const s of SPEAKERS){ const m=t.match(s.re); if(m) return {who:s.who,name:LANG==='en'?s.en:s.el,col:s.c,text:t.slice(m[0].length)}; } return {who:'narrator',name:'',col:'',text:t}; }
+function updateVoiceNote(){ const el=$('voiceNote'); if(!el) return;
+  if(!VOICE.supported()){ el.textContent=tr('Αυτή η συσκευή δεν υποστηρίζει ανάγνωση φωνής. Η ιστορία συνεχίζει με άγγιγμα.'); return; }
+  if(VOICE.voice) el.textContent=tr('Φωνή:')+' '+VOICE.voice.name+(LANG==='el'?' · '+tr('για πιο φυσική φωνή, κατέβασε τη «βελτιωμένη» ελληνική φωνή από τις ρυθμίσεις του κινητού.'):'');
+  else el.textContent=tr('Δεν βρέθηκε ελληνική φωνή. Πρόσθεσε ελληνική φωνή από τις ρυθμίσεις του κινητού (Προσβασιμότητα → Εκφώνηση).'); }
+if(VOICE.supported()){ VOICE.pick(); speechSynthesis.onvoiceschanged=()=>VOICE.pick(); }
+
+/* ---------- audio + music ---------- */
+const A={ c:null, m:null, mg:null, on:true,
+  init(){ if(this.c){ if(this.c.state==='suspended') this.c.resume(); return; }
+    try{ this.c=new (window.AudioContext||window.webkitAudioContext)(); }catch(e){ return; }
+    const c=this.c; this.m=c.createGain(); this.m.gain.value=this.on?.8:0; this.m.connect(c.destination);
+    this.mg=c.createGain(); this.mg.gain.value=1; this.mg.connect(this.m);
+    const b=c.createBuffer(1,c.sampleRate*2,c.sampleRate), d=b.getChannelData(0); for(let i=0;i<d.length;i++) d[i]=Math.random()*2-1; this.nb=b; },
+  amb(){},
+  setOn(v){ this.on=v; if(this.m) this.m.gain.setTargetAtTime(v?.8:0,this.c.currentTime,.05); },
+  tone(f,dur,o={}){ const c=this.c; if(!c) return; const t=c.currentTime+(o.at||0), osc=c.createOscillator(), g=c.createGain();
+    osc.type=o.type||'triangle'; osc.frequency.setValueAtTime(f,t); if(o.f2) osc.frequency.exponentialRampToValueAtTime(o.f2,t+dur);
+    g.gain.setValueAtTime(.0001,t); g.gain.exponentialRampToValueAtTime(o.vol||.05,t+(o.att||.01)); g.gain.exponentialRampToValueAtTime(.0001,t+dur);
+    osc.connect(g); g.connect(o.mus?this.mg:this.m); osc.start(t); osc.stop(t+dur+.05); },
+  noise(dur,o={}){ const c=this.c; if(!c) return; const t=c.currentTime+(o.at||0), s=c.createBufferSource(), f=c.createBiquadFilter(), g=c.createGain();
+    s.buffer=this.nb; f.type=o.ft||'lowpass'; f.frequency.setValueAtTime(o.ff||1000,t); if(o.ff2) f.frequency.exponentialRampToValueAtTime(o.ff2,t+dur); f.Q.value=o.q||1;
+    g.gain.setValueAtTime(.0001,t); g.gain.exponentialRampToValueAtTime(o.vol||.1,t+(o.att||.003)); g.gain.exponentialRampToValueAtTime(.0001,t+dur);
+    s.connect(f); f.connect(g); g.connect(this.m); s.start(t,Math.random()*Math.max(0,1.8-dur)); s.stop(t+dur+.05); } };
+function duck(on){ if(A.mg) A.mg.gain.setTargetAtTime(on?.3:1,A.c.currentTime,.15); }
+const mf=m=>440*Math.pow(2,(m-69)/12);
+const SONGS={
+  walk:{ step:.26, mel:[72,0,74,76,79,0,76,0,74,0,72,74,76,0,0,0,72,0,74,76,79,0,81,79,77,76,74,0,72,0,0,0], bass:[48,0,0,0,55,0,0,0,53,0,0,0,55,0,0,0,48,0,0,0,57,0,0,0,53,0,55,0,48,0,0,0] },
+  house:{ step:.3, mel:[67,0,72,0,71,0,69,0,67,0,0,0,64,0,0,0,65,0,69,0,67,0,65,0,64,0,0,0,62,0,0,0], bass:[48,0,0,0,52,0,0,0,53,0,0,0,48,0,0,0,50,0,0,0,53,0,0,0,48,0,0,0,43,0,0,0] },
+  party:{ step:.16, mel:[72,76,79,76,72,76,79,84,81,77,74,77,81,77,74,71,72,76,79,76,72,76,79,84,79,77,76,74,72,0,72,0], bass:[48,0,55,0,48,0,55,0,53,0,57,0,50,0,55,0,48,0,55,0,48,0,55,0,55,0,53,0,48,0,48,0] },
+};
+const MU={ song:null, i:0, next:0 };
+function music(name){ if(MU.name===name) return; MU.name=name; MU.song=name?SONGS[name]:null; MU.i=0; MU.next=0; }
+function musicTick(dt){ if(!MU.song||!A.c||!A.on) return; MU.next-=dt; if(MU.next>0) return; const s=MU.song; MU.next+=s.step; if(MU.next<-.3) MU.next=0;
+  const i=MU.i%s.mel.length, m=s.mel[i], b=s.bass[i];
+  if(m) A.tone(mf(m),s.step*2.2,{type:'triangle',vol:.035,mus:1}); if(m&&i%4===0) A.tone(mf(m+12),.25,{type:'sine',vol:.012,mus:1});
+  if(b) A.tone(mf(b),s.step*3,{type:'sine',vol:.06,mus:1}); MU.i++; }
+function sfx(n){ if(!A.c||!A.on) return;
+  switch(n){
+    case 'step': A.tone(rand(200,260),.05,{type:'sine',vol:.03}); break;
+    case 'star': [79,84,88,91].forEach((m,i)=>A.tone(mf(m),.25,{type:'sine',vol:.06,at:i*.07})); break;
+    case 'pop': A.tone(500,.12,{type:'sine',f2:1100,vol:.08}); break;
+    case 'yay': [72,76,79,84].forEach((m,i)=>A.tone(mf(m),.3,{type:'triangle',vol:.06,at:i*.1})); break;
+    case 'meow': A.tone(700,.4,{type:'sine',f2:500,vol:.05,att:.08}); break;
+    case 'wolf': A.tone(220,.9,{type:'sawtooth',f2:420,vol:.025,att:.2}); A.tone(420,.5,{type:'sine',f2:300,vol:.04,at:.7}); break;
+    case 'knock': for(let i=0;i<3;i++) A.noise(.08,{ff:300,vol:.3,at:i*.22}); break;
+    case 'whistle': A.tone(2000,.9,{type:'sine',f2:2300,vol:.06,att:.03}); break;
+    case 'splash': A.noise(.5,{ft:'bandpass',ff:1500,q:.7,vol:.12}); break;
+    case 'cluck': for(let i=0;i<3;i++) A.tone(800,.06,{type:'square',f2:500,vol:.03,at:i*.15}); break;
+    case 'boing': A.tone(180,.35,{type:'sine',f2:520,vol:.07}); break;
+    case 'door': A.tone(300,.2,{type:'triangle',f2:200,vol:.05}); break;
+    case 'tap': A.tone(880,.05,{type:'sine',vol:.03}); break;
+  } }
+
+/* ---------- basket ---------- */
+const basketEl=$('basket');
+function renderBasket(){ basketEl.innerHTML='';
+  S.inv.forEach(id=>{ const b=document.createElement('button'); b.className='it'+(S.sel===id?' on':''); b.setAttribute('aria-label',tr(ITEMS[id].n)); b.appendChild(iconCanvas(id));
+    b.addEventListener('pointerdown',e=>{ e.stopPropagation(); e.preventDefault(); A.init(); if(D.active) return;
+      if(S.sel===id){ S.sel=null; renderBasket(); return; }
+      S.sel=id; sfx('tap'); renderBasket();
+      if(id==='whistle'&&!(S.scene==='bedroom'&&F.revealed&&!F.woodIn)) { VOICE.speak(tr(ITEMS[id].n),'narrator'); return; }
+      if(id==='whistle'){ S.sel=null; renderBasket(); blowWhistle(); return; }
+      VOICE.speak(tr(ITEMS[id].n)+'. '+tr(ITEMS[id].d),'narrator'); });
+    basketEl.appendChild(b); }); }
+
+
+function setVoice(on){ VOICE.on=on; if(!on) VOICE.stop(); document.querySelectorAll('#vRow button[data-v]').forEach(b=>b.setAttribute('aria-pressed',String((b.dataset.v==='1')===on))); savePrefs(); }
+document.querySelectorAll('#vRow button[data-v]').forEach(b=>b.addEventListener('click',e=>{ e.stopPropagation(); setVoice(b.dataset.v==='1'); }));
+$('vTest').addEventListener('click',e=>{ e.stopPropagation(); VOICE.pick(); if(!VOICE.on) setVoice(true); VOICE.speak(tr('Γεια σου! Εγώ είμαι η φωνή που θα σου διαβάζει το παραμύθι.'),'narrator'); });
+$('bSay').addEventListener('click',e=>{ e.stopPropagation(); A.init(); if(D.active&&D.line){ VOICE.speak(D.opts?D.text:D.line.text,D.opts?'narrator':D.line.who); return; } if(S.mode==='play') say([hintText()]); });
+$('bSet').addEventListener('click',e=>{ e.stopPropagation(); A.init(); VOICE.stop(); updateVoiceNote(); openSettings(); });
+/* ---------- walk grid + A* pathfinding ---------- */
+const CELL=4;
+function buildGrid(s){ const gw=Math.ceil(s.w/CELL), gh=Math.ceil(H/CELL), m=new Uint8Array(gw*gh);
+  for(let gy=0;gy<gh;gy++) for(let gx=0;gx<gw;gx++){ const x=gx*CELL+2, y=gy*CELL+2; let ok=inPoly(x,y,s.walk); if(ok) for(const b of s.block) if(x>=b[0]&&x<=b[0]+b[2]&&y>=b[1]&&y<=b[1]+b[3]){ ok=false; break; } m[gy*gw+gx]=ok?1:0; }
+  s.grid={gw,gh,m}; }
+function walkable(s,x,y){ const G=s.grid, gx=Math.floor(x/CELL), gy=Math.floor(y/CELL); return gx>=0&&gy>=0&&gx<G.gw&&gy<G.gh&&G.m[gy*G.gw+gx]===1; }
+function nearestCell(s,x,y){ const G=s.grid; const gx=clamp(Math.floor(x/CELL),0,G.gw-1), gy=clamp(Math.floor(y/CELL),0,G.gh-1); if(G.m[gy*G.gw+gx]) return [gx,gy];
+  for(let r=1;r<70;r++){ let best=null, bd=1e9; for(let dy=-r;dy<=r;dy++) for(let dx=-r;dx<=r;dx++){ if(Math.max(Math.abs(dx),Math.abs(dy))!==r) continue; const cx=gx+dx, cy=gy+dy; if(cx<0||cy<0||cx>=G.gw||cy>=G.gh||!G.m[cy*G.gw+cx]) continue; const d=dx*dx*2.5+dy*dy; if(d<bd){ bd=d; best=[cx,cy]; } } if(best) return best; } return null; }
+function los(s,a,b){ const d=Math.hypot(b[0]-a[0],b[1]-a[1]), n=Math.ceil(d/2); for(let i=1;i<=n;i++){ const t=i/n; if(!walkable(s,a[0]+(b[0]-a[0])*t,a[1]+(b[1]-a[1])*t)) return false; } return true; }
+function findPath(s,sx,sy,tx,ty){
+  const G=s.grid, gw=G.gw, st=nearestCell(s,sx,sy), en=nearestCell(s,tx,ty); if(!st||!en) return [];
+  const N=gw*G.gh, sI=st[1]*gw+st[0], eI=en[1]*gw+en[0], gS=new Float32Array(N).fill(1e9), came=new Int32Array(N).fill(-1), closed=new Uint8Array(N), heap=[];
+  const push=(i,f)=>{ heap.push([f,i]); let c=heap.length-1; while(c>0){ const p=(c-1)>>1; if(heap[p][0]<=heap[c][0]) break; [heap[p],heap[c]]=[heap[c],heap[p]]; c=p; } };
+  const pop=()=>{ const top=heap[0], last=heap.pop(); if(heap.length){ heap[0]=last; let c=0; for(;;){ const l=c*2+1, r=l+1; let m=c; if(l<heap.length&&heap[l][0]<heap[m][0]) m=l; if(r<heap.length&&heap[r][0]<heap[m][0]) m=r; if(m===c) break; [heap[m],heap[c]]=[heap[c],heap[m]]; c=m; } } return top; };
+  const hf=i=>{ const dx=Math.abs(i%gw-en[0]), dy=Math.abs(((i/gw)|0)-en[1]); return Math.max(dx,dy)+.414*Math.min(dx,dy); };
+  gS[sI]=0; push(sI,hf(sI));
+  while(heap.length){ const [,i]=pop(); if(closed[i]) continue; if(i===eI) break; closed[i]=1; const x=i%gw, y=(i/gw)|0;
+    for(let dy=-1;dy<=1;dy++) for(let dx=-1;dx<=1;dx++){ if(!dx&&!dy) continue; const nx=x+dx, ny=y+dy; if(nx<0||ny<0||nx>=gw||ny>=G.gh) continue; const j=ny*gw+nx; if(!G.m[j]||closed[j]) continue;
+      if(dx&&dy&&(!G.m[y*gw+nx]||!G.m[ny*gw+x])) continue; const c=gS[i]+(dx&&dy?1.414:1); if(c<gS[j]){ gS[j]=c; came[j]=i; push(j,c+hf(j)); } } }
+  if(sI!==eI&&came[eI]<0) return [];
+  const cells=[]; for(let i=eI;i!==sI&&i>=0;i=came[i]) cells.push(i); cells.reverse();
+  const pts=cells.map(i=>[(i%gw)*CELL+2,((i/gw)|0)*CELL+2]); if(walkable(s,tx,ty)) pts.push([tx,ty]); if(!pts.length) return [];
+  const out=[]; let cur=[sx,sy], k=0;
+  while(k<pts.length){ let far=k; for(let m=pts.length-1;m>k;m--) if(los(s,cur,pts[m])){ far=m; break; } out.push(pts[far]); cur=pts[far]; k=far+1; }
+  return out; }
+function walkTo(x,y,cb,force){ const s=SC[S.scene]; S.path=findPath(s,S.x,S.y,x,y); S.onArrive=cb||null; if(!S.path.length){ S.onArrive=null; if(cb) cb(); } }
+function faceTo(h){ const f=h.face; if(f==='back') S.dir='back'; else if(f==='front') S.dir='front'; else if(f==='left'){ S.dir='side'; S.face=-1; } else if(f==='right'){ S.dir='side'; S.face=1; } }
+
+/* ---------- particles ---------- */
+const PFX=[];
+function puff(x,y,c,n){ for(let i=0;i<(n||3);i++) PFX.push({x:x+rand(-2,2),y:y-1,vx:rand(-9,9),vy:rand(-10,-3),t:0,max:rand(.35,.6),c,r:rand(1,2.2)}); }
+
+/* ---------- hotspots ---------- */
+function hRect(h){ return typeof h.rect==='function'?h.rect():h.rect; }
+function hotAt(wx,wy){ const s=SC[S.scene]; let best=null, ba=1e9;
+  for(const h of s.hs){ const r=hRect(h); if(wx>=r[0]&&wx<=r[0]+r[2]&&wy>=r[1]&&wy<=r[1]+r[3]){ const a=r[2]*r[3]; if(a<ba){ ba=a; best=h; } } } return best; }
+const DEF=G.DEF;
+const NOPE=G.NOPE;
+function doVerb(h,v){
+  if(v==='item'){ const it=S.sel; if(h.item&&h.item(it)) return; if(G.itemFallback&&G.itemFallback(h,it)) return; return say([NOPE[(Math.random()*NOPE.length)|0]]); }
+  if(v==='walk'&&h.exit) return h.exit();
+  const f=h[v]; if(typeof f==='function') return f.call(h); if(Array.isArray(f)) return say(f);
+  if(v==='hand'&&h.exit) return h.exit();
+  say(DEF[v]||DEF.look); }
+function clickAt(sx,sy,touch){
+  if(G.smart) return G.smart(sx,sy,touch);
+  if(!$('settings').hidden) return;
+  if(D.active){ if(!D.opts) advance(); return; }
+  if(S.mode!=='play'||S.lock||S.trans) return;
+  closeInv(); const wx=sx+S.cam, wy=sy, h=hotAt(wx,wy), v=S.verb; S.idle=0;
+  if(touch&&h) flashLabel(tr(typeof h.n==='function'?h.n():h.n),sx,sy);
+  if(v==='walk'){ if(h&&h.exit){ walkTo(h.at[0],h.at[1],()=>{ faceTo(h); h.exit(); }); return; } tapFx(wx,wy); walkTo(wx,Math.max(wy,SC[S.scene].far)); return; }
+  if(!h){ if(v==='item'&&G.itemFallback&&G.itemFallback(null,S.sel)) return; if(v==='look'&&SC[S.scene].look) return say(SC[S.scene].look); tapFx(wx,wy); return; }
+  if(v==='look'||!h.at){ if(h.at&&v!=='look'){} doVerb(h,v); return; }
+  walkTo(h.at[0],h.at[1],()=>{ faceTo(h); doVerb(h,v); }); }
+let TAP=null; function tapFx(x,y){ TAP={x,y,t:.35}; }
+
+/* ---------- verbs, cursor, icon bar ---------- */
+const VERBS=G.verbs||['walk','look','hand','talk','item'];
+const VNAME=Object.assign({walk:'Περπάτα',look:'Κοίτα',hand:'Πάρε / Χρησιμοποίησε',talk:'Μίλα',item:'Χρησιμοποίησε αντικείμενο'},G.VNAME||{});
+const VIC={
+  walk:g=>{ for(const [x,y] of [[3,2],[9,7]]){ R(g,x,y,4,6,'#7a4a2a'); R(g,x+1,y+1,2,4,'#c8804a'); R(g,x,y-1,4,1,'#2b1d3a'); R(g,x+1,y+6,2,2,'#7a4a2a'); } },
+  look:g=>{ R(g,2,6,12,5,'#ffffff'); R(g,3,5,10,1,'#2b1d3a'); R(g,3,11,10,1,'#2b1d3a'); R(g,1,7,1,3,'#2b1d3a'); R(g,14,7,1,3,'#2b1d3a'); disc(g,8,8,2,'#2a5fd6'); R(g,8,8,1,1,'#1a1210'); R(g,7,7,1,1,'#ffffff'); },
+  hand:g=>{ R(g,4,6,8,8,'#f6caa0'); for(let i=0;i<4;i++) R(g,4+i*2,2+(i===0?2:0),2,5,'#f6caa0'); R(g,12,7,3,2,'#f6caa0'); R(g,4,13,8,1,'#c98d63'); for(let i=0;i<4;i++) R(g,5+i*2,3+(i===0?2:0),1,1,'#ffe8d0'); R(g,3,6,1,7,'#c98d63'); },
+  talk:g=>{ R(g,3,6,10,5,'#e8463a'); R(g,4,5,8,1,'#e8463a'); R(g,4,11,8,1,'#c82a28'); R(g,4,8,8,1,'#7a1414'); R(g,5,8,6,1,'#ffffff'); R(g,13,3,2,1,'#ffd23f'); R(g,13,13,2,1,'#ffd23f'); R(g,14,8,2,1,'#ffd23f'); },
+  bag:g=>{ R(g,2,6,12,8,'#a8703e'); R(g,2,6,12,1,'#c8904a'); R(g,6,3,4,3,'#7a4a2a'); R(g,7,4,2,2,'#4a3a6a'); R(g,7,8,2,2,'#ffd23f'); R(g,2,13,12,1,'#7a4a2a'); },
+  menu:g=>{ disc(g,8,8,5,'#cfcfdf'); disc(g,8,8,2,'#4a3a6a'); for(const [x,y] of [[7,1],[7,13],[1,7],[13,7]]) R(g,x,y,2,2,'#cfcfdf'); },
+};
+function iconInto(c,fn){ const g=c.getContext('2d'); g.clearRect(0,0,c.width,c.height); fn(g); }
+function setVerb(v){ if(v==='item'&&!S.sel) return; S.verb=v; document.querySelectorAll('.vb[data-v]').forEach(b=>b.classList.toggle('on',b.dataset.v===v)); hint(tr(VNAME[v])+(v==='item'&&S.sel?': '+tr(ITEMS[S.sel].n):'')); }
+function cycleVerb(){ const list=VERBS.filter(v=>v!=='item'||S.sel); const i=list.indexOf(S.verb); setVerb(list[(i+1)%list.length]); sfx('blip'); }
+let hintT=0; function hint(t){ const el=$('hint'); el.textContent=t; el.classList.add('show'); clearTimeout(hintT); hintT=setTimeout(()=>el.classList.remove('show'),1400); }
+function flashLabel(t,sx,sy){ const el=$('hover'); el.textContent=t; el.style.left=(sx/W*100)+'%'; el.style.top=(sy/H*100)+'%'; el.hidden=false; clearTimeout(flashLabel.t); flashLabel.t=setTimeout(()=>{ if(!S.mouseOn) el.hidden=true; },1100); }
+const CUR=document.createElement('canvas'); CUR.width=16; CUR.height=16;
+function drawCursor(g,x,y){ const c=CUR.getContext('2d'); c.clearRect(0,0,16,16);
+  if(S.verb==='item'&&S.sel){ c.save(); c.translate(2,2); ICON[S.sel](c); c.restore(); } else VIC[S.verb](c);
+  g.save(); g.globalAlpha=.85; g.globalCompositeOperation='source-over';
+  for(const [dx,dy] of [[1,0],[-1,0],[0,1],[0,-1]]){ g.filter='none'; } g.drawImage(CUR,Math.round(x)-8,Math.round(y)-8); g.restore();
+  const h=S.hover; if(h){ R(g,Math.round(x)-1,Math.round(y)+8,3,1,'#ffd23f'); } }
+
+/* ---------- inventory ---------- */
+const invEl=$('inv'), slotsEl=$('slots'), capEl=$('invCap');
+function renderInv(){ slotsEl.innerHTML='';
+  S.inv.forEach(id=>{ const b=document.createElement('button'); b.className='slot'+(S.sel===id?' on':''); b.setAttribute('aria-label',tr(ITEMS[id].n)); b.appendChild(iconCanvas(id)); b.addEventListener('click',e=>{ e.stopPropagation(); invTap(id); }); slotsEl.appendChild(b); });
+  $('bExam').disabled=!S.sel; updItemBtn(); if(G.onInv) G.onInv(); }
+function updItemBtn(){ const c=$('vItem'); if(!c) return; const g=c.getContext('2d'); g.clearRect(0,0,16,16); if(S.sel){ g.save(); g.translate(2,2); ICON[S.sel](g); g.restore(); } $('vItemB').disabled=!S.sel; }
+function setSel(id){ S.sel=id; updItemBtn(); if(id) setVerb('item'); else if(S.verb==='item') setVerb('walk'); }
+function invTap(id){ A.init();
+  if(S.sel&&S.sel!==id){ const r=RECIPES[rkey(S.sel,id)];
+    if(r){ const a=S.sel; take(a); take(id); give(r[0]); setSel(null); if(r[2]) pts(r[2],r[3]); sfx('pick'); closeInv(); say([r[1]]); }
+    else { setSel(null); capEl.textContent=tr('Αυτά τα δύο δεν συνδυάζονται.'); }
+    renderInv(); return; }
+  if(S.sel===id){ setSel(null); capEl.textContent=tr('Διάλεξε ένα αντικείμενο.'); } else { setSel(id); capEl.textContent=tr(ITEMS[id].n); }
+  renderInv(); }
+function openInv(){ if(S.mode!=='play'||D.active||S.trans) return; renderInv(); capEl.textContent=tr(S.sel?ITEMS[S.sel].n:'Διάλεξε ένα αντικείμενο. Πάτα δεύτερο για να τα συνδυάσεις.'); invEl.hidden=false; }
+function closeInv(){ invEl.hidden=true; }
+
+
+/* ---------- HD layer ---------- */
+const lc=document.createElement('canvas'); lc.width=W; lc.height=H; const lg=lc.getContext('2d');
+function hdAdd(fn){ octx.save(); octx.globalCompositeOperation='lighter'; fn(); octx.restore(); }
+function hdGlow(x,y,r,rgb,a){ if(r<=0) return; const g=octx.createRadialGradient(x,y,0,x,y,r); g.addColorStop(0,'rgba('+rgb+','+a+')'); g.addColorStop(1,'rgba('+rgb+',0)'); octx.fillStyle=g; octx.fillRect(x-r,y-r,r*2,r*2); }
+function hdBeam(pts,rgb,a0,a1,y0,y1){ octx.beginPath(); pts.forEach(([x,y],i)=>i?octx.lineTo(x,y):octx.moveTo(x,y)); octx.closePath(); const g=octx.createLinearGradient(0,y0,0,y1); g.addColorStop(0,'rgba('+rgb+','+a0+')'); g.addColorStop(1,'rgba('+rgb+','+a1+')'); octx.fillStyle=g; octx.fill(); }
+function hdSun(sx,sy,warm){ const cg=Math.round(236-warm*70), cb=Math.round(190-warm*120);
+  hdAdd(()=>{ hdGlow(sx,sy,90,'255,'+cg+','+cb,.45); octx.fillStyle='rgba(255,'+(250-warm*60)+','+(220-warm*120)+',.95)'; octx.beginPath(); octx.arc(sx,sy,6,0,7); octx.fill();
+    if(FXFULL) for(let i=0;i<4;i++){ const a=2.0+i*.24+Math.sin(T*.3+i)*.03, len=260, w2=.035+.02*Math.sin(T*.5+i*2); octx.beginPath(); octx.moveTo(sx,sy); octx.lineTo(sx+Math.cos(a-w2)*len,sy+Math.sin(a-w2)*len); octx.lineTo(sx+Math.cos(a+w2)*len,sy+Math.sin(a+w2)*len); octx.closePath();
+      const l2=octx.createLinearGradient(sx,sy,sx+Math.cos(a)*len,sy+Math.sin(a)*len); l2.addColorStop(0,'rgba(255,'+cg+','+cb+',.075)'); l2.addColorStop(1,'rgba(0,0,0,0)'); octx.fillStyle=l2; octx.fill(); } }); }
+function hdGrade(mode,rgb,a){ octx.save(); octx.globalCompositeOperation=mode; octx.fillStyle='rgba('+rgb+','+a+')'; octx.fillRect(0,0,W,H); octx.restore(); }
+function hdVignette(a,rgb){ const vg=octx.createRadialGradient(W/2,H/2,H*.42,W/2,H/2,W*.7); vg.addColorStop(0,'rgba('+(rgb||'20,8,30')+',0)'); vg.addColorStop(1,'rgba('+(rgb||'20,8,30')+','+a+')'); octx.fillStyle=vg; octx.fillRect(0,0,W,H); }
+const hdl=document.createElement('canvas'), hdg=hdl.getContext('2d');
+function composite(dt,cam,lights,dark){
+  const s=SC[S.scene], k=OW/W;
+  octx.setTransform(1,0,0,1,0,0); octx.globalCompositeOperation='source-over'; octx.globalAlpha=1; octx.imageSmoothingEnabled=false; octx.drawImage(cv,0,0,OW,OH);
+  if(dark>0){ if(hdl.width!==OW||hdl.height!==OH){ hdl.width=OW; hdl.height=OH; }
+    hdg.setTransform(1,0,0,1,0,0); hdg.globalCompositeOperation='source-over'; hdg.clearRect(0,0,OW,OH); hdg.fillStyle='rgba('+(G.darkRGB||'4,3,8')+','+dark+')'; hdg.fillRect(0,0,OW,OH);
+    hdg.setTransform(k,0,0,k,0,0); hdg.globalCompositeOperation='destination-out';
+    for(const [x0,y,r,i] of lights){ const x=x0-cam; if(x<-r||x>W+r) continue; const g=hdg.createRadialGradient(x,y,0,x,y,r); g.addColorStop(0,'rgba(0,0,0,'+i+')'); g.addColorStop(.4,'rgba(0,0,0,'+(i*.7)+')'); g.addColorStop(.75,'rgba(0,0,0,'+(i*.22)+')'); g.addColorStop(1,'rgba(0,0,0,0)'); hdg.fillStyle=g; hdg.fillRect(x-r,y-r,r*2,r*2); }
+    octx.drawImage(hdl,0,0); }
+  octx.setTransform(k,0,0,k,0,0); octx.imageSmoothingEnabled=true;
+  const td=G.tod?G.tod():0;
+  if(G.hd) G.hd(s,cam,td,dt,lights);
+  if(G.grade) G.grade(s,td);
+  for(let i=POP.length-1;i>=0;i--){ const p=POP[i]; p.t+=dt; if(p.t>1.4){ POP.splice(i,1); continue; } const x=p.x-cam, y=p.y-p.t*16;
+    octx.save(); octx.globalAlpha=Math.min(1,(1.4-p.t)*2); octx.font=G.popFont||'700 10px sans-serif'; octx.textAlign='center'; octx.lineWidth=3; octx.strokeStyle=G.popStroke||'#2b1d3a'; octx.strokeText(p.txt,x,y); octx.fillStyle=G.popFill||'#ffd23f'; octx.fillText(p.txt,x,y); octx.restore(); }
+  if(G.post) G.post(s,cam,td,dt);
+  hdVignette(G.vig?G.vig(s):.28,G.vigRGB);
+  if(S.fade>.001){ if(G.fadeBlack){ octx.fillStyle='rgba(0,0,0,'+S.fade+')'; octx.fillRect(0,0,W,H); }
+    else { const cx=S.mode==='title'?W/2:clamp(S.x-cam,30,W-30), cy=S.y-30*scl(S.y), r=Math.max(0,(1-S.fade)*Math.hypot(W,H));
+      octx.save(); octx.beginPath(); octx.rect(0,0,W,H); octx.moveTo(cx+r,cy); octx.arc(cx,cy,r,0,Math.PI*2,true); octx.fillStyle=G.irisCol||'#2b1d3a'; octx.fill('evenodd');
+      if(r>2){ octx.beginPath(); octx.arc(cx,cy,r,0,Math.PI*2); octx.lineWidth=1.5; octx.strokeStyle=G.irisRim||'rgba(255,210,63,.8)'; octx.stroke(); } octx.restore(); } }
+}
+/* ---------- dialogue ---------- */
+const D={ q:[], cb:null, text:'', shown:0, active:false, opts:null };
+const dlgEl=$('dlg'), dlgText=$('dlgText'), dlgOpts=$('dlgOpts'), moreEl=$('more');
+function ptSet(l){ return l; }
+const whoEl=$('who'); Object.assign(D,{line:null,auto:0});
+function say(lines,cb){ if(typeof lines==='string') lines=[lines]; D.q=lines.map(tr); D.cb=cb||null; D.active=true; D.opts=null; S.idle=0; nextLine(); }
+function nextLine(){ D.auto=0;
+  if(!D.q.length){ D.active=false; dlgEl.hidden=true; VOICE.stop(); const cb=D.cb; D.cb=null; if(cb) cb(); return; }
+  const p=parseLine(D.q.shift()); D.line=p; D.text=p.text; D.shown=0; dlgText.textContent=''; dlgOpts.innerHTML=''; dlgEl.hidden=false;
+  whoEl.textContent=p.name; whoEl.style.background=p.col; moreEl.style.visibility='hidden';
+  const my=D.text; VOICE.speak(p.text,p.who,(ok)=>{ if(ok&&D.active&&!D.opts&&D.text===my) D.auto=.7; }); }
+function advance(){ if(!D.active||D.opts) return; if(D.shown<D.text.length){ D.shown=D.text.length; dlgText.textContent=D.text; return; } VOICE.stop(); nextLine(); }
+function choose(prompt,opts){ prompt=tr(prompt); D.active=true; D.text=prompt; D.shown=prompt.length; D.opts=opts; D.q=[]; D.auto=0; whoEl.textContent=''; dlgText.textContent=prompt; dlgOpts.innerHTML=''; dlgEl.hidden=false; moreEl.style.visibility='hidden';
+  VOICE.speak(prompt,'narrator');
+  opts.forEach(o=>{ const b=document.createElement('button'); b.textContent=tr(o.t); b.addEventListener('click',e=>{ e.stopPropagation(); VOICE.stop(); D.opts=null; D.active=false; dlgEl.hidden=true; dlgOpts.innerHTML=''; o.f(); }); dlgOpts.appendChild(b); }); }
+let spT=0; function sparkle(t){ const el=$('sparkle'); el.textContent=t; el.classList.add('show'); clearTimeout(spT); spT=setTimeout(()=>el.classList.remove('show'),900); }
+
+let whT=0; function whisper(t){ const el=$('whisper'); el.textContent=tr(t); el.classList.add('show'); clearTimeout(whT); whT=setTimeout(()=>el.classList.remove('show'),1700); }
+let tipT=0; function tip(t,ms){ const el=$('tip'); el.textContent=tr(t); el.classList.add('show'); clearTimeout(tipT); tipT=setTimeout(()=>el.classList.remove('show'),ms||6000); }
+
+
+/* ---------- flow ---------- */
+function fadeTo(v,d,cb){ S.fadeFrom=S.fade; S.fadeTo=v; S.fadeDur=d; S.fadeT=0; S.fadeCb=cb||null; }
+function place(id,from){ const s=SC[id], e=s.entries[from]||s.entries.start||Object.values(s.entries)[0]; S.scene=id; S.x=e[0]; S.y=e[1]; S.dir=e[2]; S.face=e[3]||1; S.path=[]; S.onArrive=null; S.cam=clamp(S.x-W/2,0,s.w-W); if(G.onPlace) G.onPlace(id); }
+function enter(id,from){ place(id,from); A.amb(); if(S.mode==='play') music(G.musicFor(id)); save(); }
+function go(id,from,cb){ if(S.trans) return; S.trans=1; closeInv();
+  fadeTo(1,.4,()=>{ enter(id,from); fadeTo(0,.5,()=>{ S.trans=0; const s=SC[id]; if(s.onEnter) s.onEnter(); if(cb) cb(); }); }); }
+
+/* ---------- save & prefs ---------- */
+const KEY=G.key+'-save-v1', PREF=G.key+'-prefs-v1';
+function save(){ if(S.mode!=='play'||(G.noSave&&G.noSave())) return; try{ localStorage.setItem(KEY,JSON.stringify({scene:S.scene,x:S.x,y:S.y,inv:S.inv,F})); }catch(e){} }
+function load(){ try{ const v=localStorage.getItem(KEY); return v?JSON.parse(v):null; }catch(e){ return null; } }
+function clearSave(){ try{ localStorage.removeItem(KEY); }catch(e){} }
+function loadPrefs(){ try{ return JSON.parse(localStorage.getItem(PREF))||{}; }catch(e){ return {}; } }
+let TS=1.3, FXFULL=true;
+function savePrefs(){ try{ localStorage.setItem(PREF,JSON.stringify({ts:TS,sound:A.on,lang:LANG,fx:FXFULL,portraits:typeof PORTRAITS!=='undefined'?PORTRAITS:true,voice:typeof VOICE!=='undefined'?VOICE.on:true})); }catch(e){} }
+function setTS(v){ TS=v; stage.style.setProperty('--ts',v); document.querySelectorAll('#tsRow button').forEach(b=>b.setAttribute('aria-pressed',String(+b.dataset.ts===v))); savePrefs(); }
+function setFX(on){ FXFULL=on; document.querySelectorAll('#fxRow button').forEach(b=>b.setAttribute('aria-pressed',String((b.dataset.fx==='1')===on))); fit(); savePrefs(); }
+function setLang(l){ LANG=l; document.documentElement.lang=l; document.title=tr(G.title);
+  document.querySelectorAll('[data-i18n]').forEach(el=>el.textContent=tr(el.dataset.i18n));
+  document.querySelectorAll('[data-i18n-label]').forEach(el=>el.setAttribute('aria-label',tr(el.dataset.i18nLabel)));
+  document.querySelectorAll('#lgRow button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.lg===l)));
+  $('sSound').textContent=tr(G.soundLabel||'Ήχος:')+' '+tr(A.on?'ναι':'όχι'); if($('score')) showScore(false); if(G.onLang) G.onLang(); savePrefs(); }
+
+/* ---------- input ---------- */
+function toLow(e){ const r=OUT.getBoundingClientRect(); return [(e.clientX-r.left)/r.width*W,(e.clientY-r.top)/r.height*H]; }
+OUT.addEventListener('pointermove',e=>{ if(e.pointerType!=='mouse') return; S.mouseOn=true; const [x,y]=toLow(e); S.mouse={x,y};
+  const h=(S.mode==='play'&&!D.active)?hotAt(x+S.cam,y):null; S.hover=h; const el=$('hover');
+  if(h){ el.textContent=tr(typeof h.n==='function'?h.n():h.n); el.style.left=(x/W*100)+'%'; el.style.top=(y/H*100)+'%'; el.hidden=false; } else el.hidden=true; });
+OUT.addEventListener('pointerleave',()=>{ S.mouseOn=false; $('hover').hidden=true; });
+OUT.addEventListener('contextmenu',e=>e.preventDefault());
+OUT.addEventListener('pointerdown',e=>{ A.init(); if(!$('menu').hidden){ $('menu').hidden=true; return; }
+  if(e.pointerType==='mouse'&&e.button===2){ e.preventDefault(); if(!D.active) cycleVerb(); return; }
+  if(e.pointerType!=='mouse') S.mouseOn=false; const [x,y]=toLow(e); clickAt(x,y,e.pointerType!=='mouse'); });
+$('dlg').addEventListener('pointerdown',e=>{ if(e.target.closest('button')) return; e.stopPropagation(); A.init(); advance(); });
+document.querySelectorAll('.vb[data-v]').forEach(b=>b.addEventListener('click',e=>{ e.stopPropagation(); A.init(); if(D.active) return; setVerb(b.dataset.v); sfx('blip'); }));
+$('bInv').addEventListener('click',e=>{ e.stopPropagation(); A.init(); invEl.hidden?openInv():closeInv(); });
+$('bClose').addEventListener('click',e=>{ e.stopPropagation(); closeInv(); });
+$('bExam').addEventListener('click',e=>{ e.stopPropagation(); if(!S.sel) return; const it=ITEMS[S.sel]; closeInv(); say(typeof it.d==='function'?it.d():it.d); });
+addEventListener('keydown',e=>{ const k=e.key;
+  if(k===' '||k==='Enter'){ e.preventDefault(); if(D.active) advance(); }
+  else if(k>='1'&&k<='5'){ setVerb(VERBS[+k-1]); }
+  else if(k==='i'||k==='I'){ invEl.hidden?openInv():closeInv(); } else if(k==='Escape'){ closeInv(); $('settings').hidden=true; } });
+$('bMenu').addEventListener('click',e=>{ e.stopPropagation(); A.init(); $('menu').hidden=!$('menu').hidden; });
+$('mTitle').addEventListener('click',e=>{ e.stopPropagation(); $('menu').hidden=true; toTitle(); });
+function openSettings(){ closeInv(); $('menu').hidden=true; $('sSound').textContent=tr('Ήχος:')+' '+tr(A.on?'ναι':'όχι'); $('settings').hidden=false; }
+$('mSet').addEventListener('click',e=>{ e.stopPropagation(); openSettings(); });
+$('tSet').addEventListener('click',e=>{ e.stopPropagation(); A.init(); openSettings(); });
+document.querySelectorAll('#tsRow button').forEach(b=>b.addEventListener('click',e=>{ e.stopPropagation(); setTS(+b.dataset.ts); }));
+document.querySelectorAll('#lgRow button').forEach(b=>b.addEventListener('click',e=>{ e.stopPropagation(); setLang(b.dataset.lg); }));
+document.querySelectorAll('#ptRow button').forEach(b=>b.addEventListener('click',e=>{ e.stopPropagation(); setPortraits(b.dataset.pt==='1'); }));
+document.querySelectorAll('#fxRow button').forEach(b=>b.addEventListener('click',e=>{ e.stopPropagation(); setFX(b.dataset.fx==='1'); }));
+$('sSound').addEventListener('click',e=>{ e.stopPropagation(); A.init(); A.setOn(!A.on); $('sSound').textContent=tr('Ήχος:')+' '+tr(A.on?'ναι':'όχι'); savePrefs(); });
+$('sFull').addEventListener('click',e=>{ e.stopPropagation(); const el=document.documentElement; try{ const p=(el.requestFullscreen||el.webkitRequestFullscreen||function(){}).call(el); if(p&&p.then) p.then(()=>{ try{ screen.orientation.lock('landscape').catch(()=>{}); }catch(_){} }).catch(()=>{}); }catch(_){} });
+$('sClose').addEventListener('click',e=>{ e.stopPropagation(); $('settings').hidden=true; });
+$('settings').addEventListener('pointerdown',e=>e.stopPropagation());
+
+
+function setUI(on){ if($('vbar')) $('vbar').hidden=!on; if(G.setUI) G.setUI(on); if(!on){ $('hover').hidden=true; closeInv(); } }
+function toTitle(){ S.mode='title'; closeInv(); D.active=false; D.opts=null; dlgEl.hidden=true; $('end').hidden=true; $('title').hidden=false; setUI(false);
+  $('tCont').hidden=!load(); place(G.titleScene[0],G.titleScene[1]); S.fade=0; S.lock=0; S.trans=0; S.dance=0; A.amb(); music(G.titleMusic); if(G.onTitle) G.onTitle(); }
+function startGame(data){ A.init(); $('title').hidden=true; $('end').hidden=true; S.fade=1; S.mode='play'; S.lock=0; S.dance=0; timers.length=0; POP.length=0;
+  if(data){ F=data.F||{}; S.inv=data.inv||[]; const sc=G.resume?G.resume(data):data.scene; place(sc,'x'); if(sc===data.scene){ S.x=data.x; S.y=data.y; } S.cam=clamp(S.x-W/2,0,SC[S.scene].w-W); A.amb(); music(G.musicFor(S.scene)); }
+  else { G.newGame(); }
+  setUI(true); S.sel=null; renderInv(); if(VERBS.includes('walk')) setVerb('walk'); if($('score')) showScore(false); music(G.musicFor(S.scene));
+  if(!data) G.intro(); else if(G.welcomeBack) G.welcomeBack();
+  fadeTo(0,.8); }
+$('tNew').addEventListener('click',e=>{ e.stopPropagation(); startGame(null); });
+$('tCont').addEventListener('click',e=>{ e.stopPropagation(); startGame(load()); });
+$('endB').addEventListener('click',e=>{ e.stopPropagation(); toTitle(); });
+
+/* ---------- update ---------- */
+function update(dt){
+  for(let i=timers.length-1;i>=0;i--){ timers[i].t-=dt; if(timers[i].t<=0){ const f=timers[i].fn; timers.splice(i,1); f(); } }
+  if(S.fadeDur){ S.fadeT+=dt; const k=Math.min(1,S.fadeT/S.fadeDur); S.fade=S.fadeFrom+(S.fadeTo-S.fadeFrom)*k; if(k>=1){ S.fadeDur=0; const cb=S.fadeCb; S.fadeCb=null; if(cb) cb(); } }
+  if(G.dlgTick) G.dlgTick(dt); else if(D.active&&!D.opts&&D.shown<D.text.length){ const b=Math.floor(D.shown/4); D.shown=Math.min(D.text.length,D.shown+dt*55); dlgText.textContent=D.text.slice(0,Math.floor(D.shown)); if(Math.floor(D.shown/4)!==b) sfx('type'); }
+  if(!G.dlgTick) moreEl.style.visibility=D.active&&!D.opts&&D.shown>=D.text.length?'visible':'hidden';
+  if(typeof ptDraw==='function') ptDraw(); musicTick(dt); S.shk=Math.max(0,S.shk-dt);
+  const s=SC[S.scene]; S.moving=false;
+  if(S.mode==='play'&&S.path.length&&(!D.active||S.dance)&&!S.trans&&!S.frozen){
+    const [tx,ty]=S.path[0], dx=tx-S.x, dy=ty-S.y, nx=dx, ny=dy/.62, L=Math.hypot(nx,ny), step=(G.speed||54)*scl(S.y)*dt;
+    if(L<=step){ S.x=tx; S.y=ty; S.path.shift(); if(!S.path.length){ const cb=S.onArrive; S.onArrive=null; if(cb) cb(); } }
+    else { S.x+=nx/L*step; S.y+=ny/L*step*.62; S.moving=true; }
+    if(Math.abs(dx)>Math.abs(dy)*1.1){ S.dir='side'; S.face=dx>0?1:-1; } else if(Math.abs(dy)>.5) S.dir=dy>0?'front':'back';
+    const b=Math.floor(S.phase/Math.PI); S.phase+=dt*10; if(Math.floor(S.phase/Math.PI)!==b){ sfx('step'); const c=(G.dust||{})[S.scene]; if(c&&FXFULL) puff(S.x,S.y,c,2); } }
+  if(S.mode==='play'&&G.update) G.update(dt,s);
+  if(S.mode==='title') S.cam=clamp((s.w-W)/2+Math.sin(T*.1)*((s.w-W)/2),0,s.w-W);
+  else { const tx=clamp(S.x-W/2,0,s.w-W); S.cam+=(tx-S.cam)*Math.min(1,dt*4); }
+}
+
+/* ---------- render ---------- */
+function render(dt){
+  const s=SC[S.scene], cam=Math.round(S.cam), sx=S.shk>0?Math.round((Math.random()-.5)*2*S.shkA):0, sy=S.shk>0?Math.round((Math.random()-.5)*S.shkA):0;
+  ctx.setTransform(1,0,0,1,0,0); ctx.fillStyle='#000'; ctx.fillRect(0,0,W,H); ctx.translate(-cam+sx,sy);
+  ctx.drawImage(s.img,0,0); if(s.anim) s.anim(ctx,dt);
+  const L=s.props().slice();
+  if(S.mode!=='title'&&!S.hidePlayer){ const k=scl(S.y); L.push({y:S.y,draw(g){ actor(g,G.playerFn(),S.x,S.y,k,S.dir==='side'&&S.face<0,!!s.night); }}); }
+  if(G.extra) G.extra(L,s);
+  L.sort((a,b)=>a.y-b.y); for(const p of L) p.draw(ctx);
+  for(let i=PFX.length-1;i>=0;i--){ const p=PFX[i]; p.t+=dt; if(p.t>=p.max){ PFX.splice(i,1); continue; } p.x+=p.vx*dt; p.y+=p.vy*dt; p.vy+=(p.g!==undefined?p.g:14)*dt; ctx.globalAlpha=(1-p.t/p.max)*.8; const r=Math.round(p.r*(1+p.t)); R(ctx,p.x-r/2,p.y-r/2,r,r,p.c); ctx.globalAlpha=1; }
+  if(TAP){ TAP.t-=dt; if(TAP.t<=0) TAP=null; else { const r=Math.round((.35-TAP.t)*24); ctx.globalAlpha=TAP.t*2.4; ctx.strokeStyle=G.tapCol||'#ffffff'; ctx.lineWidth=1; ctx.beginPath(); ctx.ellipse(TAP.x,TAP.y,r+.5,r*.35+.5,0,0,7); ctx.stroke(); ctx.globalAlpha=1; } }
+  if(s.over) s.over(ctx,dt);
+  if(G.overWorld) G.overWorld(ctx,s,dt);
+  ctx.setTransform(1,0,0,1,0,0);
+  if(G.lowPost) G.lowPost(ctx,s,dt);
+  let lights=[], dark=0; if(s.dark){ dark=s.dark*(G.darkMul?G.darkMul(s):1); lights=s.lights?s.lights().slice():[]; const pl=G.playerLight&&G.playerLight(s); if(pl) lights.push(pl); }
+  if(S.mouseOn&&S.mouse&&S.mode==='play'&&!D.active&&$('settings').hidden&&VIC[S.verb]) drawCursor(ctx,S.mouse.x,S.mouse.y);
+  composite(dt,cam,lights,dark);
+}
+
+/* ---------- loop & layout ---------- */
+for(const k in SC){ const s=SC[k]; s.id=k; const c=document.createElement('canvas'); c.width=s.w; c.height=H; const g=c.getContext('2d'); s.bg(g,s.w); s.img=c; buildGrid(s); }
+VERBS.concat(['bag','menu']).forEach(v=>{ const c=document.querySelector('[data-icon="'+v+'"]'); if(c&&VIC[v]) iconInto(c,VIC[v]); });
+let last=performance.now();
+function loop(now){ const dt=clamp((now-last)/1000,0,.05); last=now; T+=dt; update(dt); render(dt); requestAnimationFrame(loop); }
+function fit(){ const wr=$('wrap'), k=Math.min(wr.clientWidth/W,wr.clientHeight/H), w=Math.floor(W*k), h=Math.floor(H*k);
+  stage.style.width=w+'px'; stage.style.height=h+'px'; stage.style.setProperty('--u',(h/180)+'px');
+  const dpr=Math.min(FXFULL?2:1,window.devicePixelRatio||1), sc=Math.max(1,Math.min(6,Math.round(w*dpr/W))); OW=W*sc; OH=H*sc; if(OUT.width!==OW||OUT.height!==OH){ OUT.width=OW; OUT.height=OH; } }
+addEventListener('resize',fit); if(window.visualViewport) visualViewport.addEventListener('resize',fit);
+addEventListener('orientationchange',()=>setTimeout(fit,250));
+document.addEventListener('visibilitychange',()=>{ if(document.hidden){ if(A.c) A.c.suspend(); if(typeof VOICE!=='undefined') VOICE.stop(); } else if(A.c) A.c.resume(); });
+(()=>{ const pr=loadPrefs(); if(pr.sound===false) A.on=false; setTS([1,1.3,1.6,2].includes(pr.ts)?pr.ts:1.3); setLang(pr.lang==='en'?'en':'el'); if(typeof setPortraits==='function') setPortraits(pr.portraits!==false); if(typeof setVoice==='function') setVoice(pr.voice!==false); setFX(pr.fx!==false); })();
+fit(); toTitle(); requestAnimationFrame(loop);
+
+</script>
+
+
+
+
+<script id="cine">
+/* ================= CINE — engine-independent cutscene player =================
+   Same cutscenes in every version of a game (v1 / v2 / pseudo-3D): it overlays #stage, draws its own pixel-art
+   shots at 320×180 plus smooth HD light, letterbox bars, subtitles (LANG el/en), music pad, skip & tap-to-advance.
+   Hooks: intro = before "New game", mid = first time a scene/flag is reached, ending = before the end screen. */
+const CINE=(()=>{
+  const W2=320,H2=180, OX=160, OY=120, wb=document.createElement('canvas'); wb.width=640; wb.height=640; const lg=wb.getContext('2d'); lg.imageSmoothingEnabled=false;
+  const low=document.createElement('canvas'); low.width=W2; low.height=H2; const l2=low.getContext('2d'); l2.imageSmoothingEnabled=false;
+  let el,cv2,o,cap,skipB,shots=null,i=0,t=0,done=null,raf=0,last=0,k=1,fade=1,bars=0,ac=null,mus=null,prevGain=null,busy=false,T2=0;
+  const prev=document.createElement('canvas'), pg2=prev.getContext('2d'); let xf=0;
+  const grain=[0,1,2].map(()=>{ const c=document.createElement('canvas'); c.width=160; c.height=90; const x=c.getContext('2d'), id=x.createImageData(160,90); for(let j=0;j<id.data.length;j+=4){ const v=Math.random()*255; id.data[j]=id.data[j+1]=id.data[j+2]=v; id.data[j+3]=Math.random()<.5?22:0; } x.putImageData(id,0,0); return c; });
+  const ease=p=>p<.5?2*p*p:1-Math.pow(-2*p+2,2)/2;
+  const L=a=>(typeof LANG!=='undefined'&&LANG==='en')?a[1]:a[0];
+  function build(){ const st=document.getElementById('stage')||document.body; el=document.createElement('div'); el.id='cine';
+    el.style.cssText='position:absolute;inset:0;z-index:80;background:#000;display:none;touch-action:none;overflow:hidden;';
+    cv2=document.createElement('canvas'); cv2.style.cssText='position:absolute;inset:0;width:100%;height:100%;'; el.appendChild(cv2); o=cv2.getContext('2d');
+    cap=document.createElement('div'); cap.style.cssText='position:absolute;left:8%;right:8%;bottom:3%;text-align:center;color:#fff;font-size:calc(var(--u,2px)*7*var(--ts,1));line-height:1.35;text-shadow:0 0 calc(var(--u,2px)*3) #000,0 0 calc(var(--u,2px)*1) #000;opacity:0;transition:opacity .5s;pointer-events:none;';
+    el.appendChild(cap); skipB=document.createElement('button'); skipB.style.cssText='position:absolute;right:2%;top:3%;background:rgba(0,0,0,.45);color:#fff;border:1px solid rgba(255,255,255,.5);border-radius:99px;padding:calc(var(--u,2px)*1.6) calc(var(--u,2px)*5);font:inherit;font-size:calc(var(--u,2px)*5.2);cursor:pointer;';
+    el.appendChild(skipB); st.appendChild(el);
+    skipB.addEventListener('pointerdown',e=>{ e.stopPropagation(); e.preventDefault(); finish(); });
+    el.addEventListener('pointerdown',e=>{ e.stopPropagation(); e.preventDefault(); next(); });
+    ['click','pointerup','touchstart'].forEach(ev=>el.addEventListener(ev,e=>e.stopPropagation()));
+    addEventListener('keydown',e=>{ if(!busy) return; e.stopImmediatePropagation(); e.preventDefault(); if(e.key==='Escape') finish(); else if(e.key===' '||e.key==='Enter'||e.key==='ArrowRight') next(); },true);
+    addEventListener('resize',fit); }
+  function fit(){ if(!el) return; const r=el.getBoundingClientRect(), d=Math.min(2,devicePixelRatio||1); cv2.width=Math.max(320,Math.round(r.width*d)); cv2.height=Math.max(180,Math.round(r.height*d)); k=cv2.width/W2; prev.width=cv2.width; prev.height=cv2.height; }
+  function snap(){ pg2.clearRect(0,0,prev.width,prev.height); pg2.drawImage(cv2,0,0); xf=1; }
+  function audio(mood){ try{ ac=(typeof A!=='undefined'&&A.c)?A.c:(ac||new (window.AudioContext||window.webkitAudioContext)()); if(ac.state==='suspended') ac.resume(); }catch(e){ ac=null; return; }
+    if(typeof A!=='undefined'&&A.m&&A.c){ prevGain=A.on; A.m.gain.setTargetAtTime(0,A.c.currentTime,.2); }
+    const g=ac.createGain(); g.gain.value=0; g.gain.setTargetAtTime(.9,ac.currentTime,.8); g.connect(ac.destination); mus={g,nodes:[],mood,next:0,step:0}; }
+  const MOODS={sea:[[57,64,69,76],[55,62,67,74],[53,60,65,72],[52,59,64,71]],horror:[[45,52,55,60],[44,51,55,59],[45,52,57,60],[46,53,56,61]],sunny:[[60,64,67,72],[65,69,72,77],[62,65,69,74],[67,71,74,79]],
+    police:[[55,62,67,70],[53,60,65,69],[51,58,63,67],[50,57,62,65]],tale:[[60,64,67,72],[57,60,64,69],[65,69,72,77],[67,71,74,79]],dark:[[38,45,50,53],[37,44,49,52],[38,45,50,53],[41,48,53,56]],hope:[[60,67,72,76],[57,64,69,72],[65,72,77,81],[67,74,79,83]]};
+  const mf=m=>440*Math.pow(2,(m-69)/12);
+  function tone(f,at,dur,type,vol){ if(!ac||!mus) return; const os=ac.createOscillator(), g=ac.createGain(); os.type=type; os.frequency.value=f; g.gain.setValueAtTime(0,at); g.gain.linearRampToValueAtTime(vol,at+Math.min(.6,dur*.3)); g.gain.exponentialRampToValueAtTime(.0001,at+dur); os.connect(g); g.connect(mus.g); os.start(at); os.stop(at+dur+.05); }
+  function musicTick(){ if(!ac||!mus) return; const now=ac.currentTime; if(now<mus.next-.1) return; const ch=MOODS[mus.mood]||MOODS.hope, c=ch[mus.step%ch.length], dur=2.6;
+    c.forEach((m,j)=>tone(mf(m),now+.02,dur+.6,j?'sine':'triangle',j?.018:.03)); for(let j=0;j<4;j++) tone(mf(c[(j+1)%4]+12),now+.3+j*.6,.7,'sine',.012); mus.next=now+dur; mus.step++; }
+  function stopAudio(){ if(mus&&ac){ const g=mus.g; g.gain.setTargetAtTime(0,ac.currentTime,.3); setTimeout(()=>{ try{ g.disconnect(); }catch(e){} },1500); } mus=null; if(typeof A!=='undefined'&&A.m&&A.c&&prevGain!==null){ A.setOn(A.on); } prevGain=null; }
+  function play(list,cb,mood){ if(!el) build(); if(busy){ cb&&cb(); return; } shots=list; i=0; t=0; xf=0; done=cb; busy=true; bars=0; fade=1; el.style.display='block'; fit(); skipB.textContent=L(['Παράλειψη ▸▸','Skip ▸▸']); setCap(); try{ audio(mood||'hope'); }catch(e){} last=performance.now(); cancelAnimationFrame(raf); raf=requestAnimationFrame(loop); }
+  function setCap(){ const s=shots[i]; cap.style.opacity=0; setTimeout(()=>{ if(!shots||shots[i]!==s) return; cap.innerHTML=''; if(s.who){ const b=document.createElement('b'); b.textContent=L(s.who)+' '; b.style.color=s.whoCol||'#ffe066'; cap.appendChild(b); } cap.appendChild(document.createTextNode(s.cap?L(s.cap):'')); cap.style.opacity=s.cap?1:0; },250); }
+  function next(){ if(!busy) return; if(t<.35) return; snap(); i++; t=0; if(i>=shots.length) return finish(); setCap(); }
+  function finish(){ if(!busy) return; busy=false; cancelAnimationFrame(raf); stopAudio(); let a=1; const out=()=>{ a-=.06; el.style.opacity=a; if(a>0) requestAnimationFrame(out); else { el.style.display='none'; el.style.opacity=1; shots=null; const cb=done; done=null; cb&&cb(); } }; out(); }
+  function loop(now){ if(!busy) return; const dt=Math.max(0,Math.min(.05,(now-last)/1000)); last=now; t+=dt; T2+=dt; const s=shots[i]; if(t>=s.d){ snap(); i++; t=0; if(i>=shots.length) return finish(); setCap(); }
+    const sh=shots[i], p=Math.min(1,t/sh.d); musicTick(); bars=Math.min(1,bars+dt*1.5);
+    let cx=160,cy=90,cz=1; if(sh.cam){ const e=ease(p), a=sh.cam[0], b=sh.cam[1]||a; cx=a[0]+(b[0]-a[0])*e; cy=a[1]+(b[1]-a[1])*e; cz=a[2]+(b[2]-a[2])*e; if(!sh.free){ cx=Math.max(160/cz,Math.min(320-160/cz,cx)); cy=Math.max(90/cz,Math.min(180-90/cz,cy)); } } let sx=0,sy=0; if(sh.shake){ const m=typeof sh.shake==='function'?sh.shake(t,p):sh.shake; sx=(Math.random()-.5)*m; sy=(Math.random()-.5)*m; }
+    lg.setTransform(1,0,0,1,0,0); lg.globalAlpha=1; lg.globalCompositeOperation='source-over'; lg.fillStyle='#000'; lg.fillRect(0,0,640,640); lg.setTransform(1,0,0,1,OX,OY); try{ sh.low&&sh.low(lg,t,p); }catch(e){ console.error(e); } lg.setTransform(1,0,0,1,0,0); lg.globalAlpha=1;
+    const sw=W2/cz, shh=H2/cz; l2.fillStyle='#000'; l2.fillRect(0,0,W2,H2); l2.drawImage(wb,OX+cx-sw/2-sx/cz,OY+cy-shh/2-sy/cz,sw,shh,0,0,W2,H2);
+    o.setTransform(1,0,0,1,0,0); o.imageSmoothingEnabled=false; o.globalAlpha=1; o.globalCompositeOperation='source-over'; o.drawImage(low,0,0,cv2.width,cv2.height); o.setTransform(k*cz,0,0,k*cz,k*(160-cx*cz+sx),k*(90-cy*cz+sy)); o.imageSmoothingEnabled=true;
+    try{ sh.hd&&sh.hd(o,t,p); }catch(e){ console.error(e); } o.setTransform(k,0,0,k,0,0); o.globalAlpha=1; o.globalCompositeOperation='source-over';
+    try{ sh.ui&&sh.ui(o,t,p); }catch(e){ console.error(e); }
+    if(sh.grade){ o.save(); o.globalCompositeOperation=sh.grade[2]||'soft-light'; o.fillStyle='rgba('+sh.grade[0]+','+sh.grade[1]+')'; o.fillRect(0,0,W2,H2); o.restore(); }
+    if(sh.vig!==0) CK.vign(o,sh.vig||.42); if(sh.grain!==0){ o.save(); o.globalAlpha=.55; o.drawImage(grain[Math.floor(T2*24)%3],0,0,W2,H2); o.restore(); }
+    if(xf>0){ const tr=sh.tr||'cross'; if(tr==='cross'){ o.setTransform(1,0,0,1,0,0); o.globalAlpha=xf; o.drawImage(prev,0,0); o.globalAlpha=1; o.setTransform(k,0,0,k,0,0); } xf=Math.max(0,xf-dt*(1/(sh.xd||.9))); if(tr==='flash') CK.flash(o,xf); }
+    const fi=sh.fi===undefined?(i===0?.8:0):sh.fi, fo=sh.fo===undefined?(i===shots.length-1?.8:0):sh.fo, a=Math.max(t<fi?1-t/fi:0, t>sh.d-fo?(t-(sh.d-fo))/fo:0); if(a>0){ o.globalCompositeOperation='source-over'; o.fillStyle='rgba(0,0,0,'+Math.min(1,a)+')'; o.fillRect(0,0,W2,H2); }
+    o.fillStyle='#000'; const bh=18*bars; o.fillRect(0,0,W2,bh); o.fillRect(0,H2-bh,W2,bh);
+    raf=requestAnimationFrame(loop); }
+  return {play,busy:()=>busy,L};
+})();
+
+/* ---------- drawing kit (low-res 320×180, integer pixels) ---------- */
+const CK={
+  R:(g,x,y,w,h,c)=>{ g.fillStyle=c; g.fillRect(Math.round(x),Math.round(y),Math.round(w),Math.round(h)); },
+  disc(g,x,y,r,c){ g.fillStyle=c; for(let dy=-r;dy<=r;dy++){ const w=Math.round(Math.sqrt(r*r-dy*dy)); g.fillRect(Math.round(x-w),Math.round(y+dy),w*2+1,1); } },
+  ell(g,x,y,rx,ry,c){ g.fillStyle=c; for(let dy=-ry;dy<=ry;dy++){ const w=Math.round(rx*Math.sqrt(1-(dy*dy)/(ry*ry||1))); g.fillRect(Math.round(x-w),Math.round(y+dy),w*2+1,1); } },
+  sky(g,y0,y1,cols){ const n=cols.length-1; for(let y=y0;y<y1;y++){ const f=(y-y0)/(y1-y0)*n, i=Math.min(n-1,Math.floor(f)), u=f-i; const a=CK.hex(cols[i]), b=CK.hex(cols[i+1]); g.fillStyle='rgb('+Math.round(a[0]+(b[0]-a[0])*u)+','+Math.round(a[1]+(b[1]-a[1])*u)+','+Math.round(a[2]+(b[2]-a[2])*u)+')'; g.fillRect(0,y,320,1); } },
+  hex:h=>[parseInt(h.slice(1,3),16),parseInt(h.slice(3,5),16),parseInt(h.slice(5,7),16)],
+  hills(g,base,amp,fr,col,ph,w){ g.fillStyle=col; for(let x=0;x<(w||320);x++){ const h=amp*(.6+.4*Math.sin(x*fr+ph)+.25*Math.sin(x*fr*3.1+ph*2)); g.fillRect(x,Math.round(base-h),1,Math.round(h)+200); } },
+  rnd(seed){ let s=seed>>>0||1; return ()=>((s=(s*1664525+1013904223)>>>0)/4294967296); },
+  skyline(g,base,seed,col,win,off){ const r=CK.rnd(seed); let x=-((off||0)%40); while(x<330){ const w=12+r()*22, h=20+r()*50; CK.R(g,x,base-h,w,h+200,col); if(win) for(let yy=base-h+4;yy<base-4;yy+=6) for(let xx=x+3;xx<x+w-3;xx+=5) if(r()<.35) CK.R(g,xx,yy,2,3,win); x+=w+1; } },
+  stars(g,n,t,seed){ const r=CK.rnd(seed||7); for(let i=0;i<n;i++){ const x=r()*320, y=r()*90, a=.5+.5*Math.sin(t*2+i); g.globalAlpha=a; CK.R(g,x,y,1,1,'#fff'); } g.globalAlpha=1; },
+  sea(g,y0,cols,t,glit){ CK.sky(g,y0,180,cols); if(glit){ for(let i=0;i<60;i++){ const x=(i*53+t*20*(i%3+1))%330, y=y0+3+(i*17)%(180-y0-4); CK.R(g,x,y,3+(i%3),1,glit); } } },
+  rain(g,t,n,col){ g.fillStyle=col||'rgba(180,200,230,.6)'; for(let i=0;i<(n||120);i++){ const x=(i*37+t*60)%340-10, y=(i*91+t*420)%200-10; g.fillRect(Math.round(x),Math.round(y),1,4); } },
+  fig(g,x,y,h,col,o={}){ const hw=Math.max(2,Math.round(h*.12)); CK.R(g,x-hw,y-h*.62,hw*2,h*.42,col); CK.R(g,x-hw+1,y-h*.22,hw-1,h*.22,col); CK.R(g,x+1,y-h*.22,hw-1,h*.22,col); CK.disc(g,x,y-h*.75,Math.max(2,Math.round(h*.11)),o.head||col); if(o.hair) CK.R(g,x-hw,y-h*.88,hw*2,Math.max(2,h*.08),o.hair); if(o.long) CK.R(g,x-hw-1,y-h*.82,3,h*.4,o.hair||col); },
+  face(g,x,y,s,o){ const S=v=>Math.round(v*s); CK.R(g,x-S(9),y-S(11),S(18),S(22),o.skin); CK.R(g,x-S(9),y-S(11),S(3),S(22),o.skinD||o.skin); if(o.hair){ CK.R(g,x-S(11),y-S(15),S(22),S(7),o.hair); if(o.long){ CK.R(g,x-S(13),y-S(11),S(4),S(26),o.hair); CK.R(g,x+S(9),y-S(11),S(4),S(26),o.hair); } }
+    const bl=o.blink; CK.R(g,x-S(5),y-S(2),S(3),bl?1:S(3),o.eye||'#1a1a2a'); CK.R(g,x+S(2),y-S(2),S(3),bl?1:S(3),o.eye||'#1a1a2a'); if(!bl){ CK.R(g,x-S(5),y-S(2),1,1,'#fff'); CK.R(g,x+S(2),y-S(2),1,1,'#fff'); } if(o.beard) CK.R(g,x-S(8),y+S(4),S(16),S(9),o.beard); CK.R(g,x-S(3),y+S(6),S(6),1,o.mouth||'#8a3a3a'); if(o.tear) CK.R(g,x-S(5),y+S(1)+((o.tear*20)%S(8)),1,2,'#bfe8ff'); },
+  title(o,txt,y,size,col,a){ o.save(); o.globalAlpha=a===undefined?1:a; o.textAlign='center'; o.font='700 '+size+'px "EB Garamond", "Comfortaa", serif'; o.lineWidth=size/5; o.strokeStyle='rgba(0,0,0,.8)'; o.strokeText(txt,160,y); o.fillStyle=col||'#fff'; o.fillText(txt,160,y); o.restore(); },
+  glow(o,x,y,r,rgb,a){ const gr=o.createRadialGradient(x,y,0,x,y,r); gr.addColorStop(0,'rgba('+rgb+','+a+')'); gr.addColorStop(1,'rgba('+rgb+',0)'); o.save(); o.globalCompositeOperation='lighter'; o.fillStyle=gr; o.fillRect(x-r,y-r,r*2,r*2); o.restore(); },
+  beams(o,t,rgb,a,n){ o.save(); o.globalCompositeOperation='lighter'; for(let i=0;i<(n||6);i++){ const x=i*60-20+Math.sin(t*.5+i)*14, w=14+6*Math.sin(t+i); const gr=o.createLinearGradient(0,0,0,180); gr.addColorStop(0,'rgba('+rgb+','+a+')'); gr.addColorStop(1,'rgba('+rgb+',0)'); o.fillStyle=gr; o.beginPath(); o.moveTo(x,0); o.lineTo(x+w,0); o.lineTo(x+w+60,180); o.lineTo(x+30,180); o.fill(); } o.restore(); },
+  vign(o,a,rgb){ const gr=o.createRadialGradient(160,90,60,160,90,200); gr.addColorStop(0,'rgba('+(rgb||'0,0,0')+',0)'); gr.addColorStop(1,'rgba('+(rgb||'0,0,0')+','+a+')'); o.fillStyle=gr; o.fillRect(0,0,320,180); },
+  tint(o,rgb,a,mode){ o.save(); o.globalCompositeOperation=mode||'soft-light'; o.fillStyle='rgba('+rgb+','+a+')'; o.fillRect(0,0,320,180); o.restore(); },
+  flash(o,a){ if(a>0){ o.fillStyle='rgba(255,255,255,'+a+')'; o.fillRect(0,0,320,180); } },
+  portrait(g,id,x,y,s,talk,blink){ if(typeof PTD==='undefined'||!PTD[id]) return false; const c=CK._pc||(CK._pc=document.createElement('canvas')); c.width=42; c.height=42; const x2=c.getContext('2d'); x2.imageSmoothingEnabled=false; try{ PTD[id](x2,!!talk,!!blink); }catch(e){ return false; } g.imageSmoothingEnabled=false; g.drawImage(c,Math.round(x-21*s),Math.round(y-21*s),Math.round(42*s),Math.round(42*s)); return true; },
+  bokeh(o,t,n,rgb,a,seed){ const r=CK.rnd(seed||5); o.save(); o.globalCompositeOperation='lighter'; for(let i=0;i<n;i++){ const x=(r()*360+t*(4+r()*10))%360-20, y=r()*180+Math.sin(t*.7+i)*6, rr=3+r()*9; const gr=o.createRadialGradient(x,y,0,x,y,rr); gr.addColorStop(0,'rgba('+rgb+','+(a*(.5+.5*Math.sin(t*1.3+i)))+')'); gr.addColorStop(.7,'rgba('+rgb+','+(a*.3)+')'); gr.addColorStop(1,'rgba('+rgb+',0)'); o.fillStyle=gr; o.fillRect(x-rr,y-rr,rr*2,rr*2); } o.restore(); },
+  rim(o,x,y,w,h,rgb,a){ o.save(); o.globalCompositeOperation='lighter'; const gr=o.createLinearGradient(x,y,x+w,y); gr.addColorStop(0,'rgba('+rgb+','+a+')'); gr.addColorStop(.25,'rgba('+rgb+',0)'); o.fillStyle=gr; o.fillRect(x,y,w,h); o.restore(); },
+  card(o,txt,y,size,col,a,glow){ o.save(); o.globalAlpha=a===undefined?1:a; o.textAlign='center'; o.font='700 '+size+'px "EB Garamond","Comfortaa",serif'; if(glow){ o.shadowColor='rgba('+glow+',.9)'; o.shadowBlur=size*.8; } o.fillStyle=col||'#fff'; o.fillText(txt,160,y); o.shadowBlur=0; o.restore(); },
+};
+
+/* ---------- hooks: intro before New game · mid at a key point · ending before the end screen ---------- */
+function cineInstall(cfg){ const $$=id=>document.getElementById(id); let bypass=false;
+  document.addEventListener('click',e=>{ const b=e.target.closest&&e.target.closest('#tNew'); if(!b||bypass||CINE.busy()) return; e.stopImmediatePropagation(); e.preventDefault(); try{ if(typeof A!=='undefined'&&A.init) A.init(); }catch(_){}
+    CINE.play(cfg.intro,()=>{ bypass=true; b.click(); bypass=false; },cfg.introMood); },true);
+  setInterval(()=>{ if(CINE.busy()||typeof S==='undefined'||S.mode!=='play'||typeof F==='undefined'||!F||F.__cm) return; if(cfg.midWhen()){ F.__cm=1; CINE.play(cfg.mid,()=>{},cfg.midMood); } },300);
+  const end=$$('end'); if(end) new MutationObserver(()=>{ if(end.hidden||end.dataset.cine==='1'||end.classList.contains('over')) return; end.dataset.cine='1'; end.style.visibility='hidden';
+    CINE.play(cfg.ending(),()=>{ end.style.visibility=''; },cfg.endMood); }).observe(end,{attributes:true,attributeFilter:['hidden']});
+  const tn=$$('tNew'); if(tn) tn.addEventListener('click',()=>{ if(end) end.dataset.cine='0'; }); }
+
+(()=>{
+/* ===== cutscenes · Απογραφή · Λουκουμάς · Περιπολικό 7 · Κοκκινοσκουφίτσα ===== */
+const C=CK;
+function tower(g,x,base,h,col){ C.R(g,x-7,base-h,14,h,col); C.R(g,x-8,base-h-3,16,3,col); for(let i=0;i<3;i++) C.R(g,x-5+i*4,base-h+8,2,3,'#ffd890'); }
+function whiteHouses(g,base,seed,day){ const r=C.rnd(seed); for(let i=0;i<14;i++){ const x=150+i*12+r()*6, y=base-i%4*6-r()*10, w=10+r()*6; C.R(g,x,y-10,w,12,day?'#f4f0e8':'#c8c0c8'); C.R(g,x+2,y-7,2,3,day?'#3a7ad8':'#ffd890'); if(i%4===0) { C.disc(g,x+w/2,y-12,3,'#3a7ad8'); } } }
+function lightning(o,t,period){ const ph=t%period; return ph<.08||(ph>.18&&ph<.24)?.55:0; }
+function carSide(g,x,y,col,lights){ C.R(g,x,y-8,40,8,col); C.R(g,x+8,y-14,22,7,col); C.R(g,x+10,y-13,8,5,'#9ad0f0'); C.R(g,x+20,y-13,8,5,'#9ad0f0'); C.disc(g,x+8,y,4,'#1a1a1a'); C.disc(g,x+32,y,4,'#1a1a1a'); if(lights){ C.R(g,x+14,y-16,4,2,lights[0]); C.R(g,x+20,y-16,4,2,lights[1]); } }
+
+function CS_apografi(){ const rainSky=['#05070e','#0c1220','#141c30'];
+  return { introMood:'horror', midMood:'horror', endMood:'horror', midWhen:()=>S.scene==='dream',
+  intro:[
+    {d:6.5,cap:['Θεσσαλονίκη, 1987. Βρέχει τρεις μέρες χωρίς σταματημό.','Thessaloniki, 1987. It has rained for three days without stopping.'],
+     low(g,t){ C.sky(g,0,130,rainSky); C.skyline(g,128,3,'#0a0e18','#5a4a2a'); tower(g,60,128,44,'#0e1220'); C.sea(g,128,['#0a1222','#04070e'],t,'#2a3448'); C.rain(g,t,160); },
+     hd(o,t,p){ C.flash(o,lightning(o,t,3.2)); C.title(o,CINE.L(['ΑΠΟΓΡΑΦΗ','INVENTORY']),70,26,'#e8d8b8',Math.min(1,t/1.5)); C.vign(o,.6); }},
+    {d:5.5,cap:['Ο Λευτέρης Σταθάκης, δικαστικός εκτιμητής, είχε μια τελευταία δουλειά για σήμερα.','Lefteris Stathakis, a court appraiser, had one last job for the day.'],
+     low(g,t,p){ C.sky(g,0,100,rainSky); C.R(g,200,30,90,80,'#14121a'); C.R(g,236,70,18,40,'#0a080e'); for(const x of [212,268]) C.R(g,x,50,12,14,'#2a2418'); C.R(g,0,110,320,70,'#0c0e14'); for(let i=0;i<20;i++) C.R(g,i*17,140,10,1,'#2a3040'); const x=20+p*150; C.fig(g,x,150,34,'#08080c'); C.R(g,x-10,112,20,3,'#101018'); C.R(g,x,112,1,6,'#101018'); C.R(g,60,60,3,60,'#1a1a22'); C.rain(g,t,140); },
+     hd(o,t,p){ C.glow(o,61,62,40,'255,210,140',.4); C.glow(o,218,57,10,'255,200,120',.25); C.flash(o,lightning(o,t+1.3,4)); C.vign(o,.6); }},
+    {d:5.5,cap:['«Εντολή απογραφής. Οικία Σταθάκη.» Το ίδιο επώνυμο με το δικό του. Σύμπτωση, σκέφτηκε.','"Inventory order. Stathakis residence." The same surname as his own. A coincidence, he thought.'],
+     low(g,t,p){ C.R(g,0,0,320,180,'#1a140e'); const s=1+p*.12; g.save(); g.translate(160,90); g.scale(s,s); g.translate(-160,-90); C.R(g,90,30,140,120,'#e8dcc0'); C.R(g,90,30,140,14,'#d8c8a0'); for(let i=0;i<9;i++) C.R(g,102,56+i*9,90-(i%3)*20,2,'#6a5a4a'); C.R(g,180,128,40,10,'#8a2a2a'); C.R(g,70,120,40,30,'#c8a080'); g.restore(); },
+     hd(o){ C.glow(o,160,80,120,'255,220,160',.18); C.vign(o,.7); }},
+    {d:6,cap:['Μέσα, όλα ήταν σκεπασμένα με σεντόνια. Μόνο ένα πράγμα δεν είχε σκεπάσει κανείς: το ρολόι. Σταματημένο στις 3:17.','Inside, everything was covered in sheets. Only one thing had been left uncovered: the clock. Stopped at 3:17.'],
+     low(g,t,p){ C.R(g,0,0,320,180,'#0a0806'); const s=1+p*.35; g.save(); g.translate(160,80); g.scale(s,s); C.R(g,-26,-70,52,150,'#3a2414'); C.disc(g,0,-36,22,'#e8dcc0'); C.disc(g,0,-36,2,'#1a1a1a'); g.strokeStyle='#1a1a1a'; g.lineWidth=2; g.beginPath(); g.moveTo(0,-36); g.lineTo(0,-36-14); g.moveTo(0,-36); g.lineTo(Math.cos(1.5)*10,-36+Math.sin(1.5)*10*-.2+8); g.stroke(); for(let i=0;i<12;i++){ const a=i/12*6.28; C.R(g,Math.cos(a)*18-1,-36+Math.sin(a)*18-1,2,2,'#3a2a1a'); } C.R(g,-2,-8,4,40,'#a88040'); C.disc(g,0,34,7,'#c8a050'); g.restore(); },
+     hd(o,t){ C.glow(o,160,44,60,'255,200,120',.2); C.vign(o,.8); }},
+  ],
+  mid:[
+    {d:4.5,cap:['Το ρολόι χτυπάει. Μία… δύο… τρεις…','The clock strikes. One… two… three…'],low(g,t){ C.R(g,0,0,320,180,'#140404'); const a=Math.sin(t*3)*.6; g.save(); g.translate(160,10); g.rotate(a); C.R(g,-2,0,4,120,'#a88040'); C.disc(g,0,124,14,'#c8a050'); g.restore(); },hd(o,t){ C.tint(o,'200,20,20',.5,'multiply'); C.glow(o,160,120,80,'255,60,40',.25+.15*Math.sin(t*6)); C.vign(o,.85); }},
+    {d:4.5,cap:['Οι τοίχοι τεντώνονται. Ο διάδρομος δεν τελειώνει.','The walls stretch. The corridor never ends.'],low(g,t,p){ C.R(g,0,0,320,180,'#1a0606'); for(let i=0;i<14;i++){ const k=((i/14)+(t*.25))%1, s=Math.pow(k,2.2), w=320*s, h=180*s; g.strokeStyle=i%2?'#4a1010':'#2a0808'; g.lineWidth=Math.max(1,s*4); g.strokeRect(160-w/2,90-h/2,w,h); } },hd(o){ C.tint(o,'160,0,0',.35,'multiply'); C.vign(o,.9); }},
+    {d:4.5,cap:['Στο βάθος, κάποιος κρατάει ένα κερί. Τον περίμενε.','At the far end, someone holds a candle. Waiting for him.'],low(g,t){ C.R(g,0,0,320,180,'#0a0202'); C.fig(g,160,130,30,'#000'); },hd(o,t){ C.glow(o,163,96,30+4*Math.sin(t*9),'255,170,90',.6); C.vign(o,.9); }},
+  ],
+  ending:()=>[
+    {d:5.5,cap:['Το πρωί, η βροχή σταμάτησε. Για πρώτη φορά μετά από μέρες, ο ουρανός ρόδισε.','In the morning, the rain stopped. For the first time in days, the sky turned pink.'],low(g,t,p){ C.sky(g,0,130,['#3a3a6a','#c87a8a','#ffc8a0']); C.skyline(g,128,3,'#2a2030','#ffd890'); tower(g,60,128,44,'#2a2030'); C.sea(g,128,['#c88a9a','#4a3a5a'],t,'#ffe0c0'); },hd(o,t,p){ C.glow(o,250,124,90,'255,200,150',.4*p); }},
+    {d:5,cap:['Ο Λευτέρης κλείδωσε την πόρτα πίσω του. Η απογραφή είχε τελειώσει.','Lefteris locked the door behind him. The inventory was done.'],low(g,t,p){ C.sky(g,0,100,['#8a7aa8','#e8b8a8']); C.R(g,200,30,90,80,'#3a3040'); C.R(g,236,70,18,40,p>.3?'#1a141a':'#5a4a3a'); C.R(g,0,110,320,70,'#4a4450'); C.fig(g,236-p*160,150,34,'#1a1620'); }},
+    {d:6,cap:['Κάποια πράγματα δεν απογράφονται. Τα κουβαλάς μαζί σου.','Some things can\'t be inventoried. You carry them with you.'],low(g,t){ C.R(g,0,0,320,180,'#0a0806'); g.save(); g.translate(160,80); C.disc(g,0,0,40,'#e8dcc0'); g.strokeStyle='#1a1a1a'; g.lineWidth=3; const a=-1.57+t*.6; g.beginPath(); g.moveTo(0,0); g.lineTo(Math.cos(a)*30,Math.sin(a)*30); g.moveTo(0,0); g.lineTo(Math.cos(1.6)*18,Math.sin(1.6)*18); g.stroke(); g.restore(); },hd(o,t){ C.glow(o,160,80,90,'255,220,160',.25); C.title(o,CINE.L(['Τέλος','The End']),160,14,'#e8d8b8',Math.min(1,t/3)); C.vign(o,.7); }},
+  ]}; }
+
+function CS_loukoumas(){ return { introMood:'sunny', midMood:'sunny', endMood:'sunny', midWhen:()=>S.scene==='disco',
+  intro:[
+    {d:6,cap:['Αιγαίο, καλοκαίρι 1988.','The Aegean, summer 1988.'],low(g,t,p){ C.sky(g,0,100,['#3a98ff','#b2e2ff']); C.hills(g,100,26,.02,'#c8b890',1); whiteHouses(g,92,5,true); C.sea(g,100,['#2b8de8','#1a5ab8'],t,'#ffffff'); const x=-60+p*150; C.R(g,x,112,70,10,'#f4f4f4'); C.R(g,x+8,104,40,8,'#f4f4f4'); C.R(g,x+30,96,8,8,'#e8463a'); C.R(g,x,120,70,3,'#1a3a8a'); for(let i=0;i<3;i++){ const bx=60+i*70+Math.sin(t*2+i)*10, by=40+i*8+Math.sin(t*3+i)*4; C.R(g,bx-4,by,4,1,'#fff'); C.R(g,bx+1,by,4,1,'#fff'); } },
+     hd(o,t){ C.glow(o,262,26,50,'255,240,180',.6); C.title(o,CINE.L(['Ο Λουκουμάς στο Αλμυρίκι','Loukoumas on Almyriki']),64,18,'#ffd23f',Math.min(1,t/1.5)); }},
+    {d:6,cap:['Ο Τάκης Λουκουμάς, λογιστής, ήρθε για ήλιο, θάλασσα… και έρωτα.','Takis Loukoumas, accountant, came for sun, sea… and love.'],low(g,t,p){ C.sky(g,0,180,['#7ac8ff','#d8f0ff']); C.R(g,0,120,320,60,'#f4f4f4'); C.R(g,0,118,320,3,'#1a3a8a'); C.fig(g,150,150,46,'#3a3a46',{head:'#eab58c',hair:'#2a1a12'}); C.R(g,166,128,16,14,'#8a4a2a'); const sx=p<.5?200-p*80:160+(p-.5)*400, sy=p<.5?60+p*60:90-(p-.5)*160; C.R(g,sx-6,sy,6,2,'#fff'); C.R(g,sx+1,sy,6,2,'#fff'); C.R(g,sx,sy+1,3,3,'#fff'); if(p>.5) C.disc(g,sx+2,sy+6,3,'#d8a050'); else C.disc(g,142,126,3,'#d8a050'); }},
+    {d:5,cap:['Και το Σάββατο: ο μεγάλος διαγωνισμός χορού. Η Δανάη θα είναι εκεί.','And on Saturday: the big dance contest. Danae will be there.'],low(g,t,p){ C.R(g,0,0,320,180,'#f4f0e8'); g.save(); const s=1+p*.1; g.translate(160,90); g.scale(s,s); g.translate(-160,-90); C.R(g,90,20,140,140,'#e0338a'); C.R(g,100,30,120,120,'#ffd23f'); C.R(g,110,40,100,20,'#2b1d3a'); for(let i=0;i<5;i++){ C.disc(g,130+i*15,110,5+Math.sin(t*4+i)*2,['#e8463a','#3a7ad8','#3fae4a','#ff8a2a','#9a5ab8'][i]); } g.restore(); },hd(o,t){ C.title(o,CINE.L(['ΔΙΑΓΩΝΙΣΜΟΣ ΧΟΡΟΥ','DANCE CONTEST']),56,12,'#ffd23f',1); }},
+  ],
+  mid:[
+    {d:5,cap:['Ο ήλιος βούτηξε στη θάλασσα. Το Αλμυρίκι άναψε.','The sun dipped into the sea. Almyriki lit up.'],low(g,t,p){ const c=p<.5?['#ff8a4a','#ffc070']:['#1a1a4a','#5a3a7a']; C.sky(g,0,100,c); C.hills(g,100,26,.02,p<.5?'#8a6a5a':'#1a1a2a',1); whiteHouses(g,92,5,p<.5); C.sea(g,100,p<.5?['#e87a4a','#5a3a7a']:['#1a1a3a','#0a0a1a'],t,p<.5?'#ffd090':'#ffd890'); },hd(o,t,p){ if(p<.5) C.glow(o,250,98-p*40,40,'255,180,90',.6); else C.glow(o,230,80,60,'255,80,200',.3*Math.sin(t*6)+.3); }},
+    {d:5,cap:['Στη ντισκοτέκ, οι μπάλες-καθρέφτες γύρισαν. Ήρθε η ώρα.','At the disco, the mirror balls began to spin. It was time.'],low(g,t){ C.R(g,0,0,320,180,'#140a24'); for(let i=0;i<8;i++) for(let j=0;j<5;j++) C.R(g,40+i*30,110+j*14,28,12,['#e0338a','#3a7ad8','#ffd23f','#3fae4a'][(i+j+Math.floor(t*4))%4]); C.disc(g,160,30,12,'#c8c8d8'); },hd(o,t){ for(let i=0;i<6;i++){ const a=t*1.5+i; C.glow(o,160+Math.cos(a)*120,90+Math.sin(a*1.3)*50,30,['255,80,200','80,180,255','255,230,80'][i%3],.35); } C.glow(o,160,30,24,'255,255,255',.5); }},
+  ],
+  ending:()=>[
+    {d:6,cap:['Πυροτεχνήματα πάνω από τον κόλπο. Το νησί χειροκροτούσε.','Fireworks over the bay. The whole island was cheering.'],low(g,t){ C.sky(g,0,110,['#0a0a2a','#2a1a4a']); C.hills(g,110,24,.02,'#0a0a1a',1); whiteHouses(g,104,5,false); C.sea(g,110,['#1a1a3a','#05050f'],t,'#ffd890'); },hd(o,t){ for(let i=0;i<5;i++){ const ph=(t*.7+i*.37)%1, x=40+i*60, y=30+(i%2)*20; for(let k=0;k<12;k++){ const a=k/12*6.28; C.glow(o,x+Math.cos(a)*ph*30,y+Math.sin(a)*ph*30+ph*ph*10,5,['255,80,120','255,220,80','120,200,255'][i%3],(1-ph)*.8); } } }},
+    {d:6,cap:['Ο Τάκης κέρδισε τον διαγωνισμό. Και κάτι πολύ πιο σημαντικό.','Takis won the contest. And something far more important.'],low(g,t){ C.R(g,0,0,320,180,'#140a24'); for(let i=0;i<8;i++) for(let j=0;j<4;j++) C.R(g,40+i*30,124+j*14,28,12,['#e0338a','#3a7ad8','#ffd23f','#3fae4a'][(i+j+Math.floor(t*4))%4]); const b=Math.sin(t*6)*3; C.fig(g,145,124+b,50,'#2b1d3a',{head:'#eab58c',hair:'#2a1a12'}); C.fig(g,175,124-b,46,'#e0338a',{head:'#f0c8a0',hair:'#ffd23f',long:true}); },hd(o,t){ C.glow(o,160,30,30,'255,255,255',.4); C.glow(o,160,90,60,'255,120,200',.25); C.title(o,CINE.L(['Τέλος','The End']),40,16,'#ffd23f',Math.min(1,t/3)); }},
+  ]}; }
+
+function CS_peripoliko(){ return { introMood:'police', midMood:'police', endMood:'police', midWhen:()=>S.scene==='street',
+  intro:[
+    {d:6,cap:['Ακτή, 1989. Πέντε και μισή το πρωί.','Akti, 1989. Half past five in the morning.'],low(g,t,p){ C.sky(g,0,120,['#1a2a5a','#8a7aa8','#ffb08a']); C.skyline(g,120,9,'#2a2a4a','#ffe090'); C.R(g,0,120,320,60,'#4a4a5a'); C.R(g,110,70,100,50,'#5a6a8a'); C.R(g,110,66,100,6,'#3a4a6a'); C.R(g,140,74,40,8,'#f4f4f4'); C.R(g,150,96,20,24,'#2a3a5a'); },hd(o,t){ o.save(); o.font='700 6px sans-serif'; o.textAlign='center'; o.fillStyle='#1a2a6a'; o.fillText(CINE.L(['ΑΣΤΥΝΟΜΙΑ','POLICE']),160,80.5); o.restore(); C.title(o,CINE.L(['Περιπολικό 7','Patrol Car 7']),40,22,'#ffffff',Math.min(1,t/1.5)); C.glow(o,300,118,70,'255,190,130',.35); }},
+    {d:5.5,cap:['Η πρώτη βάρδια του αστυφύλακα Άρη Μαυρίδη.','Officer Aris Mavridis\'s first shift.'],low(g,t,p){ C.R(g,0,0,320,180,'#2a3a5a'); g.save(); g.translate(160,90); const s=1.2+p*.3; g.scale(s,s); C.disc(g,0,0,30,'#c8a040'); C.disc(g,0,0,24,'#e8c860'); C.R(g,-6,-12,12,24,'#1a2a6a'); C.R(g,-3,-6,6,3,'#ffffff'); g.restore(); },hd(o,t){ const x=(t*60)%400-40; C.glow(o,x,70,30,'255,255,255',.5); C.title(o,'7',100,22,'#ffffff',.9); }},
+    {d:5,cap:['Κανονισμός, υπομονή, ψυχραιμία. Και κανένα λάθος.','Regulations, patience, composure. And no mistakes.'],low(g,t,p){ C.R(g,0,0,320,180,'#1a1a22'); for(let i=0;i<6;i++){ C.R(g,30+i*45,40,40,110,i===3?'#5a6a7a':'#3a4a5a'); C.R(g,62+i*45,90,3,8,'#c8c8c8'); } C.R(g,0,150,320,30,'#2a2a30'); },hd(o,t){ const on=t>1&&(t>1.6||Math.sin(t*40)>0); if(on){ C.glow(o,160,10,140,'220,240,255',.35); } C.title(o,'7',70,10,'#ffffff',1); }},
+  ],
+  mid:[
+    {d:5.5,cap:['Περιπολικό 7, σε περιπολία. Το κέντρο ακούει.','Patrol Car 7, on patrol. Dispatch is listening.'],low(g,t,p){ C.sky(g,0,110,['#5a9ad8','#c8e0f0']); C.skyline(g,110,4,'#8a9ab8','#ffffff',t*30); C.R(g,0,110,320,70,'#4a4a52'); for(let i=0;i<10;i++) C.R(g,(i*40-t*120)%360+360-40,142,20,2,'#e8e8e8'); carSide(g,130,150,'#f4f4f4',['#ff3030','#3060ff']); C.R(g,130,144,40,2,'#1a3a8a'); },hd(o,t){ const a=Math.sin(t*12)>0; C.glow(o,146,134,30,a?'255,40,40':'40,80,255',.6); }},
+  ],
+  ending:()=>[
+    {d:6,cap:['Το περιπολικό γύρισε στο τμήμα με τη δύση του ήλιου.','The patrol car came back to the station at sunset.'],low(g,t){ C.sky(g,0,120,['#2a2a5a','#c86a6a','#ffb070']); C.skyline(g,120,9,'#2a2030','#ffe090'); C.R(g,0,120,320,60,'#3a3440'); C.R(g,110,70,100,50,'#4a4a6a'); carSide(g,40,150,'#e8e8e8'); },hd(o){ C.glow(o,260,118,80,'255,170,110',.4); }},
+    {d:6,cap:['Αναφορά υπογεγραμμένη. Ο κανονισμός τηρήθηκε. Τέλος βάρδιας.','Report signed. Regulations followed. End of shift.'],low(g,t,p){ C.R(g,0,0,320,180,'#3a2a1a'); C.R(g,90,30,140,120,'#f0e8d8'); for(let i=0;i<9;i++) C.R(g,104,46+i*9,100-(i%3)*18,2,'#4a4a5a'); if(p>.4){ g.save(); g.translate(190,128); g.rotate(-.2); C.R(g,-24,-8,48,16,'rgba(40,60,160,.75)'); g.restore(); } },hd(o,t){ C.title(o,CINE.L(['Τέλος βάρδιας','End of shift']),24,12,'#ffffff',Math.min(1,t/2)); }},
+  ]}; }
+
+function CS_kokkino(){ return { introMood:'tale', midMood:'tale', endMood:'tale', midWhen:()=>S.scene==='forest',
+  intro:[
+    {d:5.5,cap:['Μια φορά κι έναν καιρό…','Once upon a time…'],low(g,t,p){ C.R(g,0,0,320,180,'#8a5a3a'); for(let i=0;i<12;i++) C.R(g,0,i*16,320,1,'#7a4a2a'); const w=Math.max(4,140*(1-Math.max(0,p-.6)*2.5)); C.R(g,160-w/2-4,26,w+8,130,'#5a1a1a'); C.R(g,160-w/2,30,w,122,'#c8302a'); if(w>60) C.disc(g,160,80,22,'#e8e0d0'); },hd(o,t,p){ if(p<.6) C.title(o,CINE.L(['Η Κοκκινοσκουφίτσα','Little Red Riding Hood']),130,13,'#ffe8b0',1); C.glow(o,160,70,120,'255,220,160',.15); }},
+    {d:6,cap:['…ζούσε ένα κοριτσάκι που φορούσε πάντα μια κόκκινη κάπα.','…there lived a little girl who always wore a red cape.'],low(g,t,p){ C.sky(g,0,110,['#8fd5ff','#e2f6ff']); C.hills(g,110,20,.02,'#7ac860',2); C.R(g,0,110,320,70,'#86cc5c'); C.R(g,40,70,50,40,'#f4e8d0'); g.fillStyle='#c8302a'; g.beginPath(); g.moveTo(34,72); g.lineTo(65,48); g.lineTo(96,72); g.fill(); C.R(g,58,86,12,24,'#8a5a2a'); for(let i=0;i<14;i++) C.disc(g,(i*29)%320,130+(i*13)%40,2,['#ff6a8a','#ffe066','#ffffff'][i%3]); const x=120+p*80; C.fig(g,x,150,30,'#e0262f',{head:'#ffe3cf',hair:'#e0262f'}); },hd(o){ C.glow(o,280,30,60,'255,240,180',.5); }},
+    {d:5,cap:['Μια μέρα, η μαμά της είπε: «Η γιαγιά είναι άρρωστη. Πήγαινέ της κουλουράκια.»','One day, her mum said: "Grandma is poorly. Take her some cookies."'],low(g,t){ C.R(g,0,0,320,180,'#f4e8d0'); C.R(g,0,130,320,50,'#c98a4f'); C.fig(g,120,140,56,'#3fae6e',{head:'#ffe3cf',hair:'#8a4a2a'}); C.fig(g,190,140,34,'#e0262f',{head:'#ffe3cf',hair:'#e0262f'}); C.R(g,200,118,14,10,'#c8903a'); },hd(o){ C.glow(o,160,60,100,'255,220,160',.2); }},
+  ],
+  mid:[
+    {d:5,cap:['Το δάσος ήταν μεγάλο και πράσινο, γεμάτο πουλάκια και πεταλούδες.','The forest was big and green, full of birds and butterflies.'],low(g,t){ C.R(g,0,0,320,180,'#3a7a4a'); for(let i=0;i<9;i++){ C.R(g,i*38,20,12,160,'#5a3a2a'); C.disc(g,i*38+6,30,26,'#2f6a3a'); } C.R(g,0,140,320,40,'#5a9a4a'); for(let i=0;i<4;i++){ const x=(i*80+t*30)%340, y=100+Math.sin(t*3+i)*10; C.R(g,x,y,3,2,'#ffe066'); C.R(g,x+3,y-1,2,4,'#ff8ab0'); } },hd(o,t){ C.beams(o,t,'255,240,170',.18,6); }},
+    {d:5,cap:['Μα πίσω από έναν θάμνο, δύο κίτρινα μάτια παρακολουθούσαν… Ποιος να ’ναι άραγε;','But behind a bush, two yellow eyes were watching… Who could it be?'],low(g,t){ C.R(g,0,0,320,180,'#1a3a2a'); C.ell(g,160,110,90,40,'#2a5a3a'); C.ell(g,140,100,60,30,'#346a44'); const bl=(t%2.4)<.15; C.R(g,140,96,8,bl?1:6,'#ffd23f'); C.R(g,166,96,8,bl?1:6,'#ffd23f'); if(!bl){ C.R(g,143,98,2,3,'#1a1a1a'); C.R(g,169,98,2,3,'#1a1a1a'); } },hd(o){ C.glow(o,157,99,30,'255,220,80',.25); C.vign(o,.6); }},
+  ],
+  ending:()=>[
+    {d:6,cap:['Και όλοι μαζί έκαναν ένα μεγάλο πάρτι στο σπιτάκι της γιαγιάς!','And they all had a big party at Grandma\'s cottage!'],low(g,t){ C.R(g,0,0,320,180,'#f4d8b0'); C.R(g,0,130,320,50,'#c98a4f'); const b=Math.sin(t*6)*3; C.fig(g,90,150+b,30,'#e0262f',{head:'#ffe3cf',hair:'#e0262f'}); C.fig(g,140,150-b,46,'#9a5ab8',{head:'#ffe3cf',hair:'#e8e8e8'}); C.fig(g,195,150+b,56,'#7a5a2a',{head:'#ffe3cf',hair:'#7a4a2a'}); C.fig(g,250,150-b,44,'#8a8a9a',{head:'#9a9aaa'}); for(let i=0;i<40;i++){ const x=(i*29+t*30*(i%3+1))%320, y=(i*47+t*60)%180; C.R(g,x,y,2,2,['#e0262f','#ffd23f','#3fae6e','#4aa8ff'][i%4]); } },hd(o){ C.glow(o,160,40,100,'255,230,160',.3); }},
+    {d:5,cap:['Και ο λύκος; Έμαθε να ζητάει συγγνώμη. Και να τρώει κουλουράκια.','And the wolf? He learned to say sorry. And to eat cookies.'],low(g,t,p){ C.R(g,0,0,320,180,'#8a5a3a'); const w=Math.max(4,140*Math.min(1,p*1.6)); C.R(g,160-w/2-4,26,w+8,130,'#5a1a1a'); C.R(g,160-w/2,30,w,122,'#c8302a'); },hd(o,t,p){ if(p>.5) C.title(o,CINE.L(['Τέλος','The End']),96,18,'#ffe8b0',Math.min(1,(p-.5)*3)); }},
+  ]}; }
+
+cineInstall(CS_kokkino());
+})();
+</script>
+</body>
+</html>
