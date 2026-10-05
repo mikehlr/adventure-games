@@ -108,6 +108,14 @@ button:focus-visible{outline:3px solid var(--sun);outline-offset:2px;}
 
 [hidden]{display:none!important;}
 </style>
+
+
+
+<style id="gfxcss">
+/* settings panel: scrollable on small screens (content centred only when it fits) */
+#settings{overflow-y:auto!important;justify-content:flex-start!important;padding-top:calc(var(--u)*8)!important;padding-bottom:calc(var(--u)*10)!important;touch-action:pan-y!important;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;}
+#settings>*{flex-shrink:0;} #settings>:first-child{margin-top:auto!important;} #settings>:last-child{margin-bottom:auto!important;}
+</style>
 </head>
 <body>
 <div id="wrap">
@@ -826,6 +834,177 @@ fit(); toTitle(); requestAnimationFrame(loop);
 
 
 
+
+
+
+<script id="gfx">
+/* ===== GFX+ — engine-independent graphics pack =====
+   Works on any of our builds (needs: render(), a composite*() HD pass, SC[*].img backgrounds, S.cam, cv, octx, OW/OH).
+   Each background is split automatically into FAR (sky and sea, found by flood-fill from the top row and from the sea band,
+   so blue doors/windows/domes inside buildings are NOT taken) and NEAR (everything else). Every frame:
+   far (45% parallax, palette-cycled sea, heat shimmer) → drifting clouds → boat → birds → near.
+   HD post: soft bloom, horizon haze, indoor dust motes, optional CRT. A frame-time monitor lowers quality on its own. */
+(()=>{
+  const KEY='gfx-'+((typeof G!=='undefined'&&G.key)||document.title||'game').replace(/\s+/g,'-');
+  const P=(()=>{ try{ return JSON.parse(localStorage.getItem(KEY))||{}; }catch(e){ return {}; } })();
+  const GX={on:P.on!==false, crt:!!P.crt, lvl:2, ft:[], st:{}};
+  const save=()=>{ try{ localStorage.setItem(KEY,JSON.stringify({on:GX.on,crt:GX.crt})); }catch(e){} };
+  const L=a=>(typeof LANG!=='undefined'&&LANG==='en')?a[1]:a[0];
+  const FULL=()=>typeof FXFULL==='undefined'?true:FXFULL;
+  const blue=(r,g,b)=>b>165&&b-r>55&&g-r>18;
+  function build(s,id){ const src=s.img; if(!src||!src.getContext) return {none:true,src}; const w=src.width, h=src.height, d=src.getContext('2d').getImageData(0,0,w,h).data;
+    const lim=typeof s.gy==='number'?s.gy:typeof s.far==='number'?s.far-2:140, band=Math.max(0,Math.min(h,140,lim));
+    const reg=new Uint8Array(w*h), dist=(i,c)=>Math.abs(d[i]-c[0])+Math.abs(d[i+1]-c[1])+Math.abs(d[i+2]-c[2]);
+    const rowTop=y=>{ const m={}; for(let x=0;x<w;x++){ const i=(y*w+x)*4, k=d[i]<<16|d[i+1]<<8|d[i+2]; m[k]=(m[k]||0)+1; } return Object.entries(m).sort((a,b)=>b[1]-a[1]).slice(0,2).map(([k,n])=>[[k>>16&255,k>>8&255,k&255],n/w]); };
+    let skyBot=-1, lum=0, ln=0;
+    for(let y=0;y<band;y++){ const t=rowTop(y), cols=[t[0][0]]; if(t[1]&&t[1][1]>.12) cols.push(t[1][0]); let n=0;
+      for(let x=0;x<w;x++){ const p=y*w+x, i=p*4; if(cols.some(c=>dist(i,c)<36)){ reg[p]=1; n++; if(y<20){ lum+=d[i]*.3+d[i+1]*.59+d[i+2]*.11; ln++; } } }
+      const c0=t[0][0], ground=y>45&&((c0[0]>c0[2]+40&&c0[1]>c0[2]&&c0[0]+c0[1]+c0[2]>330)||(c0[1]>c0[0]+15&&c0[1]>c0[2]+15));
+      if(n<w*.5||ground){ for(let x=0;x<w;x++) reg[y*w+x]=0; break; } skyBot=y; }
+    lum=ln?lum/ln:0; const day=lum>45&&!s.underwater&&!s.night&&!s.dark;
+    if(skyBot<15||!day) return {none:true,src,indoor:skyBot<15,lum};
+    const sb=(r,g,b)=>b>150&&b-r>100&&g-r>40; let seaTop=-1, seaBot=-1;
+    let hz=-1, prev=rowTop(24)[0][0]; for(let y=25;y<=skyBot;y++){ const c=rowTop(y)[0][0]; if(Math.abs(c[0]-prev[0])+Math.abs(c[1]-prev[1])+Math.abs(c[2]-prev[2])>80){ hz=y; break; } prev=c; }
+    if(hz>0) for(let y=hz;y<=skyBot;y++){ let n=0; for(let x=0;x<w;x++){ const i=(y*w+x)*4; if(sb(d[i],d[i+1],d[i+2])) n++; } if(n>w*.35){ if(seaTop<0) seaTop=y; seaBot=y; } else if(seaTop>0) break; }
+    if(seaTop<0) for(let y=skyBot+1;y<band;y++){ let n=0; for(let x=0;x<w;x++){ const i=(y*w+x)*4; if(sb(d[i],d[i+1],d[i+2])) n++; }
+      if(n>w*.35){ if(seaTop<0) seaTop=y; seaBot=y; for(let x=0;x<w;x++){ const p=y*w+x, i=p*4; if(sb(d[i],d[i+1],d[i+2])) reg[p]=1; } } else if(seaTop>0) break; else if(y>skyBot+14) break; }
+    const bot=Math.max(skyBot,seaBot);
+    const seen=new Uint8Array(w*(bot+1)); for(let y=0;y<=bot;y++) for(let x=0;x<w;x++){ const p=y*w+x; if(reg[p]||seen[p]) continue; const comp=[p]; seen[p]=1; let k=0, big=false;
+      while(k<comp.length){ const c=comp[k++], cx=c%w, cy=(c/w)|0; for(const [dx,dy] of [[1,0],[-1,0],[0,1],[0,-1]]){ const xx=cx+dx, yy=cy+dy; if(xx<0||xx>=w||yy<0) continue; if(yy>bot){ big=true; continue; } const p2=yy*w+xx; if(reg[p2]||seen[p2]) continue; seen[p2]=1; comp.push(p2); if(comp.length>14) big=true; } if(big&&comp.length>40) break; }
+      if(!big) for(const c of comp) reg[c]=2; }
+    const fill=[]; for(let y=0;y<=bot;y++){ let n=0,r=0,g=0,b=0; for(let x=0;x<w;x++){ const p=y*w+x; if(reg[p]===1){ const i=p*4; r+=d[i]; g+=d[i+1]; b+=d[i+2]; n++; } } fill[y]=n?[r/n|0,g/n|0,b/n|0]:(fill[y-1]||[d[0],d[1],d[2]]); }
+    const far=document.createElement('canvas'); far.width=w; far.height=bot+1; const fg=far.getContext('2d'), fid=fg.createImageData(w,bot+1), fd=fid.data;
+    const nc=document.createElement('canvas'); nc.width=w; nc.height=h; const ng=nc.getContext('2d'), nid=ng.createImageData(w,h), nd=nid.data;
+    for(let y=0;y<h;y++) for(let x=0;x<w;x++){ const p=y*w+x, i=p*4; if(y<=bot){ if(reg[p]){ fd[i]=d[i]; fd[i+1]=d[i+1]; fd[i+2]=d[i+2]; } else { const f=fill[y]; fd[i]=f[0]; fd[i+1]=f[1]; fd[i+2]=f[2]; nd[i]=d[i]; nd[i+1]=d[i+1]; nd[i+2]=d[i+2]; nd[i+3]=255; } fd[i+3]=255; }
+      else { nd[i]=d[i]; nd[i+1]=d[i+1]; nd[i+2]=d[i+2]; nd[i+3]=255; } }
+    const sea=[]; if(seaTop>0) for(let y=seaTop;y<=seaBot;y++) for(let x=0;x<w;x++){ const p=y*w+x; if(reg[p]) sea.push(p*4,x,y); }
+    fg.putImageData(fid,0,0); ng.putImageData(nid,0,0);
+    const out=document.createElement('canvas'); out.width=w; out.height=h; let v=w*7+h; const rnd=()=>((v=(v*9301+49297)%233280)/233280);
+    const top2=hz>0?hz:skyBot, cy=Math.max(10,top2-14), tint=fill[Math.min(bot,8)]||[255,255,255], ct='rgba('+[0,1,2].map(k=>Math.round(255*.75+tint[k]*.25)).join(',')+',.9)';
+    return {src,out,far,fg,fid,base:new Uint8ClampedArray(fd),near:nc,bot,skyBot,seaTop,seaBot,sea,w,h,seaT:0,beach:/beach|παραλ/i.test(id),ct,
+      clouds:[...Array(5)].map(()=>({x:rnd()*w,y:4+rnd()*Math.max(4,cy-8),s:.6+rnd()*.8,v:1+rnd()*2})),
+      birds:[...Array(4)].map(()=>({x:rnd()*w,y:6+rnd()*Math.max(4,cy-6),v:(8+rnd()*10)*(rnd()<.5?-1:1),ph:rnd()*6})), boat:{x:rnd()*w,v:2.5}}; }
+  function cloud(g,x,y,s,ct){ const r=Math.round; g.fillStyle=ct||'rgba(255,255,255,.9)'; for(const [dx,dy,rr] of [[0,0,5],[6,-2,6],[13,0,5],[6,2,6]]){ const R2=r(rr*s); for(let yy=-R2;yy<=R2;yy++){ const ww=r(Math.sqrt(R2*R2-yy*yy)); g.fillRect(r(x+dx*s-ww),r(y+dy*s+yy),ww*2+1,1); } } g.fillStyle='rgba(215,232,250,.85)'; g.fillRect(r(x-3*s),r(y+3*s),r(22*s),Math.max(1,r(2*s))); }
+  function animSea(L2,t){ const fd=L2.fid.data, b=L2.base, s=L2.sea, n=s.length, span=L2.seaBot-L2.seaTop+1;
+    for(let j=0;j<n;j+=3){ const i=s[j], x=s[j+1], y=s[j+2], dp=(y-L2.seaTop)/span, w=Math.sin(x*.11+y*.9-t*2.6)*Math.sin(x*.027+y*.2+t*1.1), k=1+w*.09*(1-dp*.5);
+      let r=b[i]*k, g=b[i+1]*k, bl=b[i+2]*k; if(w>.86&&((x*7+y*13)&3)===0){ r=g=bl=255; } fd[i]=r; fd[i+1]=g; fd[i+2]=bl; }
+    L2.fg.putImageData(L2.fid,0,0,0,L2.seaTop,L2.w,span); }
+  function idOf(s){ if(s.id) return s.id; for(const k in SC) if(SC[k]===s) return s.id=k; return 'x'; }
+  function compose(s,dt){ const id=idOf(s); let L2=GX.st[id];
+    if(!L2||(s.img!==L2.out&&s.img!==L2.src)) L2=GX.st[id]=build(s,id);
+    if(L2.none){ return; } if(!GX.on){ if(s.img===L2.out) s.img=L2.src; return; }
+    const g=L2.out.getContext('2d'), cam=S.cam, w=L2.w; g.imageSmoothingEnabled=false;
+    L2.seaT-=dt; if(L2.sea.length&&L2.seaT<=0&&GX.lvl>0){ L2.seaT=.085; animSea(L2,T); }
+    g.clearRect(0,0,w,L2.h); g.drawImage(L2.far,Math.round(cam*.55),0);
+    if(GX.lvl>1&&L2.beach&&L2.seaTop>0) for(let y=Math.max(0,L2.seaTop-8);y<=L2.seaTop+3;y++){ const o=Math.round(Math.sin(y*.9+T*7)); if(o) g.drawImage(L2.out,0,y,w,1,o,y,w,1); }
+    for(const c of L2.clouds){ c.x+=c.v*dt; cloud(g,((c.x+cam*.72)%(w+80))-40,c.y,c.s,L2.ct); }
+    if(L2.seaTop>0){ const b=L2.boat; b.x+=b.v*dt; const bx=((b.x+cam*.55)%(w+40))-20, by=L2.seaTop+3; g.fillStyle='#f4f4f4'; for(let k=0;k<5;k++) g.fillRect(Math.round(bx+2+k*.5),by-6+k,Math.max(1,5-k),1); g.fillStyle='#e8463a'; g.fillRect(Math.round(bx),by,8,2); g.fillStyle='rgba(255,255,255,.6)'; g.fillRect(Math.round(bx-2),by+2,12,1); }
+    if(GX.lvl>0) for(const q of L2.birds){ q.x+=q.v*dt; q.ph+=dt*7; if(q.x<-20) q.x=w+20; if(q.x>w+20) q.x=-20; const bx=Math.round(q.x), by=Math.round(q.y+Math.sin(q.ph*.3)*3), f=Math.sin(q.ph)>0;
+      g.fillStyle='#ffffff'; g.fillRect(bx,by,1,1); g.fillRect(bx-1,by-(f?1:0),1,1); g.fillRect(bx+1,by-(f?1:0),1,1); g.fillRect(bx-2,by-(f?2:-1),1,1); g.fillRect(bx+2,by-(f?2:-1),1,1); }
+    g.drawImage(L2.near,0,0); s.img=L2.out; }
+  const bl=document.createElement('canvas'); bl.width=80; bl.height=45; const bg=bl.getContext('2d');
+  let crtC=null, crtW=0; function crt(){ const k=OW/320; if(!crtC||crtW!==OW){ crtW=OW; crtC=document.createElement('canvas'); crtC.width=OW; crtC.height=OH; const c=crtC.getContext('2d'); c.fillStyle='rgba(0,0,0,.28)'; for(let y=0;y<OH;y+=k) c.fillRect(0,Math.round(y+k*.62),OW,Math.max(1,Math.round(k*.38))); const gr=c.createRadialGradient(OW/2,OH/2,OH*.35,OW/2,OH/2,OW*.62); gr.addColorStop(0,'rgba(0,0,0,0)'); gr.addColorStop(1,'rgba(0,0,0,.55)'); c.fillStyle=gr; c.fillRect(0,0,OW,OH); }
+    octx.save(); octx.setTransform(1,0,0,1,0,0); octx.globalCompositeOperation='source-over'; octx.globalAlpha=1; octx.drawImage(crtC,0,0); octx.restore(); }
+  function post(){ if(typeof octx==='undefined') return; const s=SC[S.scene]||{}, L2=GX.st[idOf(s)]||{};
+    if(GX.on){ octx.save(); octx.setTransform(1,0,0,1,0,0);
+      if(GX.lvl>1){ bg.globalCompositeOperation='source-over'; bg.globalAlpha=1; bg.imageSmoothingEnabled=true; bg.drawImage(cv,0,0,80,45); bg.globalCompositeOperation='multiply'; bg.drawImage(bl,0,0); bg.drawImage(bl,0,0); bg.drawImage(bl,0,0);
+        const str=/disco/.test(S.scene)?.65:(s.night||s.dark||(L2.none&&L2.lum<70&&!L2.indoor))?.45:s.underwater?.35:L2.none?.28:.2; octx.globalCompositeOperation='lighter'; octx.globalAlpha=str; octx.imageSmoothingEnabled=true; octx.drawImage(bl,0,0,OW,OH); octx.globalAlpha=1; }
+      const k=OW/320; octx.setTransform(k,0,0,k,0,0); octx.globalCompositeOperation='source-over';
+      if(!L2.none&&L2.seaTop>0){ const y=L2.seaTop, gr=octx.createLinearGradient(0,y-14,0,y+8); gr.addColorStop(0,'rgba(255,255,255,0)'); gr.addColorStop(.6,'rgba(255,250,240,.2)'); gr.addColorStop(1,'rgba(255,255,255,0)'); octx.fillStyle=gr; octx.fillRect(0,y-14,320,22); }
+      if(GX.lvl>0&&L2.none&&L2.indoor&&!s.underwater){ octx.globalCompositeOperation='lighter'; for(let i=0;i<24;i++){ const x=(i*47+T*(3+i%4))%320, y=(i*29+Math.sin(T*.6+i)*12+T*2)%150+10, a=.2+.2*Math.sin(T*2+i); octx.fillStyle='rgba(255,240,200,'+a+')'; octx.beginPath(); octx.arc(x,y,.5+(i%3)*.25,0,7); octx.fill(); } }
+      octx.restore(); }
+    if(GX.crt) crt(); }
+  const _render=window.render; window.render=function(dt){ GX.ft.push(dt); if(GX.ft.length>90){ const a=GX.ft.reduce((p,c)=>p+c,0)/GX.ft.length; GX.ft.length=0; if(T>3){ if(a>.026&&GX.lvl>0) GX.lvl--; else if(a<.019&&GX.lvl<(FULL()?2:1)) GX.lvl++; } }
+    if(!FULL()&&GX.lvl>1) GX.lvl=1; const s=SC[S.scene]; try{ if(s&&s.img) compose(s,dt||.016); }catch(e){ console.error(e); } return _render.apply(this,arguments); };
+  const cn=['composite','compositeA','compositeP','compositeK','compositeL'].find(n=>typeof window[n]==='function');
+  if(cn){ const _c=window[cn]; window[cn]=function(){ const r=_c.apply(this,arguments); try{ post(); }catch(e){ console.error(e); } return r; }; }
+  function ui(){ const st=document.getElementById('settings'); if(!st||document.getElementById('gxRow')) return; const rows=st.querySelectorAll('.row'), last=rows[rows.length-1]; if(!last) return;
+    const mk=(lab,id,get,set)=>{ const p=document.createElement('p'); p.className='lab'; p.dataset.gx=JSON.stringify(lab); p.textContent=L(lab); const r=document.createElement('div'); r.id=id; r.style.cssText='display:flex;gap:calc(var(--u)*3);';
+      [[1,['Ναι','On']],[0,['Όχι','Off']]].forEach(([v,t])=>{ const b=document.createElement('button'); b.dataset.gx=JSON.stringify(t); b.textContent=L(t); b.style.cssText='flex:1;background:#fff;color:#222;border:calc(var(--u)*.8) solid #222;border-radius:calc(var(--u)*2);padding:calc(var(--u)*2.5) 0;line-height:1;font-size:calc(var(--u)*6.4);';
+        const paint=()=>{ const on=get()===!!v; b.style.background=on?'#ffd23f':'#fff'; }; b._paint=paint; paint();
+        b.addEventListener('click',e=>{ e.stopPropagation(); set(!!v); r.querySelectorAll('button').forEach(x=>x._paint()); save(); }); r.appendChild(b); });
+      st.insertBefore(p,last); st.insertBefore(r,last); };
+    mk(['Γραφικά+ (parallax, ζωντανή θάλασσα, λάμψη)','Graphics+ (parallax, living sea, glow)'],'gxRow',()=>GX.on,v=>{ GX.on=v; });
+    mk(['Φίλτρο CRT (παλιά οθόνη)','CRT filter (retro screen)'],'crtRow',()=>GX.crt,v=>{ GX.crt=v; });
+    st.addEventListener('click',()=>setTimeout(()=>st.querySelectorAll('[data-gx]').forEach(e=>e.textContent=L(JSON.parse(e.dataset.gx))),0)); }
+  ui(); window.GFXPLUS=GX;
+})();
+
+/* ===== NPC Life — engine-independent idle activities for characters =====
+   Every NPC gets something to do: the kid digs a sandcastle, the vendor reads the paper, the mechanic hammers with sparks,
+   the barber snips, the DJ's music floats out, a cat flicks its tail… plus gentle breathing (1-px bob) for every actor()
+   and a "!" greeting bubble the first time the hero walks up to someone.
+   Activities are chosen by hotspot id (NPCLIFE_IDS, content can extend it) or by name pattern (NPCLIFE_NAMES).
+   Each entry: [pattern, action, condition?]  — actions are drawn in the low-res layer, anchored to the NPC's hotspot. */
+(()=>{
+  const IDS=Object.assign({ king:'glint', crathor:'bubble', mama:'bubble', clown:'bubble', grindle:'think', jorin:'juggle', guard:'tap', fairies:'sparkle', petal:'sparkle', sylva:'sparkle',
+    beaver:'gnaw', bramble:'tea', tansy:'juggle', gnomes:'hammers', morg:'wisps', kid:'dig', sakis:'sweat', danae:'hum', gorilla:'gum', zozo:'zz', crowd:'bob', booth:'music', cat:'tail',
+    sarge:'tap', mitsos:'hammer', suspect:'sweat', desk:'type', bunny:'sigh', wolf:'tail', lady:'fan', babis:'stir', thanasis:'beads', litsa:'fan', souv:'smoke', barber:'snip', kiosk:'read' },
+    (typeof NPCLIFE_IDS!=='undefined')?NPCLIFE_IDS:{});
+  const NAMES=[[/Παιδάκι|\bkid\b/i,'dig'],[/Περίπτερο|kiosk/i,'read'],[/Σουβλατζ|souvlaki/i,'smoke'],[/Κουρείο|barber/i,'snip'],[/Θανάσ/i,'beads'],[/Λίτσα|Ομπρέλα|umbrella/i,'fan'],
+    [/DJ Σάκης/i,'sweat'],[/Δανάη|Danae/i,'hum'],[/Γορίλα|Gorilla/i,'gum'],[/Ρεσεψιόν|reception/i,'zz'],[/Κόσμος|crowd/i,'bob'],[/Κονσόλα|console|booth/i,'music'],[/Γάτα|\bcat\b/i,'tail'],
+    [/Αρχιφύλακ|sergeant/i,'tap'],[/Μήτσος|mechanic/i,'hammer'],[/δερμάτιν|leather/i,'sweat'],[/Αστυφύλακας Γι|Giannakis/i,'type'],[/Λαγουδ|bunny/i,'sigh'],[/Λύκος|wolf/i,'tail'],
+    [/^Μαμά$|^Mum$/i,'stir'],[/Ξυλοκόπ|woodcutter/i,'chop'],[/Γιαγιά|Grandma/i,'knit'],[/Μπάμπης|Babis/i,'stir']];
+  const COND={ zz:()=>!(typeof F!=='undefined'&&F&&F.awake), hammers:()=>!(typeof F!=='undefined'&&F&&F.freed), sweat:()=>true };
+  const nameOf=h=>{ try{ return typeof h.n==='function'?h.n():(h.n||''); }catch(e){ return ''; } };
+  function actionFor(h){ if(h._life!==undefined) return h._life; let a=null; if(h.id&&IDS[h.id]) a=IDS[h.id]; else { const n=nameOf(h); for(const [re,act] of NAMES) if(re.test(n)){ a=act; break; } } return h._life=a; }
+  function anchor(h){ let r=null; try{ if(typeof hRect==='function') r=hRect(h); }catch(e){}
+    if(r&&r[2]>0) return {hx:r[0]+r[2]/2, hy:r[1], ax:r[0]+r[2]*.78, ay:r[1]+Math.min(r[3]*.5,24), w:r[2], h:r[3], x:r[0]};
+    if(typeof h.x==='number'){ const top=(h.my||100)+6; return {hx:h.x, hy:top, ax:h.x+5, ay:top+20, w:(h.r||8)*2, h:40, x:h.x-(h.r||8)}; } return null; }
+  const P=(g,x,y,w,hh,c)=>{ g.fillStyle=c; g.fillRect(Math.round(x),Math.round(y),w,hh); };
+  const hsh=n=>{ n=Math.sin(n*127.1)*43758.5; return n-Math.floor(n); };
+  const A={
+    dig(g,a,t,s){ const ang=-1.2+Math.max(0,Math.sin(t*3+s))*1.4, x=a.ax-2, y=a.ay+6; for(let k=0;k<8;k++) P(g,x+Math.cos(ang)*k,y+Math.sin(ang)*k,1,1,'#8a5a2a'); P(g,x+Math.cos(ang)*8-1,y+Math.sin(ang)*8-1,3,3,'#c8c8d0');
+      const ph=(t*3+s)%6.28; if(ph<1.2) for(let k=0;k<5;k++){ const p=ph/1.2; P(g,x+8+k*2+p*6,y-p*10+p*p*12-k,1,1,'#e8c890'); }
+      const hc=2+Math.floor((t*.4+s)%6); P(g,a.ax+6,a.ay+18-hc,9,hc,'#e0b878'); P(g,a.ax+7,a.ay+17-hc,2,1,'#e0b878'); P(g,a.ax+12,a.ay+17-hc,2,1,'#e0b878'); P(g,a.ax-12,a.ay+14,6,5,'#e8463a'); P(g,a.ax-12,a.ay+13,6,1,'#ff7a6a'); },
+    read(g,a,t,s){ const x=a.hx-7, y=a.ay-2, fl=((t*.25+s)%1)<.12; P(g,x,y,fl?7:14,9,'#f0ece0'); for(let k=0;k<4;k++) P(g,x+2,y+2+k*2,fl?3:10,1,'#9a9a9a'); P(g,x+(fl?7:7),y,1,9,'#c8c4b8'); },
+    smoke(g,a,t,s){ for(let k=0;k<6;k++){ const p=((t*.5+k/6+s)%1), x=a.hx+Math.sin(t*1.5+k)*4, y=a.hy+6-p*26; g.globalAlpha=(1-p)*.55; P(g,x,y,2+p*4,2+p*3,'#d8d8d8'); } g.globalAlpha=1; if(((t*4+s)%3)<.2) P(g,a.hx+2,a.hy+8,1,1,'#ffb040'); },
+    snip(g,a,t,s){ const o=Math.abs(Math.sin(t*8+s))*3, x=a.ax, y=a.ay; for(let k=0;k<6;k++){ P(g,x+k,y-o*k/6,1,1,'#c8c8d0'); P(g,x+k,y+o*k/6,1,1,'#c8c8d0'); } P(g,x-2,y-1,2,2,'#3a3a3a'); for(let k=0;k<3;k++){ const p=((t*.8+k/3)%1); P(g,x+3+k,y+2+p*16,1,1,'#3a2a1a'); } },
+    beads(g,a,t,s){ const sw=Math.sin(t*2.4+s)*.8; for(let k=0;k<6;k++) P(g,a.ax+Math.sin(sw)*k*1.6,a.ay+Math.cos(sw)*k*1.6,2,2,k%2?'#e8a030':'#c87820'); },
+    fan(g,a,t,s){ const w=4+Math.abs(Math.sin(t*6+s))*3; P(g,a.ax,a.ay-4,1,6,'#8a5a2a'); g.fillStyle='#e0338a'; g.beginPath(); g.moveTo(a.ax,a.ay-3); g.arc(a.ax,a.ay-3,w,-2.6,-.5); g.fill(); },
+    sweat(g,a,t,s){ for(let k=0;k<2;k++){ const p=((t*.7+k*.5+s)%1); P(g,a.hx+(k?7:-8),a.hy+6+p*10,1,2,'#9ad8ff'); } for(let k=0;k<3;k++) P(g,a.hx-4+k*4,a.hy-6+Math.round(Math.sin(t*5+k)),1,3,'rgba(255,255,255,.5)'); },
+    hum(g,a,t,s){ const p=((t*.45+s)%1); if(p<.85){ const x=a.hx+6+p*8, y=a.hy-2-p*16; g.globalAlpha=1-p; P(g,x,y,1,4,'#2b1d3a'); P(g,x-2,y+3,2,2,'#2b1d3a'); P(g,x+1,y,2,1,'#2b1d3a'); g.globalAlpha=1; } },
+    music(g,a,t,s){ for(let k=0;k<3;k++){ const p=((t*.5+k/3+s)%1), x=a.hx-8+k*8+Math.sin(t*2+k)*3, y=a.hy-p*22; g.globalAlpha=1-p; const c=['#ff5ab8','#5ad8ff','#ffe066'][k]; P(g,x,y,1,4,c); P(g,x-2,y+3,2,2,c); P(g,x+1,y,2,1,c); } g.globalAlpha=1; },
+    gum(g,a,t,s){ const p=((t*.3+s)%1), r=p<.8?1+p*5:0; if(r>0){ g.fillStyle='#ff8ad8'; g.beginPath(); g.arc(a.hx+4,a.hy+11,r,0,7); g.fill(); P(g,a.hx+3,a.hy+9,1,1,'#ffffff'); } else for(let k=0;k<4;k++) P(g,a.hx+2+k*2,a.hy+10+(k%2)*2,1,1,'#ff8ad8'); },
+    zz(g,a,t,s){ for(let k=0;k<3;k++){ const p=((t*.4+k/3)%1), x=a.hx+4+p*10, y=a.hy-p*18; g.globalAlpha=1-p; g.fillStyle='#ffffff'; g.font='bold '+(5+k)+'px monospace'; g.fillText('z',Math.round(x),Math.round(y)); } g.globalAlpha=1; },
+    bob(g,a,t,s){ for(let k=0;k<5;k++){ const up=Math.sin(t*7+k*1.3)>0; P(g,a.x+6+k*(a.w-12)/4,a.hy+(up?-4:2),2,up?6:3,'#f0c098'); } A.music(g,a,t,s+.3); },
+    tail(g,a,t,s){ const sw=Math.sin(t*4+s)*3, x=a.x+(a.w>14?a.w-2:a.w), y=a.hy+a.h*.6; for(let k=0;k<6;k++) P(g,x+k*.7,y-k+Math.round(sw*k/6),1,1,'#c87a3a'); },
+    tap(g,a,t,s){ const up=Math.sin(t*9+s)>0; P(g,a.ax,a.ay+(up?-2:0),3,1,'#e8c8a0'); if(!up){ P(g,a.ax+4,a.ay-2,1,1,'#ffffff'); P(g,a.ax+5,a.ay-3,1,1,'#ffffff'); } },
+    hammer(g,a,t,s){ const ph=(t*1.7+s)%1, ang=ph<.7?-1.6+ph/.7*1.8:.2-((ph-.7)/.3)*1.8, x=a.ax, y=a.ay; for(let k=0;k<7;k++) P(g,x+Math.cos(ang)*k,y+Math.sin(ang)*k,1,1,'#8a5a2a'); P(g,x+Math.cos(ang)*7-1,y+Math.sin(ang)*7-1,3,3,'#7a7a8a');
+      if(ph>.66&&ph<.8) for(let k=0;k<6;k++){ const q=(ph-.66)/.14; P(g,x+7+Math.cos(k)*q*6,y+3+Math.sin(k)*q*5-q*3,1,1,k%2?'#ffe066':'#ffffff'); } },
+    hammers(g,a,t,s){ for(let k=0;k<5;k++){ let x=a.x+20+k*(a.w-40)/4, y=a.hy+10; if(typeof Yd==='function'&&SC.quarry&&S.scene==='quarry'){ x=80+k*80+5; y=Yd(SC.quarry,.15+(k%2)*.15)-22*(typeof scl==='function'?scl(Yd(SC.quarry,.15+(k%2)*.15)):1); } A.hammer(g,{ax:x,ay:y},t,s+k*.37); } },
+    type(g,a,t,s){ P(g,a.hx-8,a.ay+2,16,3,'#3a3a46'); for(let k=0;k<5;k++) if(Math.sin(t*14+k*2.1)>.6) P(g,a.hx-7+k*3,a.ay+2,2,1,'#ffffff'); P(g,a.hx-5,a.ay-6,10,8,'#f4f4f4'); },
+    sigh(g,a,t,s){ const p=((t*.3+s)%1); if(p<.6){ g.globalAlpha=Math.min(1,p*4)*(1-p/.6*.5); P(g,a.hx+6,a.hy-8,12,7,'#ffffff'); for(let k=0;k<3;k++) P(g,a.hx+8+k*3,a.hy-5,1,1,'#5a5a6a'); g.globalAlpha=1; } },
+    stir(g,a,t,s){ const an=t*4+s, x=a.ax, y=a.ay+4; P(g,x-5,y,10,5,'#c8c8d0'); P(g,x-5,y,10,1,'#e8e8f0'); P(g,x+Math.cos(an)*3,y-6+Math.sin(an),1,7,'#8a5a2a'); for(let k=0;k<3;k++){ const p=((t*.6+k/3)%1); g.globalAlpha=(1-p)*.6; P(g,x-3+k*3+Math.sin(t*2+k)*1.5,y-3-p*12,1,2,'#ffffff'); } g.globalAlpha=1; },
+    chop(g,a,t,s){ const ph=(t*1.2+s)%1, ang=ph<.6?-2.2+ph/.6*2.4:.2-((ph-.6)/.4)*2.4, x=a.ax, y=a.ay; for(let k=0;k<9;k++) P(g,x+Math.cos(ang)*k,y+Math.sin(ang)*k,1,1,'#8a5a2a'); P(g,x+Math.cos(ang)*9-1,y+Math.sin(ang)*9-2,3,4,'#9aa0b0');
+      if(ph>.58&&ph<.75) for(let k=0;k<4;k++){ const q=(ph-.58)/.17; P(g,x+9+k*2*q,y+8-q*8+k,2,1,'#c8a060'); } },
+    knit(g,a,t,s){ const o=Math.sin(t*5+s)*2, x=a.ax-3, y=a.ay; for(let k=0;k<7;k++){ P(g,x+k,y-3+k*.6+o*.3,1,1,'#c8c8d0'); P(g,x+k,y+3-k*.6-o*.3,1,1,'#c8c8d0'); } P(g,x+2,y+5,5,4,'#e8463a'); P(g,x+3,y+6,3,2,'#ff7a6a'); },
+    think(g,a,t,s){ const p=((t*.25+s)%1); if(p<.5){ for(let k=0;k<3;k++) if(p*6>k){ P(g,a.hx+6+k*3,a.hy-3-k*3,1+k,1+k,'#ffffff'); } } },
+    juggle(g,a,t,s){ for(let k=0;k<2;k++){ const ph=(t*1.6+k*.5+s)%1, x=a.hx-6+ph*12, y=a.hy+2-Math.sin(ph*Math.PI)*14; P(g,x,y,2,2,k?'#a8703a':'#d83a5a'); } },
+    glint(g,a,t,s){ const p=((t*.35+s)%1); if(p<.15){ const k=p/.15, x=a.hx+8, y=a.hy+2; P(g,x-2*k,y,4*k+1,1,'#ffffff'); P(g,x,y-2*k,1,4*k+1,'#ffffff'); } },
+    bubble(g,a,t,s){ for(let k=0;k<3;k++){ const p=((t*.4+k/3+s)%1); g.globalAlpha=1-p; g.strokeStyle='#dff8ff'; g.lineWidth=1; g.beginPath(); g.arc(a.hx+4+Math.sin(t*3+k)*2,a.hy-p*20,1+k*.5,0,7); g.stroke(); } g.globalAlpha=1; },
+    gnaw(g,a,t,s){ if(Math.sin(t*10+s)>.3) for(let k=0;k<3;k++){ const p=((t*1.3+k/3)%1); P(g,a.ax+p*6,a.ay+2+p*p*8,1,1,'#c8a060'); } },
+    sparkle(g,a,t,s){ for(let k=0;k<4;k++){ const an=t*2+k*1.57+s; P(g,a.hx+Math.cos(an)*9,a.hy+8+Math.sin(an)*5,1,1,['#ffffff','#ffe066','#ff9ad8','#9ad8ff'][k]); } },
+    tea(g,a,t,s){ P(g,a.ax-2,a.ay,5,4,'#f4f4f4'); P(g,a.ax+3,a.ay+1,1,2,'#f4f4f4'); for(let k=0;k<2;k++){ const p=((t*.5+k/2)%1); g.globalAlpha=(1-p)*.6; P(g,a.ax-1+k*2+Math.sin(t*2+k),a.ay-2-p*10,1,2,'#ffffff'); } g.globalAlpha=1; },
+    wisps(g,a,t,s){ for(let k=0;k<6;k++){ const p=((t*.35+k/6)%1); g.globalAlpha=(1-p)*.7; P(g,a.x+a.w*(k/6)+Math.sin(t+k)*3,a.hy+a.h-p*a.h,2,3,'#140818'); } g.globalAlpha=1; },
+  };
+  const met={}; let lastScene=null;
+  function draw(){ if(typeof S==='undefined'||!SC||!SC[S.scene]||typeof ctx==='undefined') return; const s=SC[S.scene], hs=s.hs||[]; if(lastScene!==S.scene){ lastScene=S.scene; for(const k in met) delete met[k]; }
+    const cam=Math.round(S.cam||0); ctx.save(); ctx.setTransform(1,0,0,1,-cam,0); ctx.imageSmoothingEnabled=false;
+    for(const h of hs){ const act=actionFor(h); const talks=!!(h.talk);
+      if(!act&&!talks) continue; const a=anchor(h); if(!a) continue; if(a.hx<cam-40||a.hx>cam+360) continue; const seed=hsh(a.hx+a.hy);
+      try{ if(act&&A[act]&&(!COND[act]||COND[act]())) A[act](ctx,a,T,seed); }catch(e){}
+      if(talks&&S.mode==='play'&&!(typeof D!=='undefined'&&D.active)){ const key=h.id||nameOf(h); const near=Math.abs((S.x||0)-a.hx)<38;
+        if(near&&!met[key]) met[key]=T; const t0=met[key]; if(t0&&T-t0<1.4){ const p=(T-t0)/1.4, y=a.hy-10-Math.min(1,p*4)*3; ctx.globalAlpha=p>.8?(1-p)*5:1; P(ctx,a.hx-4,y-7,9,9,'#ffffff'); P(ctx,a.hx-1,y+2,3,2,'#ffffff'); P(ctx,a.hx,y-5,1,4,'#e0338a'); P(ctx,a.hx,y,1,1,'#e0338a'); ctx.globalAlpha=1; } } }
+    ctx.restore(); }
+  if(typeof actor==='function'){ const _a=actor; window.actor=function(g,fn,wx,wy,sc,flip,night,noShadow){ if(typeof S!=='undefined'&&Math.abs(wx-S.x)<.5&&Math.abs(wy-S.y)<.5) return _a.apply(this,arguments);
+      const off=Math.sin((typeof T!=='undefined'?T:0)*2.1+wx*.37+wy*.11)>.55?-1:0; if(!off) return _a.apply(this,arguments); return _a.call(this,g,gg=>{ gg.translate(0,off); fn(gg); },wx,wy,sc,flip,night,noShadow); }; }
+  const cn=['composite','compositeA','compositeP','compositeK','compositeL'].find(n=>typeof window[n]==='function');
+  if(cn){ const _c=window[cn]; window[cn]=function(){ try{ draw(); }catch(e){ console.error(e); } return _c.apply(this,arguments); }; }
+  window.NPCLIFE={A,IDS,NAMES,actionFor};
+})();
+
+</script>
 
 <script id="cine">
 /* ================= CINE — engine-independent cutscene player =================

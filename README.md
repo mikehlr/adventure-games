@@ -1,8 +1,6 @@
 # Περιπέτειες (Retro adventure games)
 
-Έξι περιπέτειες σε δύο εκδόσεις η καθεμία, όλες σε αυτόνομα αρχεία HTML (χωρίς εγκατάσταση, χωρίς εξαρτήσεις).
-Παίζουν σε κινητό (οριζόντια) και σε υπολογιστή.
-
+Έξι περιπέτειες σε δύο εκδόσεις η καθεμία, σε αυτόνομα αρχεία HTML (χωρίς εγκατάσταση). Παίζουν σε κινητό (οριζόντια) και υπολογιστή.
 Ξεκίνα από το **index.html**.
 
 | Παιχνίδι | v2 (πλάγια κύλιση, A/B) | Pseudo 3D (point & click) |
@@ -14,10 +12,9 @@
 | Περιπολικό 7 | peripoliko7-v2.html | peripoliko7-3d.html |
 | Η Κοκκινοσκουφίτσα | kokkinoskoufitsa-v2.html | kokkinoskoufitsa-3d.html |
 
-## Ανέβασμα στο GitHub Pages
-1. Φτιάξε ένα repository (ή άνοιξε ένα υπάρχον).
-2. **Add file → Upload files**: σύρε μέσα όλα τα αρχεία αυτού του φακέλου (μαζί με το index.html) και πάτα **Commit changes**.
-3. **Settings → Pages → Build and deployment**: Source **Deploy from a branch**, Branch **main**, φάκελος **/ (root)**. Πάτα **Save**.
-4. Σε λίγα λεπτά: `https://<username>.github.io/<repo>/`.
+Στις Ρυθμίσεις κάθε παιχνιδιού: «Γραφικά+» (parallax, ζωντανή θάλασσα, λάμψη) και «Φίλτρο CRT».
 
-Η πρόοδος και οι ρυθμίσεις αποθηκεύονται στον browser (localStorage) του κάθε παίκτη.
+## Ανέβασμα στο GitHub Pages
+1. Repository → **Add file → Upload files** → σύρε όλα τα αρχεία αυτού του φακέλου → **Commit changes**.
+2. **Settings → Pages**: Deploy from a branch, Branch **main**, φάκελος **/ (root)** → **Save**.
+3. Σε λίγα λεπτά: `https://<username>.github.io/<repo>/`.
