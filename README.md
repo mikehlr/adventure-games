@@ -1,6 +1,6 @@
 # Τα παιχνίδια — retro adventures
 
-21 εκδόσεις παιχνιδιών (v2 πλάγια κύλιση · 2.5D · HD) και η σελίδα επιλογής `index.html`.
+25 εκδόσεις παιχνιδιών (v2 πλάγια κύλιση · 2.5D · VGA · HD) και η σελίδα επιλογής `index.html`.
 Κάθε παιχνίδι είναι ένα αυτόνομο αρχείο HTML — δεν χρειάζεται server ή εγκατάσταση.
 
 ## Παίξε τοπικά
@@ -17,6 +17,10 @@
 ## Αρχεία
 | Αρχείο |
 |---|
+| `games/friday1659_v2.html` |
+| `games/friday1659_25d.html` |
+| `games/friday1659_vga.html` |
+| `games/friday1659_hd.html` |
 | `games/pente_kardies_25d.html` |
 | `games/pente_kardies_hd.html` |
 | `games/ypopsifios_v2.html` |
