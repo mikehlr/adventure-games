@@ -6,10 +6,10 @@
 <meta name="theme-color" content="#000000">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
-<title>Απογραφή · point & click</title>
+<title>Η Κοκκινοσκουφίτσα · 2.5D</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@600;700&display=swap" rel="stylesheet">
 <style>
 :root{
   box-sizing:border-box;
@@ -146,8 +146,6 @@ button:focus-visible{outline:2px solid var(--pink);outline-offset:2px;}
 @keyframes turn{0%,30%{transform:rotate(0)}60%,100%{transform:rotate(-90deg)}}
 @media (orientation:portrait) and (max-width:900px){#rotate{display:flex;}}
 @media (prefers-reduced-motion:reduce){#more,#rotate i{animation:none;}}
-
-[hidden]{display:none!important;}
 </style>
 <style>
 #vbar{position:absolute;left:0;right:0;top:0;height:calc(var(--u)*24);display:flex;align-items:center;gap:calc(var(--u)*2.5);padding:0 calc(var(--u)*4);
@@ -183,41 +181,108 @@ button:focus-visible{outline:2px solid var(--pink);outline-offset:2px;}
 #fxRow button{flex:1;background:#fff;border:calc(var(--u)*.8) solid var(--ink);border-radius:calc(var(--u)*2);padding:calc(var(--u)*2.5) 0;line-height:1;}
 #fxRow button[aria-pressed="true"]{background:var(--sun);border-color:var(--pink);}
 
-:root{--ink:#ddd5c4;--paper:#120f0d;--pink:#8e1c17;--sun:#c8a868;}
-body{font-family:'EB Garamond',Georgia,serif;font-weight:400;color:var(--ink);}
-#stage{background:#000;}
-#vbar{background:linear-gradient(#1c1714,#0c0a09);border-bottom:calc(var(--u)*.6) solid #4a3a2a;}
-.vb{background:#2a221c;border-color:#000;}
-.vb.on{background:#c8a868;}
-#score{color:#8c8476;font-style:italic;}
-#dlg{background:rgba(8,6,6,.86);border:0;border-top:1px solid rgba(221,213,196,.25);border-bottom:1px solid rgba(221,213,196,.25);box-shadow:none;border-radius:0;color:var(--ink);}
-#dlgText{font-style:italic;}
-#dlgOpts button{background:transparent;color:var(--ink);border:0;border-top:1px solid rgba(221,213,196,.25);border-radius:0;box-shadow:none;}
-#more{color:#8c8476;}
-#hint{background:rgba(8,6,6,.86);color:var(--ink);border-color:#4a3a2a;}
-#hover{background:rgba(8,6,6,.86);color:var(--ink);}
-#tip{color:#8c8476;text-shadow:none;}
-#whisper{color:#c43a2c;-webkit-text-stroke:0;text-shadow:0 0 calc(var(--u)*4) rgba(120,0,0,.9);font-style:italic;}
-#inv{background:linear-gradient(rgba(6,5,5,.95),rgba(6,5,5,.88));border-bottom:1px solid #4a3a2a;box-shadow:none;}
-.slot{background:rgba(221,213,196,.05);border-color:rgba(221,213,196,.25);}
-.slot.on{background:rgba(168,41,31,.25);border-color:#8e1c17;}
-#invBar button,#menu button{background:#1a1512;color:var(--ink);border-color:#4a3a2a;}
-#settings{background:#0c0a09;color:var(--ink);}
-#settings h3{color:#c8a868;font-style:italic;font-weight:400;}
-#tsRow button,#lgRow button,#fxRow button,#settings .row button{background:#1a1512;color:var(--ink);border-color:#4a3a2a;}
-#tsRow button[aria-pressed="true"],#lgRow button[aria-pressed="true"],#fxRow button[aria-pressed="true"]{background:#3a2a1a;border-color:#c8a868;}
-.screen{background:linear-gradient(90deg,rgba(0,0,0,.78) 0%,rgba(0,0,0,.35) 55%,rgba(0,0,0,0) 80%);color:var(--ink);}
-#title h1{font-weight:400;font-style:italic;font-size:calc(var(--u)*28);color:#e4dccb;-webkit-text-stroke:0;text-shadow:none;}
-#title h1 span{font-style:normal;font-size:calc(var(--u)*6.4);color:#8c8476;text-shadow:none;}
-#title h1 .v2{background:#8e1c17;border-color:#000;font-size:calc(var(--u)*5);}
-#title nav button{background:none;border:0;box-shadow:none;color:var(--ink);font-size:calc(var(--u)*9*var(--ts));padding:calc(var(--u)*1.5) 0;}
-#title small{color:#8c8476;font-style:italic;}
-#end{background:#000;}
-#end h2{color:var(--ink);-webkit-text-stroke:0;text-shadow:none;font-style:italic;font-weight:400;}
-#end button{background:none;border:0;box-shadow:none;color:#8c8476;}
-#rotate{background:#000;color:var(--ink);}
+:root{
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+  --ink:#4a2c2a; --paper:#fff8ec; --red:#e0262f; --leaf:#5cb85c; --sun:#ffd34d; --sky:#9fdcff; --wood:#b07a4a; --bg:#5a9e3e;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){ --ink:#4a2c2a; --paper:#fff8ec; --bg:#5a9e3e; } }
+:root[data-theme="dark"]{ --ink:#4a2c2a; --paper:#fff8ec; --bg:#5a9e3e; }
+html{scroll-padding-top:env(safe-area-inset-top,0px);}
+html,body{height:100%;margin:0;background:var(--bg);overflow:hidden;}
+body{box-sizing:border-box;padding-left:env(safe-area-inset-left,0px);padding-right:env(safe-area-inset-right,0px);
+  touch-action:none;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;-webkit-tap-highlight-color:transparent;
+  font-family:'Comfortaa','Trebuchet MS',sans-serif;font-weight:700;color:var(--ink);}
+#wrap{width:100%;height:100%;display:flex;align-items:center;justify-content:center;}
+#stage{position:relative;overflow:hidden;background:#000;--u:2px;--ts:1;border-radius:calc(var(--u)*4);}
+#cv{position:absolute;inset:0;width:100%;height:100%;image-rendering:pixelated;image-rendering:crisp-edges;}
+button{font:inherit;color:inherit;-webkit-appearance:none;appearance:none;cursor:pointer;}
+button:focus-visible{outline:3px solid var(--sun);outline-offset:2px;}
+
+.round{position:absolute;width:calc(var(--u)*24);height:calc(var(--u)*24);border-radius:50%;background:var(--paper);border:calc(var(--u)*1.2) solid var(--ink);
+  display:flex;align-items:center;justify-content:center;padding:0;box-shadow:0 calc(var(--u)*1.5) 0 rgba(74,44,42,.35);}
+.round svg{width:55%;height:55%;fill:none;stroke:var(--ink);stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round;}
+.round:active{transform:translateY(2px);box-shadow:none;}
+#bSet{left:calc(var(--u)*5);top:calc(var(--u)*5);}
+#bSay{right:calc(var(--u)*5);top:calc(var(--u)*5);background:var(--sun);}
+#stars{position:absolute;left:50%;top:calc(var(--u)*5);transform:translateX(-50%);background:var(--paper);border:calc(var(--u)*1.2) solid var(--ink);border-radius:99px;
+  padding:calc(var(--u)*1.5) calc(var(--u)*6);font-size:calc(var(--u)*7);white-space:nowrap;pointer-events:none;display:flex;align-items:center;gap:calc(var(--u)*2);}
+#stars i{font-style:normal;color:#f2b500;font-size:1.2em;line-height:1;}
+#stars.pop{animation:pop .6s ease;}
+@keyframes pop{30%{transform:translateX(-50%) scale(1.35);}}
+
+#basket{position:absolute;right:calc(var(--u)*4);bottom:calc(var(--u)*3);display:flex;gap:calc(var(--u)*3);padding:calc(var(--u)*2.5) calc(var(--u)*4);
+  background:#c98a4f;border:calc(var(--u)*1.2) solid var(--ink);border-radius:calc(var(--u)*6);box-shadow:inset 0 calc(var(--u)*-2) 0 #a86e3a;min-width:calc(var(--u)*30);min-height:calc(var(--u)*24);justify-content:center;}
+#basket[hidden]{display:none;}
+#basket:empty::before{content:'🧺';font-size:calc(var(--u)*14);line-height:calc(var(--u)*24);opacity:.6;}
+.it{width:calc(var(--u)*26);height:calc(var(--u)*26);background:var(--paper);border:calc(var(--u)*1) solid var(--ink);border-radius:calc(var(--u)*4);padding:calc(var(--u)*2);transition:transform .15s;}
+.it canvas{width:100%;height:100%;image-rendering:pixelated;display:block;}
+.it.on{background:var(--sun);transform:translateY(calc(var(--u)*-4)) scale(1.12);border-color:var(--red);}
+
+#dlg{position:absolute;left:50%;top:calc(var(--u)*34);transform:translateX(-50%);width:min(94%,calc(74% + (var(--ts) - 1) * 40%));
+  max-height:calc(100% - var(--u)*70);overflow-y:auto;background:var(--paper);border:calc(var(--u)*1.4) solid var(--ink);border-radius:calc(var(--u)*6);
+  box-shadow:0 calc(var(--u)*2) 0 rgba(74,44,42,.35);padding:calc(var(--u)*5) calc(var(--u)*8) calc(var(--u)*6);text-align:center;}
+#dlg[hidden]{display:none;}
+#who{display:inline-block;margin:0 0 calc(var(--u)*2);padding:calc(var(--u)*1) calc(var(--u)*5);border-radius:99px;color:#fff;font-size:calc(var(--u)*5.6*var(--ts));}
+#who:empty{display:none;}
+#dlgText{margin:0;font-size:calc(var(--u)*8*var(--ts));line-height:1.4;min-height:1.4em;text-wrap:pretty;}
+#dlgOpts{display:flex;flex-direction:column;gap:calc(var(--u)*3);margin-top:calc(var(--u)*5);}
+#dlgOpts:empty{display:none;}
+#dlgOpts button{background:#fff;border:calc(var(--u)*1.2) solid var(--ink);border-radius:calc(var(--u)*5);padding:calc(var(--u)*3) calc(var(--u)*5);font-size:calc(var(--u)*7.4*var(--ts));box-shadow:0 calc(var(--u)*1.5) 0 rgba(74,44,42,.3);}
+#dlgOpts button:active{background:var(--sun);}
+#more{position:absolute;right:calc(var(--u)*5);bottom:calc(var(--u)*2);font-size:calc(var(--u)*6);color:var(--red);animation:bob 1s ease-in-out infinite;}
+@keyframes bob{50%{transform:translateY(3px);}}
+#speak{position:absolute;left:calc(var(--u)*5);bottom:calc(var(--u)*2);font-size:calc(var(--u)*6);opacity:0;}
+#speak.on{opacity:1;animation:wave .6s ease-in-out infinite;}
+@keyframes wave{50%{transform:scale(1.25);}}
+
+#sparkle{position:absolute;left:0;right:0;top:38%;text-align:center;font-size:calc(var(--u)*13*var(--ts));color:var(--sun);-webkit-text-stroke:calc(var(--u)*.7) var(--ink);
+  text-shadow:0 calc(var(--u)*2) 0 var(--ink);opacity:0;transform:scale(.6);transition:opacity .35s,transform .35s;pointer-events:none;}
+#sparkle.show{opacity:1;transform:scale(1);}
+
+.screen{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:calc(var(--u)*8);
+  background:radial-gradient(ellipse at center,rgba(255,248,236,.0) 0%,rgba(255,248,236,.0) 30%,rgba(90,158,62,.55) 100%);}
+.screen[hidden]{display:none;}
+#title h1{margin:0;font-size:calc(var(--u)*22);line-height:1;color:var(--red);-webkit-text-stroke:calc(var(--u)*.8) #fff;
+  text-shadow:0 calc(var(--u)*2.5) 0 var(--ink),0 0 calc(var(--u)*10) rgba(255,255,255,.8);}
+#title p{margin:calc(var(--u)*3) 0 0;font-size:calc(var(--u)*7*var(--ts));color:#fff;text-shadow:0 calc(var(--u)*1) 0 var(--ink);}
+#title nav{display:flex;gap:calc(var(--u)*4);margin-top:calc(var(--u)*8);flex-wrap:wrap;justify-content:center;}
+#title nav button,#end button{background:var(--sun);border:calc(var(--u)*1.4) solid var(--ink);border-radius:99px;padding:calc(var(--u)*3) calc(var(--u)*10);
+  font-size:calc(var(--u)*9*var(--ts));box-shadow:0 calc(var(--u)*2.5) 0 var(--ink);}
+#title nav button.sec{background:var(--paper);font-size:calc(var(--u)*7*var(--ts));}
+#title nav button:active,#end button:active{transform:translateY(3px);box-shadow:0 0 0 var(--ink);}
+#title nav button[hidden]{display:none;}
+#end{background:linear-gradient(#ffe9b8,#ffc9d6);}
+#end h2{margin:0 0 calc(var(--u)*4);font-size:calc(var(--u)*16);color:var(--red);-webkit-text-stroke:calc(var(--u)*.6) #fff;text-shadow:0 calc(var(--u)*2) 0 var(--ink);}
+#end .st{font-size:calc(var(--u)*14);color:#f2b500;letter-spacing:.05em;margin-bottom:calc(var(--u)*4);text-shadow:0 calc(var(--u)*1) 0 var(--ink);}
+#end p{margin:0 0 calc(var(--u)*3);font-size:calc(var(--u)*7.4*var(--ts));line-height:1.45;max-width:80%;}
+#end button{margin-top:calc(var(--u)*4);}
+
+#settings{position:absolute;inset:0;background:var(--paper);display:flex;flex-direction:column;justify-content:center;padding:0 10%;gap:calc(var(--u)*3.5);z-index:5;overflow-y:auto;}
+#settings[hidden]{display:none;}
+#settings h3{margin:0;font-size:calc(var(--u)*12);color:var(--red);}
+#settings .lab{margin:0;font-size:calc(var(--u)*6);opacity:.8;}
+.row{display:flex;gap:calc(var(--u)*3);flex-wrap:wrap;}
+.row button{flex:1;background:#fff;border:calc(var(--u)*1) solid var(--ink);border-radius:calc(var(--u)*4);padding:calc(var(--u)*2.6) calc(var(--u)*3);font-size:calc(var(--u)*6.4);line-height:1.1;}
+.row button[aria-pressed="true"]{background:var(--sun);border-color:var(--red);}
+#voiceNote{margin:0;font-size:calc(var(--u)*5.2);opacity:.85;line-height:1.4;}
+#voiceNote:empty{display:none;}
+
+#rotate{position:fixed;inset:0;background:var(--bg);color:#fff;display:none;flex-direction:column;align-items:center;justify-content:center;gap:24px;font-size:20px;text-align:center;padding:0 12%;z-index:9;}
+#rotate i{display:block;width:34px;height:58px;border:3px solid #fff;border-radius:7px;animation:turn 2.4s ease-in-out infinite;}
+@keyframes turn{0%,30%{transform:rotate(0)}60%,100%{transform:rotate(-90deg)}}
+@media (orientation:portrait) and (max-width:900px){#rotate{display:flex;}}
+@media (prefers-reduced-motion:reduce){#more,#rotate i,#speak.on{animation:none;}}
+
+#cv{cursor:pointer;} #stars[hidden],#basket[hidden]{display:none!important;} #vbar{display:none!important;} #hint{display:none;}
+#dlg{top:calc(var(--u)*34);text-align:center;}
+#title h1 .v2{display:block;width:max-content;margin:calc(var(--u)*3) auto 0;font-size:calc(var(--u)*6);background:var(--sun);color:var(--ink);-webkit-text-stroke:0;text-shadow:none;border:calc(var(--u)*.8) solid var(--ink);border-radius:99px;padding:calc(var(--u)*1) calc(var(--u)*5);}
+#fxRow button{flex:1;}
 
 </style>
+
 
 
 
@@ -235,17 +300,12 @@ body{font-family:'EB Garamond',Georgia,serif;font-weight:400;color:var(--ink);}
   <div id="whisper"></div>
   <div id="hint"></div>
   <div id="tip"></div>
-  <div id="vbar" hidden>
-    <button class="vb on" data-v="walk" data-i18n-label="Περπάτα" aria-label="Περπάτα"><canvas width="16" height="16" data-icon="walk"></canvas></button>
-    <button class="vb" data-v="look" data-i18n-label="Κοίτα" aria-label="Κοίτα"><canvas width="16" height="16" data-icon="look"></canvas></button>
-    <button class="vb" data-v="hand" data-i18n-label="Πάρε / Χρησιμοποίησε" aria-label="Πάρε / Χρησιμοποίησε"><canvas width="16" height="16" data-icon="hand"></canvas></button>
-    <button class="vb" data-v="talk" data-i18n-label="Μίλα" aria-label="Μίλα"><canvas width="16" height="16" data-icon="talk"></canvas></button>
-    <button class="vb" data-v="item" id="vItemB" disabled data-i18n-label="Χρησιμοποίησε αντικείμενο" aria-label="Χρησιμοποίησε αντικείμενο"><canvas width="16" height="16" id="vItem"></canvas></button>
-    <span class="sep"></span>
-    <div id="score"></div>
-    <button class="vb" id="bInv" data-i18n-label="Αντικείμενα" aria-label="Αντικείμενα"><canvas width="16" height="16" data-icon="bag"></canvas></button>
-    <button class="vb" id="bMenu" data-i18n-label="Μενού" aria-label="Μενού"><canvas width="16" height="16" data-icon="menu"></canvas></button>
-  </div>
+  <div id="stars" hidden><i>★</i><span id="starN">0</span></div>
+  <button class="round" id="bSet" aria-label="Ρυθμίσεις"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1 7 17M17 7l2.1-2.1"/></svg></button>
+  <button class="round" id="bSay" aria-label="Πες το ξανά"><svg viewBox="0 0 24 24"><path d="M4 9v6h4l5 4V5L8 9H4Z"/><path d="M16 9a4 4 0 0 1 0 6M18.5 6.5a7.5 7.5 0 0 1 0 11"/></svg></button>
+  <div id="basket" hidden></div>
+  <div id="sparkle"></div>
+  <div id="vbar" hidden><button id="bInv" hidden></button><button id="bMenu" hidden></button><div id="score" hidden></div></div>
   <div id="menu" hidden>
     <button id="mSet" data-i18n="Ρυθμίσεις">Ρυθμίσεις</button>
     <button id="mTitle" data-i18n="Στην αρχική">Στην αρχική</button>
@@ -258,16 +318,17 @@ body{font-family:'EB Garamond',Georgia,serif;font-weight:400;color:var(--ink);}
       <button id="bClose" data-i18n="Κλείσιμο">Κλείσιμο</button>
     </div>
   </div>
-  <div id="dlg" hidden><div id="pt"><canvas id="ptc" width="42" height="42"></canvas><span id="ptn"></span></div><div id="dlgBody"><p id="dlgText"></p><div id="dlgOpts"></div></div><span id="more">▼</span></div>
+  <div id="dlg" hidden><div id="who"></div><p id="dlgText"></p><div id="dlgOpts"></div><span id="speak">🔊</span><span id="more">▼</span></div>
 
   <div class="screen" id="title">
-    <h1><b data-i18n="Απογραφή">Απογραφή</b><em class="v2">point &amp; click</em><span data-i18n="Θεσσαλονίκη, Νοέμβριος 1987">Θεσσαλονίκη, Νοέμβριος 1987</span></h1>
+    <h1 data-i18n="Η Κοκκινοσκουφίτσα">Η Κοκκινοσκουφίτσα</h1>
+    <h1 style="font-size:0;margin:0"><em class="v2">point &amp; click</em></h1>
+    <p data-i18n="Ένα παραμύθι που παίζεις με τα δαχτυλάκια σου">Ένα παραμύθι που παίζεις με τα δαχτυλάκια σου</p>
     <nav>
-      <button id="tNew" data-i18n="Νέο παιχνίδι">Νέο παιχνίδι</button>
-      <button id="tCont" hidden data-i18n="Συνέχεια">Συνέχεια</button>
-      <button id="tSet" data-i18n="Ρυθμίσεις">Ρυθμίσεις</button>
+      <button id="tNew" data-i18n="Παίξε!">Παίξε!</button>
+      <button id="tCont" class="sec" hidden data-i18n="Συνέχεια">Συνέχεια</button>
+      <button id="tSet" class="sec" data-i18n="Ρυθμίσεις">Ρυθμίσεις</button>
     </nav>
-    <small data-i18n="Ποντίκι ή δάχτυλο: διάλεξε ενέργεια από τη μπάρα και πάτα πάνω στην εικόνα.">Ποντίκι ή δάχτυλο: διάλεξε ενέργεια από τη μπάρα και πάτα πάνω στην εικόνα.</small>
   </div>
   <div id="settings" hidden role="dialog">
     <h3 data-i18n="Ρυθμίσεις">Ρυθμίσεις</h3>
@@ -280,19 +341,22 @@ body{font-family:'EB Garamond',Georgia,serif;font-weight:400;color:var(--ink);}
     </div>
     <p class="lab" data-i18n="Γλώσσα">Γλώσσα</p>
     <div id="lgRow"><button data-lg="el" style="font-size:calc(var(--u)*6.4)">Ελληνικά</button><button data-lg="en" style="font-size:calc(var(--u)*6.4)">English</button></div>
-
+    <p class="lab" data-i18n="Φωνή που διαβάζει την ιστορία">Φωνή που διαβάζει την ιστορία</p>
+    <div class="row" id="vRow"><button data-v="1" data-i18n="Ναι">Ναι</button><button data-v="0" data-i18n="Όχι">Όχι</button><button id="vTest" data-i18n="Δοκιμή φωνής">Δοκιμή φωνής</button></div>
+    <p id="voiceNote"></p>
     <p class="lab" data-i18n="Οπτικά εφέ">Οπτικά εφέ</p>
     <div id="fxRow"><button data-fx="1" style="font-size:calc(var(--u)*6.4)" data-i18n="Πλήρη">Πλήρη</button><button data-fx="0" style="font-size:calc(var(--u)*6.4)" data-i18n="Ελαφριά">Ελαφριά</button></div>
     <div class="row">
-      <button id="sSound">Ήχος: ναι</button>
+      <button id="sSound">Μουσική: ναι</button>
       <button id="sFull" data-i18n="Πλήρης οθόνη">Πλήρης οθόνη</button>
       <button id="sClose" data-i18n="Κλείσιμο">Κλείσιμο</button>
     </div>
   </div>
   <div class="screen" id="end" hidden>
-    <h2 id="endH"></h2>
-    <div id="endT"></div>
-    <button id="endB" data-i18n="Από την αρχή">Από την αρχή</button>
+    <h2 id="endH" data-i18n="Τέλος!">Τέλος!</h2>
+    <div class="st" id="endStars"></div><div id="endT"></div>
+    <p data-i18n="Κι έζησαν αυτοί καλά κι εμείς καλύτερα!">Κι έζησαν αυτοί καλά κι εμείς καλύτερα!</p>
+    <button id="endB" data-i18n="Ξανά από την αρχή">Ξανά από την αρχή</button>
   </div>
 </div>
 </div>
@@ -305,7 +369,7 @@ body{font-family:'EB Garamond',Georgia,serif;font-weight:400;color:var(--ink);}
    ============================================================ */
 let LANG='el';
 let lastHint='';
-const EN={"Έντυπο απογραφής": "Inventory form", "Απογραφή κινητής περιουσίας. Οδός Αγίας Σοφίας 41.": "Inventory of movable property. 41 Agias Sofias Street.", "Στο τέλος, μια κενή γραμμή: «Υπογραφή εκτιμητή».": "At the bottom, an empty line: \"Appraiser's signature\".", "Παλιά κάρτα": "Old card", "Μια κάρτα με ζωγραφισμένα γεράνια. Το χαρτί έχει κιτρινίσει.": "A card with painted geraniums. The paper has gone yellow.", "«Ευτέρπη μου, το κλειδί εκεί που το άφηνες πάντα. Στο γεράνι. — Α.»": "\"Evterpi, my dear, the key is where you always left it. In the geranium. — A.\"", "Σκουριασμένο κλειδί": "Rusty key", "Βαρύ, παλιό, γεμάτο χώμα.": "Heavy, old, caked with soil.", "Κερί": "Candle", "Μισολιωμένο κερί σε τενεκεδένιο κηροπήγιο.": "A half-melted candle in a tin holder.", "Σπίρτα": "Matches", "Ένα κουτί σπίρτα. Το κουνάω. Ακούγεται μόνο ένα.": "A box of matches. I shake it. Only one rattles.", "Αναμμένο κερί": "Lit candle", "Η φλόγα γέρνει προς τα κάτω. Σαν κάτι να τη φυσάει από εκεί.": "The flame leans downward. As if something were breathing on it from below.", "Σπάγκος": "String", "Ένα κουβάρι γερός σπάγκος.": "A ball of strong string.", "Μαγνήτης": "Magnet", "Μαγνήτης-σουβενίρ: «Καβάλα 1966». Πιάνει γερά.": "A souvenir magnet: \"Kavala 1966\". It grips hard.", "Μαγνήτης σε σπάγκο": "Magnet on a string", "Ένα αυτοσχέδιο καλάμι. Ο πατέρας μου θα γελούσε.": "A makeshift fishing line. My father would have laughed.", "Ορειχάλκινο κλειδάκι": "Small brass key", "Ακόμα υγρό. Στη λαβή είναι χαραγμένο: «Γραφείο».": "Still wet. Engraved on the bow: \"Study\".", "Κλειδί κουρδίσματος": "Winding key", "Δεμένο με μια μαύρη κορδέλα.": "Tied with a black ribbon.", "Γράμμα της Ευτέρπης": "Evterpi's letter", "«Σε όποιον έρθει να με μετρήσει.»": "\"To whoever comes to count me.\"", "«Τα πράγματα εδώ μέσα δεν αξίζουν τίποτα. Μόνο το ρολόι.»": "\"Nothing in here is worth anything. Only the clock.\"", "«Αν το κούρδισες, σε παρακαλώ: σταμάτησέ το ξανά στις 3:17.»": "\"If you wound it, I beg you: stop it again at 3:17.\"", "«Μην το αφήσεις να προχωρήσει χωρίς εκείνον. — Ευτέρπη»": "\"Don't let it go on without him. — Evterpi\"", "Ανάβω το κερί με το τελευταίο σπίρτο. Η φλόγα τρεμοπαίζει, αλλά κρατάει.": "I light the candle with the last match. The flame shivers, but it holds.", "Δένω τον μαγνήτη στην άκρη του σπάγκου. Σφιχτός κόμπος.": "I tie the magnet to the end of the string. A tight knot.", "Αυτοκίνητο": "Car", "Το Φιατάκι μου. Τα τζάμια θολώνουν από μέσα.": "My little Fiat. The windows are fogging up from the inside.", "Όχι ακόμα. Πρώτα η δουλειά.": "Not yet. Work first.", "Φανοστάτης": "Street lamp", "Η λάμπα τρεμοπαίζει. Σαν να ανασαίνει.": "The lamp flickers. As if it were breathing.", "Γραμματοκιβώτιο": "Mailbox", "Λογαριασμοί της ΔΕΗ, απλήρωτοι. Διαφημιστικά.": "Electricity bills, unpaid. Flyers.", "Και στο βάθος, μια παλιά κάρτα. Την κρατάω.": "And at the very back, an old card. I keep it.", "Μόνο λογαριασμοί. Κανείς δεν θα τους πληρώσει.": "Only bills. Nobody will ever pay them.", "Εξώπορτα": "Front door", "Κλειδωμένη.": "Locked.", "Το έγγραφο του δικαστηρίου λέει πως το κλειδί «βρίσκεται εντός του ακινήτου».": "The court order says the key \"is located on the premises\".", "Πολύ βοηθητικό.": "Very helpful.", "Το κλειδί γυρνάει με κόπο. Κάτι μέσα στην κλειδαριά τρίζει σαν κόκαλο.": "The key turns with effort. Something inside the lock creaks like bone.", "Γλάστρα": "Flowerpot", "Βασιλικός. Ξερός εδώ και χρόνια.": "Basil. Dead for years.", "Γλάστρα με γεράνι": "Geranium pot", "Ένα μαραμένο γεράνι. Του πήρα ό,τι είχε.": "A withered geranium. I took all it had.", "Ένα μαραμένο γεράνι. Το χώμα είναι σκληρό σαν πέτρα.": "A withered geranium. The soil is hard as stone.", "«Στο γεράνι.»": "\"In the geranium.\"", "Σκάβω με τα δάχτυλα. Το χώμα είναι παγωμένο.": "I dig with my fingers. The soil is ice cold.", "Ένα κλειδί. Σκουριασμένο.": "A key. Rusted.", "Άδεια γλάστρα": "Empty pot", "Άδεια. Μόνο βρόχινο νερό και ένα πεσμένο φύλλο.": "Empty. Just rainwater and a fallen leaf.", "Ο δρόμος": "The street", "Ο δρόμος χάνεται στο σκοτάδι. Δεν έχω δουλειά εκεί.": "The street disappears into the dark. I have no business there.", "Πόρτα της κουζίνας": "Kitchen door", "Κρεμάστρα": "Coat stand", "Ένα ανδρικό παλτό, φαγωμένο από τον σκόρο.": "A man's coat, eaten by moths.", "Στην τσέπη: ένα κουβάρι σπάγκος. Και ένα μισοσκισμένο εισιτήριο τρένου.": "In the pocket: a ball of string. And a half-torn train ticket.", "Θεσσαλονίκη – Αθήνα. 17 Νοεμβρίου 1967.": "Thessaloniki – Athens. 17 November 1967.", "Το παλτό μυρίζει ακόμα καπνό.": "The coat still smells of tobacco.", "Πορτρέτο": "Portrait", "Ένας άντρας με στολή σιδηροδρομικού.": "A man in a railwayman's uniform.", "Κάποιος έχει ξύσει το πρόσωπο με κάτι αιχμηρό. Επίμονα.": "Someone has scratched out the face with something sharp. Over and over.", "Τραπεζάκι": "Side table", "Ένα κερί σε τενεκεδένιο κηροπήγιο. Το παίρνω.": "A candle in a tin holder. I take it.", "Σκόνη. Και ένας καθαρός κύκλος εκεί που ήταν το κερί.": "Dust. And a clean circle where the candle stood.", "Εκκρεμές ρολόι": "Grandfather clock", "Χτυπάει. Κάθε χτύπος αντηχεί μέσα στο στήθος μου.": "It's ticking. Every tick echoes inside my chest.", "Ένα ψηλό εκκρεμές ρολόι. Σταματημένο στις 3:17.": "A tall grandfather clock. Stopped at 3:17.", "Θα πιάσει καλή τιμή. Το σημειώνω.": "It'll fetch a good price. I make a note.", "Παράθυρο": "Window", "Βροχή. Ο δρόμος από εδώ μέσα μοιάζει πολύ πιο μακριά απ’ ό,τι είναι.": "Rain. From in here the street looks much farther away than it is.", "Πόρτα του γραφείου": "Study door", "Κλειδωμένη. Η κλειδαριά είναι μικρή, ορειχάλκινη.": "Locked. The lock is small, brass.", "Ταιριάζει.": "It fits.", "Σκάλα": "Stairs", "Η σκάλα είναι φραγμένη με έπιπλα κάτω από σεντόνια.": "The stairs are blocked by furniture under dust sheets.", "Από πάνω ακούγεται κάτι. Σαν κουνιστή πολυθρόνα.": "Something can be heard upstairs. Like a rocking chair.", "…Θα είναι ο αέρας.": "…It must be the wind.", "Πόρτα του υπογείου": "Cellar door", "Σκαλοπάτια που χάνονται στο απόλυτο σκοτάδι.": "Steps vanishing into total darkness.", "Έχω ένα κερί. Χρειάζομαι κάτι για να το ανάψω.": "I have a candle. I need something to light it.", "Χωρίς φως δεν κατεβαίνω.": "I'm not going down without light.", "Πρέπει πρώτα να το ανάψω.": "I need to light it first.", "Ημερολόγιο τοίχου": "Wall calendar", "Ημερολόγιο τοίχου. Νοέμβριος 1967.": "A wall calendar. November 1967.", "Η 17η είναι κυκλωμένη με κόκκινο. Κανείς δεν γύρισε τη σελίδα από τότε.": "The 17th is circled in red. Nobody has turned the page since.", "Ψυγείο": "Fridge", "Το ψυγείο είναι αποσυνδεδεμένο. Δεν τολμώ να το ανοίξω.": "The fridge is unplugged. I don't dare open it.", "Στην πόρτα, ένας μαγνήτης-σουβενίρ. Τον παίρνω.": "On the door, a souvenir magnet. I take it.", "Δεν το ανοίγω. Όχι.": "I'm not opening it. No.", "Συρτάρια": "Drawers", "Κουτάλια, ένα σπασμένο ψαλίδι… και σπίρτα.": "Spoons, a broken pair of scissors… and matches.", "Τίποτε άλλο χρήσιμο.": "Nothing else useful.", "Νεροχύτης": "Sink", "Η βρύση στάζει. Ρυθμικά. Σαν να μετράει κάτι.": "The tap drips. Rhythmically. As if it were counting something.", "Τραπέζι": "Table", "Δύο φλιτζάνια, στρωμένα αντικριστά.": "Two cups, set facing each other.", "Το ένα δεν το έπιασε ποτέ κανείς. Έχει σκόνη μέσα.": "One was never touched. There's dust inside.", "Προς το χολ": "To the hallway", "Η κουζίνα. Πιο κρύα από τον δρόμο.": "The kitchen. Colder than the street.", "Ράφια": "Shelves", "Βάζα με γλυκό του κουταλιού. Δεκάδες.": "Jars of spoon sweets. Dozens of them.", "Όλα έχουν την ίδια ετικέτα, με το ίδιο χέρι: «Για τον Α., όταν γυρίσει».": "Every one has the same label, in the same hand: \"For A., when he comes back.\"", "Στέρνα": "Cistern", "Μαύρο νερό. Δεν βλέπω πια τον πάτο. Ή μήπως εκείνος δεν βλέπει εμένα;": "Black water. I can't see the bottom anymore. Or does it no longer see me?", "Μια παλιά στέρνα. Το νερό είναι ακίνητο σαν γυαλί.": "An old cistern. The water is still as glass.", "Κάτι μεταλλικό γυαλίζει στον πάτο. Πολύ βαθιά για το χέρι μου.": "Something metal glints at the bottom. Too deep for my hand.", "Κατεβάζω τον μαγνήτη αργά…": "I lower the magnet slowly…", "Κάτι τραβάει τον σπάγκο. Μια στιγμή μόνο. Πιο δυνατά απ’ όσο θα έπρεπε.": "Something pulls on the string. Just for a moment. Harder than it should.", "Ένα μικρό ορειχάλκινο κλειδί.": "A small brass key.", "Δεν φτάνει ως κάτω. Αν το συνδύαζα με κάτι…": "It won't reach the bottom. If I combined it with something…", "Μπαούλο": "Trunk", "Ανδρικά ρούχα, διπλωμένα με προσοχή. Ναφθαλίνη.": "Men's clothes, carefully folded. Mothballs.", "Από πάνω, ένα πηλήκιο σιδηροδρομικού.": "On top, a railwayman's cap.", "…Υπάρχει κανείς εδώ κάτω;": "…Is anyone down here?", "Μόνο η σταγόνα που πέφτει στη στέρνα.": "Only the drip falling into the cistern.", "Βιβλιοθήκη": "Bookcase", "Δρομολόγια του σιδηροδρόμου, δεμένα σε τόμους. Από το 1958 ως το 1967.": "Railway timetables, bound in volumes. From 1958 to 1967.", "Μετά το 1967, τίποτα.": "After 1967, nothing.", "Φωτογραφία": "Photograph", "Ένα ζευγάρι σε παραλία. Εκείνη γελάει. Εκείνος κοιτάζει το ρολόι του.": "A couple on a beach. She is laughing. He is looking at his watch.", "Από πίσω: «Ευτέρπη και Ανδρέας, Καβάλα 1966».": "On the back: \"Evterpi and Andreas, Kavala 1966\".", "Γραφείο": "Desk", "Ένα ημερολόγιο, ανοιχτό στην τελευταία σελίδα:": "A diary, open at the last page:", "«Το ρολόι σταμάτησε τη νύχτα που ο Ανδρέας πήρε το τρένο των 3:17.»": "\"The clock stopped the night Andreas took the 3:17 train.\"", "«Δεν θα το ξανακουρδίσω. Όσο ο χρόνος δεν προχωρά, δεν έχει φύγει.»": "\"I will never wind it again. As long as time stands still, he hasn't left.\"", "Στο συρτάρι, ένα κλειδί κουρδίσματος με μαύρη κορδέλα.": "In the drawer, a winding key on a black ribbon.", "Πρέπει να ελέγξω αν το ρολόι λειτουργεί. Αλλάζει την εκτίμηση.": "I have to check whether the clock works. It changes the valuation.", "«Όσο ο χρόνος δεν προχωρά, δεν έχει φύγει.»": "\"As long as time stands still, he hasn't left.\"", "Χάρτης": "Map", "Χάρτης του σιδηροδρομικού δικτύου. Μια διαδρομή είναι σημαδεμένη με κόκκινο μελάνι, ξανά και ξανά.": "A map of the railway network. One route is marked in red ink, over and over.", "Θεσσαλονίκη – Αθήνα. Μόνο το πήγαινε.": "Thessaloniki – Athens. One way only.", "Τα τζάμια τρέμουν σε κάθε βροντή. Κι εγώ λίγο.": "The panes shake with every thunderclap. So do I, a little.", "Πόρτα": "Door", "Τικ.": "Tick.", "Πού πας, Ανδρέα;": "Where are you going, Andreas?", "Το τρένο δεν περιμένει κανέναν.": "The train waits for no one.", "Μείνε. Μόνο απόψε.": "Stay. Just tonight.", "Εικονοστάσι": "Icon shelf", "Το εικονοστάσι. Το καντήλι είναι αναμμένο.": "The icon shelf. The oil lamp is lit.", "Η Ευτέρπη πέθανε πριν από τρεις εβδομάδες.": "Evterpi died three weeks ago.", "Ποιος το άναψε;": "Who lit it?", "Κρεβάτι": "Bed", "Στρωμένο για δύο. Το ένα μαξιλάρι είναι ακόμα βαθουλωμένο.": "Made up for two. One pillow still holds the shape of a head.", "Κουνιστή πολυθρόνα": "Rocking chair", "Κουνιέται. Δεν την αγγίζει κανείς.": "It's rocking. Nobody is touching it.", "Τη σταματάω με το χέρι. Είναι ζεστή.": "I stop it with my hand. It's warm.", "Κάτω από το μαξιλάρι, ένας φάκελος: «Σε όποιον έρθει να με μετρήσει».": "Under the cushion, an envelope: \"To whoever comes to count me.\"", "Ξανακουνιέται. Την αφήνω.": "It starts rocking again. I let it.", "Από εδώ φαίνεται η στάση του τρένου. Το φως της είναι ακόμα αναμμένο.": "From here you can see the railway stop. Its light is still on.", "Συρταριέρα": "Chest of drawers", "Ένα μουσικό κουτί. Παίζει έναν σκοπό που δεν ξέρω.": "A music box. It plays a tune I don't know.", "Κι όμως, τον θυμάμαι.": "And yet I remember it.", "Γραφειάκι": "Writing desk", "Εδώ θα συμπληρώσω την απογραφή. Χρειάζομαι το έντυπο.": "I'll fill in the inventory here. I need the form.", "Ένα μικρό γραφείο με λάμπα. Εδώ θα συμπληρώσω την απογραφή.": "A small desk with a lamp. I'll fill in the inventory here.", "Πρώτα να ελέγξω όλο το δωμάτιο.": "First I should check the whole room.", "Το διαβάζω ξανά. Τα γράμματα τρέμουν προς το τέλος.": "I read it again. The handwriting trembles towards the end.", "Η πολυθρόνα κουνιέται.": "The chair is rocking.", "Το παράθυρο είναι κλειστό.": "The window is shut.", "Μέσα μυρίζει υγρασία και λεβάντα.": "Inside, it smells of damp and lavender.", "Το σπίτι είναι πιο ζεστό απ’ όσο θα έπρεπε. Σαν να το κατοικεί ακόμα κάποιος.": "The house is warmer than it should be. As if someone still lives here.", "Η λάμπα του γραφείου είναι αναμμένη.": "The desk lamp is on.", "Το ρεύμα έχει κοπεί από τον Οκτώβριο.": "The power was cut off in October.", "Βάζω το κλειδί στο καντράν. Μία, δύο, τρεις στροφές.": "I fit the key into the dial. One, two, three turns.", "Σπρώχνω το εκκρεμές.": "I give the pendulum a push.", "Τικ…": "Tick…", "Είμαι στο χολ. Το ρολόι χτυπάει κανονικά.": "I'm in the hallway. The clock is ticking normally.", "Τα σεντόνια από τη σκάλα έχουν γλιστρήσει στο πάτωμα. Σαν να τα τράβηξε κάποιος.": "The sheets have slid off the stairs onto the floor. As if someone pulled them.", "Γράφω. Καναπές. Δύο πολυθρόνες. Σερβίτσιο πορσελάνης. Βάζα με γλυκό: πενήντα δύο.": "I write. Sofa. Two armchairs. Porcelain tea set. Jars of spoon sweets: fifty-two.", "Εκκρεμές ρολόι, σε λειτουργία. Μόνο αυτό αξίζει όσο το μισό σπίτι.": "Grandfather clock, in working order. That alone is worth half the house.", "Από κάτω ακούγεται το τικ-τακ. Σαν να περιμένει τι θα γράψω.": "I can hear the ticking from downstairs. As if it's waiting to see what I write.", "Τι γράφω για το ρολόι;": "What do I write for the clock?", "«Σε λειτουργία». Υπογράφω.": "\"In working order.\" I sign.", "Κατεβαίνω να το σταματήσω στις 3:17.": "I go down and stop it at 3:17.", "Πρώτο τέλος · Η απογραφή": "First ending · The Inventory", "Το ρολόι φορτώθηκε σε ένα φορτηγάκι του Δημοσίου μαζί με άλλα διακόσια δεκατρία αντικείμενα. Χτυπούσε σε όλη τη διαδρομή.": "The clock was loaded onto a state van with two hundred and thirteen other items. It ticked the whole way.", "Τον Μάρτιο πήρα προαγωγή.": "In March I got a promotion.", "Ξυπνάω κάθε βράδυ στις 3:17 και ακούω ένα τικ-τακ στο χολ μου.": "Every night I wake at 3:17 and hear ticking in my hallway.", "Δεν έχω ρολόι στο χολ μου.": "There is no clock in my hallway.", "Δεύτερο τέλος · Τρεις και δεκαεφτά": "Second ending · Seventeen past three", "Άνοιξα το γυάλινο πορτάκι και σταμάτησα το εκκρεμές με δύο δάχτυλα. Γύρισα τους δείκτες πίσω: τρεις και δεκαεφτά.": "I opened the little glass door and stopped the pendulum with two fingers. I turned the hands back: seventeen past three.", "Η βροχή σταμάτησε. Από πάνω, η πολυθρόνα έτριξε μια τελευταία φορά, και ησύχασε.": "The rain stopped. Upstairs, the chair creaked one last time, and was still.", "Στο έντυπο έγραψα: «Εκκρεμές ρολόι, μη λειτουργικό. Άνευ αξίας.»": "On the form I wrote: \"Grandfather clock, not working. No value.\"", "Ήταν το μόνο ψέμα που έγραψα ποτέ σε απογραφή.": "It was the only lie I ever wrote on an inventory.", "Άδεια χέρια.": "Empty hands.", "Αυτά τα δύο δεν συνδυάζονται.": "These two don't go together.", "Διάλεξε ένα αντικείμενο.": "Pick an item.", "Διάλεξε ένα αντικείμενο. Πάτα δεύτερο για να τα συνδυάσεις.": "Pick an item. Tap a second one to combine them.", "Δεν βγαίνει νόημα.": "That makes no sense.", "Όχι, δεν ταιριάζει εδώ.": "No, that doesn't belong here.", "Δεν νομίζω.": "I don't think so.", "Αυτό δεν θα βοηθήσει.": "That won't help.", "Δεν υπάρχει τίποτα εδώ για να το χρησιμοποιήσω. (B για άδεια χέρια)": "There's nothing here to use it on. (B for empty hands)", "Ήχος: ": "Sound: ", "ναι": "on", "όχι": "off", "Θεσσαλονίκη, Νοέμβριος 1987.": "Thessaloniki, November 1987.", "Με λένε Λευτέρη Σταθάκη. Είμαι εκτιμητής του Πρωτοδικείου.": "My name is Lefteris Stathakis. I'm an appraiser for the Court of First Instance.", "Η δουλειά μου είναι να μετράω τι αφήνουν πίσω τους οι άνθρωποι.": "My job is to count what people leave behind.", "Ευτέρπη Λάμπρου, ογδόντα ενός ετών. Χωρίς κληρονόμους. Το σπίτι περνάει στο Δημόσιο.": "Evterpi Lambrou, eighty-one. No heirs. The house passes to the state.", "Μία απογραφή. Μία υπογραφή. Και μετά σπίτι μου.": "One inventory. One signature. Then home.", "Βέλη για κίνηση. A εξετάζει ή χρησιμοποιεί. B αλλάζει το αντικείμενο που κρατάς. Στην τσάντα συνδυάζεις.": "Arrows to move. A examines or uses. B switches the item you're holding. Combine items in the bag.", " · A για χρήση": " · A to use", "Απογραφή": "Inventory", "Θεσσαλονίκη, Νοέμβριος 1987": "Thessaloniki, November 1987", "Νέο παιχνίδι": "New game", "Συνέχεια": "Continue", "Ρυθμίσεις": "Settings", "Καλύτερα με ακουστικά και το κινητό οριζόντια.": "Best with headphones and your phone held sideways.", "Στην αρχική": "Back to title", "Μέγεθος γραμμάτων": "Text size", "Γλώσσα": "Language", "Έτσι θα φαίνονται τα κείμενα: «Το ρολόι σταμάτησε στις 3:17.»": "This is how text will look: \"The clock stopped at 3:17.\"", "Πλήρης οθόνη": "Full screen", "Κλείσιμο": "Close", "Εξέταση": "Examine", "Από την αρχή": "Start over", "Γύρισε το κινητό οριζόντια.": "Turn your phone sideways.", "Πόντοι:": "Points:", "Τίποτα που να αξίζει να μπει στην απογραφή.": "Nothing worth putting on the inventory.", "Καλύτερα να μην το αγγίξω.": "Better not to touch it.", "Μιλάω μόνος μου. Το σπίτι ακούει.": "I'm talking to myself. The house is listening.", "Διάλεξε ενέργεια από τη μπάρα: πόδια, μάτι, χέρι, στόμα ή αντικείμενο. Μετά πάτα πάνω στην εικόνα. Με ποντίκι, το δεξί κλικ αλλάζει ενέργεια.": "Pick an action from the bar: feet, eye, hand, mouth or item. Then tap the picture. With a mouse, right-click changes the action.", "Το Φιατάκι μου. Τα τζάμια θολώνουν από τη μέσα μεριά.": "My little Fiat. The windows are fogging up from the inside.", "Η λάμπα τρεμοπαίζει. Μοιάζει να ανασαίνει.": "The lamp flickers. It seems to be breathing.", "Ένα σκουριασμένο γραμματοκιβώτιο. Γεμάτο ως πάνω.": "A rusty mailbox. Stuffed to the brim.", "Μια βαριά ξύλινη πόρτα. Το βερνίκι έχει φουσκώσει από την υγρασία.": "A heavy wooden door. The varnish has blistered from the damp.", "Ένα μαραμένο γεράνι.": "A withered geranium.", "Το σπίτι": "The house", "Ένα νεοκλασικό του 1910. Κάποτε θα ήταν το ωραιότερο σπίτι του δρόμου.": "A neoclassical house from 1910. Once it must have been the finest house on the street.", "Σε ένα παράθυρο του πάνω ορόφου, νομίζω πως κουνήθηκε μια κουρτίνα.": "In an upstairs window, I think a curtain moved.", "Η πόρτα της κουζίνας. Μισάνοιχτη.": "The kitchen door. Half open.", "Ένα κερί σε τενεκεδένιο κηροπήγιο.": "A candle in a tin holder.", "Η εξώπορτα. Πίσω της, η βροχή.": "The front door. Behind it, the rain.", "Η σκάλα είναι ελεύθερη τώρα. Από πάνω, μια πολυθρόνα τρίζει.": "The stairs are clear now. Upstairs, a chair creaks.", "Συρτάρια κουζίνας. Το ένα δεν κλείνει καλά.": "Kitchen drawers. One of them won't close properly.", "Κλείνω τη βρύση. Σε λίγα δευτερόλεπτα ξαναρχίζει να στάζει.": "I turn off the tap. A few seconds later it starts dripping again.", "Τα σκαλοπάτια προς την κουζίνα. Και προς το φως.": "The steps up to the kitchen. And to the light.", "Ένα γραφείο με πράσινη λάμπα. Το ρεύμα έχει κοπεί, κι όμως η λάμπα καίει.": "A desk with a green lamp. The power is off, and yet the lamp is burning.", "Μια πόρτα. Από κάτω, κόκκινο φως.": "A door. Red light underneath it.", "Το κρεβάτι είναι στρωμένο για δύο. Το ένα μαξιλάρι είναι ακόμα βαθουλωμένο.": "The bed is made up for two. One pillow still holds the shape of a head.", "Μια συρταριέρα με ένα μουσικό κουτί από πάνω.": "A chest of drawers with a music box on top.", "Περπάτα": "Walk", "Κοίτα": "Look", "Πάρε / Χρησιμοποίησε": "Take / Use", "Μίλα": "Talk", "Χρησιμοποίησε αντικείμενο": "Use item", "Ήχος:": "Sound:", "Αντικείμενα": "Items", "Μενού": "Menu", "Ποντίκι ή δάχτυλο: διάλεξε ενέργεια από τη μπάρα και πάτα πάνω στην εικόνα.": "Mouse or finger: pick an action from the bar and tap the picture.", "Οπτικά εφέ": "Visual effects", "Πλήρη": "Full", "Ελαφριά": "Light"};
+const EN={"Καλάθι με πίτα": "Basket with pie", "Ένα καλάθι με ζεστή μηλόπιτα για τη γιαγιά.": "A basket with a warm apple pie for Grandma.", "Κουλουράκια": "Cookies", "Μυρωδάτα κουλουράκια με ζάχαρη.": "Sweet-smelling sugar cookies.", "Λουλούδια": "Flowers", "Ένα μπουκέτο λουλούδια για τη γιαγιά.": "A bunch of flowers for Grandma.", "Καρότο": "Carrot", "Ένα μεγάλο, πορτοκαλί καρότο.": "A big orange carrot.", "Φραουλίτσες": "Wild strawberries", "Κόκκινες, γλυκές φραουλίτσες του δάσους.": "Little red, sweet wild strawberries.", "Σφυρίχτρα": "Whistle", "Μια ξύλινη σφυρίχτρα. Φιιιιιτ!": "A wooden whistle. Wheeeee!", "Κοκκινοσκουφίτσα": "Little Red Riding Hood", "Μαμά": "Mum", "Λύκος": "Wolf", "Γιαγιά": "Grandma", "Λαγουδάκι": "Bunny", "Ξυλοκόπος": "Woodcutter", "Αυτή η συσκευή δεν υποστηρίζει ανάγνωση φωνής. Η ιστορία συνεχίζει με άγγιγμα.": "This device can't read text aloud. The story continues with a tap.", "Φωνή:": "Voice:", "για πιο φυσική φωνή, κατέβασε τη «βελτιωμένη» ελληνική φωνή από τις ρυθμίσεις του κινητού.": "for a more natural voice, download an enhanced voice in your phone's settings.", "Δεν βρέθηκε ελληνική φωνή. Πρόσθεσε ελληνική φωνή από τις ρυθμίσεις του κινητού (Προσβασιμότητα → Εκφώνηση).": "No voice found for this language. Add one in your phone's settings (Accessibility → Spoken Content).", "Κόκκινη κάπα": "Red cape", "Η κρεμάστρα είναι άδεια. Η κάπα είναι πάνω σου!": "The hook is empty. The cape is on you!", "Η Κοκκινοσκουφίτσα φοράει την αγαπημένη της κόκκινη κάπα.": "Little Red Riding Hood puts on her favourite red cape.", "Κοκκινοσκουφίτσα: «Τι ωραία που είναι!»": "Little Red: \"How lovely it is!\"", "Τραπέζι": "Table", "Πάνω στο τραπέζι μυρίζει ζεστή μηλόπιτα!": "The table smells of warm apple pie!", "Ας ρωτήσουμε τη μαμά τι να κάνουμε.": "Let's ask Mum what to do.", "Η Κοκκινοσκουφίτσα βάζει και κουλουράκια στο καλάθι.": "Little Red Riding Hood puts some cookies in the basket too.", "Κοκκινοσκουφίτσα: «Η γιαγιά τα λατρεύει!»": "Little Red: \"Grandma loves them!\"", "Το τραπέζι είναι άδειο. Όλα τα καλούδια είναι στο καλάθι!": "The table is empty. All the treats are in the basket!", "Γατούλα": "Kitty", "Νιάου! Η γατούλα χουζουρεύει δίπλα στη φωτιά.": "Meow! The kitty is snoozing by the fire.", "Μαμά: «Καλημέρα, αγάπη μου! Η γιαγιά είναι λίγο άρρωστη.»": "Mum: \"Good morning, sweetheart! Grandma is a little bit poorly.\"", "Μαμά: «Φόρεσε πρώτα την κόκκινη κάπα σου. Είναι κρεμασμένη δίπλα στο ράφι.»": "Mum: \"First put on your red cape. It's hanging by the shelf.\"", "Μαμά: «Τι όμορφη που είσαι! Πάρε αυτό το καλάθι με τη μηλόπιτα για τη γιαγιά.»": "Mum: \"Don't you look lovely! Take this basket with apple pie to Grandma.\"", "Μαμά: «Βάλε μέσα και κουλουράκια από το τραπέζι.»": "Mum: \"Put some cookies from the table in it too.\"", "Μαμά: «Μην ξεχάσεις τα κουλουράκια στο τραπέζι!»": "Mum: \"Don't forget the cookies on the table!\"", "Μαμά: «Να προσέχεις! Μη μιλάς με αγνώστους και μη φεύγεις από το μονοπάτι.»": "Mum: \"Be careful! Don't talk to strangers and don't leave the path.\"", "Κοκκινοσκουφίτσα: «Το υπόσχομαι, μαμά!»": "Little Red: \"I promise, Mum!\"", "Πόρτα": "Door", "Μαμά: «Περίμενε! Πρώτα ετοιμάζουμε το καλάθι για τη γιαγιά.»": "Mum: \"Wait! First we get Grandma's basket ready.\"", "Κοκκινοσκουφίτσα: «Το υπόσχομαι, μαμά! Γεια σου!»": "Little Red: \"I promise, Mum! Bye!\"", "Σπίτι": "Home", "Λουλουδάκι": "Little flower", "Εδώ ήταν το καρότο.": "This is where the carrot was.", "Ωπ! Η Κοκκινοσκουφίτσα τραβάει ένα μεγάλο καρότο από το χώμα!": "Oops! Little Red Riding Hood pulls a big carrot out of the ground!", "Λαγουδάκι: «Ευχαριστώ, φίλη μου! Το μονοπάτι για τη γιαγιά είναι από εκεί!»": "Bunny: \"Thank you, my friend! The path to Grandma's is that way!\"", "Λαγουδάκι: «Ουουου… Πεινάω πολύ και δεν βρίσκω ούτε ένα καρότο!»": "Bunny: \"Boo hoo… I'm so hungry and I can't find a single carrot!\"", "Κοκκινοσκουφίτσα: «Έχω ένα καρότο στο καλάθι μου!»": "Little Red: \"I've got a carrot in my basket!\"", "Κοκκινοσκουφίτσα: «Μην κλαις, λαγουδάκι! Θα σου βρω εγώ ένα.»": "Little Red: \"Don't cry, little bunny! I'll find you one.\"", "Λαγουδάκι: «Ένα καρότο! Ευχαριστώ, ευχαριστώ!»": "Bunny: \"A carrot! Thank you, thank you!\"", "Το λαγουδάκι χοροπηδάει από τη χαρά του και ανοίγει δρόμο μέσα από τους θάμνους!": "The bunny hops with joy and opens a path through the bushes!", "Θάμνοι": "Bushes", "Οι θάμνοι είναι πολύ πυκνοί. Δεν μπορούμε να περάσουμε.": "The bushes are too thick. We can't get through.", "Μήπως ξέρει κάποιος ένα μυστικό περασματάκι;": "Does anyone know a secret little path?", "Ένα λουλουδάκι για τη γιαγιά! Ας μαζέψουμε κι άλλα.": "One little flower for Grandma! Let's pick some more.", "Δύο λουλουδάκια! Ακόμα ένα!": "Two little flowers! One more!", "Τρία λουλουδάκια! Τι όμορφο μπουκέτο!": "Three little flowers! What a pretty bunch!", "Πίσω στο λιβάδι": "Back to the meadow", "Τις μαζέψαμε όλες!": "We picked them all!", "Φραουλίτσες του δάσους! Μπαίνουν κι αυτές στο καλάθι.": "Wild strawberries! Into the basket they go.", "Ρυάκι": "Stream", "Το ρυάκι κελαρύζει κάτω από το γεφυράκι. Γλου γλου γλου!": "The stream babbles under the little bridge. Glug glug glug!", "Στο σπίτι της γιαγιάς": "To Grandma's house", "Ξαφνικά, πίσω από ένα δέντρο, εμφανίζεται ένας μεγάλος γκρίζος λύκος!": "Suddenly, from behind a tree, out comes a big grey wolf!", "Λύκος: «Καλημέρα, μικρούλα! Πού πηγαίνεις με αυτό το ωραίο καλάθι;»": "Wolf: \"Good morning, little one! Where are you going with that lovely basket?\"", "Τι λέει η Κοκκινοσκουφίτσα;": "What does Little Red Riding Hood say?", "«Η μαμά λέει να μη μιλάω με αγνώστους!»": "\"Mum says not to talk to strangers!\"", "Κοκκινοσκουφίτσα: «Η μαμά λέει να μη μιλάω με αγνώστους!»": "Little Red: \"Mum says not to talk to strangers!\"", "Μπράβο! Έτσι είπε η μαμά.": "Well done! That's what Mum said.", "Λύκος: «Χμ! Μυρίζει μηλόπιτα… Θα πάει σίγουρα στη γιαγιά της!»": "Wolf: \"Hmm! I smell apple pie… I bet she's going to her grandma's!\"", "Και ο λύκος τρέχει γρήγορα μέσα στο δάσος!": "And the wolf runs off quickly into the forest!", "«Πάω στη γιαγιά μου!»": "\"I'm going to my grandma's!\"", "Κοκκινοσκουφίτσα: «Πάω στη γιαγιά μου, στο σπιτάκι με τα λουλούδια!»": "Little Red: \"I'm going to my grandma's, the little house with the flowers!\"", "Λύκος: «Α, στη γιαγιά! Τι ωραία… Πρέπει να φύγω! Γεια!»": "Wolf: \"Oh, to Grandma's! How nice… I have to go! Bye!\"", "Ωχ! Η μαμά είπε να μη μιλάμε με αγνώστους. Την επόμενη φορά θα το θυμόμαστε!": "Oops! Mum said not to talk to strangers. Next time we'll remember!", "Πίσω στο δάσος": "Back to the forest", "Ξυλοκόπος: «Αν χρειαστείς βοήθεια, φύσα τη σφυρίχτρα. Θα είμαι εδώ!»": "Woodcutter: \"If you need help, blow the whistle. I'll be right here!\"", "Ξυλοκόπος: «Γεια σου, Κοκκινοσκουφίτσα! Πας στη γιαγιά σου;»": "Woodcutter: \"Hello, Little Red Riding Hood! Going to your grandma's?\"", "Ξυλοκόπος: «Είδα έναν λύκο να τρέχει προς τα εδώ. Πάρε αυτή τη σφυρίχτρα.»": "Woodcutter: \"I saw a wolf running this way. Take this whistle.\"", "Ξυλοκόπος: «Αν χρειαστείς βοήθεια, φύσα τη δυνατά και θα έρθω αμέσως!»": "Woodcutter: \"If you need help, blow it hard and I'll come right away!\"", "Κοτούλες": "Hens", "Κοκοκό! Οι κοτούλες της γιαγιάς ψάχνουν σποράκια.": "Cluck cluck! Grandma's hens are looking for seeds.", "Πόρτα της γιαγιάς": "Grandma's door", "Ας πούμε πρώτα καλημέρα στον ξυλοκόπο!": "Let's say good morning to the woodcutter first!", "Τοκ τοκ τοκ!": "Knock knock knock!", "Λύκος με ψιλή φωνή: «Ποιος είναι;»": "Wolf, in a squeaky voice: \"Who's there?\"", "Κοκκινοσκουφίτσα: «Εγώ είμαι, γιαγιά! Σου έφερα μηλόπιτα!»": "Little Red: \"It's me, Grandma! I brought you apple pie!\"", "Λύκος με ψιλή φωνή: «Τράβα το κορδονάκι και μπες μέσα, χρυσό μου!»": "Wolf, in a squeaky voice: \"Pull the little string and come in, my dear!\"", "Χμμ… Η φωνή της γιαγιάς ακούγεται λίγο παράξενη.": "Hmm… Grandma's voice sounds a bit strange.", "Έξω": "Outside", "Όχι τώρα! Πρέπει να βοηθήσουμε τη γιαγιά!": "Not now! We have to help Grandma!", "Ντουλάπα": "Wardrobe", "Γιαγιά: «Τι καλά που ήρθες, κοριτσάκι μου!»": "Grandma: \"I'm so glad you came, my little one!\"", "Η ντουλάπα τρέμει λίγο… και ακούγεται ένα σιγανό «σσσς!»": "The wardrobe is shaking a little… and there's a quiet \"shhh!\"", "Ποιος να είναι μέσα;": "Who could be inside?", "Η Κοκκινοσκουφίτσα ανοίγει τη ντουλάπα…": "Little Red Riding Hood opens the wardrobe…", "Γιαγιά: «Εδώ είμαι! Κρύφτηκα από τον λύκο!»": "Grandma: \"Here I am! I hid from the wolf!\"", "Κοκκινοσκουφίτσα: «Γιαγιά μου!»": "Little Red: \"Grandma!\"", "Γιαγιά και εγγονούλα αγκαλιάζονται σφιχτά.": "Grandma and granddaughter give each other a big hug.", "Γιαγιά: «Λουλούδια για μένα; Τι όμορφα! Σ’ ευχαριστώ, χρυσό μου!»": "Grandma: \"Flowers for me? How pretty! Thank you, my dear!\"", "Γιαγιά;": "Grandma?", "Λύκος: «Ευχαριστώ για τα κουλουράκια! Είναι τα καλύτερα του κόσμου!»": "Wolf: \"Thank you for the cookies! They're the best in the world!\"", "Ο λύκος γλείφεται και κοιτάζει το καλάθι.": "The wolf licks his lips and looks at the basket.", "Ποιος μπορεί να μας βοηθήσει; Τι μας έδωσε ο ξυλοκόπος;": "Who can help us? What did the woodcutter give us?", "Λύκος: «Συγγνώμη… Δεν θα κάνω πια σκανταλιές.»": "Wolf: \"Sorry… I won't be naughty any more.\"", "Πού να είναι άραγε η γιαγιά; Ακούω κάτι μέσα στη ντουλάπα!": "Where could Grandma be? I can hear something inside the wardrobe!", "Λύκος: «Πεινάω τόσο πολύ… Από χθες δεν έχω φάει τίποτα.»": "Wolf: \"I'm so hungry… I haven't eaten anything since yesterday.\"", "Μήπως έχουμε κάτι νόστιμο στο καλάθι για τον λύκο;": "Do we have something tasty in the basket for the wolf?", "Πρώτα ας βρούμε τη γιαγιά!": "Let's find Grandma first!", "Λύκος: «Μμμ, φραουλίτσες! Νόστιμες! Αλλά… μήπως έχεις και κουλουράκια;»": "Wolf: \"Mmm, strawberries! Yummy! But… do you have any cookies too?\"", "Η μηλόπιτα είναι για τη γιαγιά! Μήπως έχουμε κάτι άλλο για τον λύκο;": "The apple pie is for Grandma! Do we have something else for the wolf?", "Παράθυρο": "Window", "Από το παράθυρο φαίνεται το δάσος και ο ήλιος που λάμπει.": "Through the window you can see the forest and the shining sun.", "Λαμπίτσα": "Little lamp", "Μια μικρή λάμπα σκορπάει ζεστό φως στο δωμάτιο.": "A little lamp spreads warm light around the room.", "Το δωμάτιο της γιαγιάς. Η «γιαγιά» είναι ξαπλωμένη στο κρεβάτι, με το σκουφάκι της.": "Grandma's bedroom. \"Grandma\" is lying in bed, wearing her nightcap.", "Κάτι δεν πάει καλά… Ας πλησιάσουμε!": "Something's not right… Let's go closer!", "«Γιαγιά, τι μεγάλα μάτια που έχεις!»": "\"Grandma, what big eyes you have!\"", "Λύκος με ψιλή φωνή: «Για να σε βλέπω καλύτερα, παιδί μου!»": "Wolf, in a squeaky voice: \"All the better to see you with, my dear!\"", "«Γιαγιά, τι μεγάλα αυτιά που έχεις!»": "\"Grandma, what big ears you have!\"", "Λύκος με ψιλή φωνή: «Για να σε ακούω καλύτερα, παιδί μου!»": "Wolf, in a squeaky voice: \"All the better to hear you with, my dear!\"", "«Γιαγιά, τι μεγάλη μύτη που έχεις!»": "\"Grandma, what a big nose you have!\"", "Λύκος με ψιλή φωνή: «Για να μυρίζω καλύτερα τη μηλόπιτα, παιδί μου!»": "Wolf, in a squeaky voice: \"All the better to smell the apple pie with, my dear!\"", "Κοκκινοσκουφίτσα: ": "Little Red: ", "Κοκκινοσκουφίτσα: «Γιαγιά, και τι μεγάλο στόμα που έχεις!»": "Little Red: \"Grandma, and what a big mouth you have!\"", "Λύκος: «Για να φάω… ΤΗ ΜΗΛΟΠΙΤΑ ΣΟΥ!»": "Wolf: \"All the better to eat… YOUR APPLE PIE!\"", "Ο λύκος πετάγεται από το κρεβάτι! Δεν είναι η γιαγιά, είναι ο λύκος!": "The wolf jumps out of bed! It isn't Grandma, it's the wolf!", "Γρήγορα! Τι μας έδωσε ο ξυλοκόπος; Διάλεξε τη σφυρίχτρα από το καλάθι!": "Quick! What did the woodcutter give us? Pick the whistle from the basket!", "Φιιιιιιιτ! Τι δυνατή σφυρίχτρα!": "Wheeeeee! What a loud whistle!", "Φιιιιιιιτ!": "Wheeeeee!", "Μπαμ! Η πόρτα ανοίγει και μπαίνει ο ξυλοκόπος!": "Bang! The door opens and in comes the woodcutter!", "Ξυλοκόπος: «Τι γίνεται εδώ, κύριε Λύκε;»": "Woodcutter: \"What's going on here, Mr Wolf?\"", "Λύκος: «Ωχ… Συγγνώμη… Απλώς πεινούσα πολύ…»": "Wolf: \"Oh… Sorry… I was just very hungry…\"", "Ο λύκος μαζεύεται ντροπαλός σε μια γωνίτσα.": "The wolf shuffles shyly into a corner.", "Η Κοκκινοσκουφίτσα δίνει στον λύκο τα κουλουράκια.": "Little Red Riding Hood gives the wolf the cookies.", "Λύκος: «Για μένα; Κανείς δεν μου έχει φερθεί ποτέ τόσο καλά!»": "Wolf: \"For me? Nobody has ever been so kind to me!\"", "Λύκος: «Συγγνώμη που σας τρόμαξα. Υπόσχομαι να είμαι καλός λύκος!»": "Wolf: \"Sorry I scared you. I promise to be a good wolf!\"", "Γιαγιά: «Ελάτε όλοι! Η μηλόπιτα είναι ζεστή. Ας φάμε όλοι μαζί!»": "Grandma: \"Come, everyone! The apple pie is warm. Let's all eat together!\"", "Και έτσι, η γιαγιά, η Κοκκινοσκουφίτσα, ο ξυλοκόπος και ο λύκος έφαγαν μηλόπιτα και τραγούδησαν όλο το απόγευμα.": "And so Grandma, Little Red Riding Hood, the woodcutter and the wolf ate apple pie and sang all afternoon.", "Κι έζησαν αυτοί καλά κι εμείς καλύτερα!": "And they all lived happily ever after!", "Ας φορέσουμε την κόκκινη κάπα! Πάτα την κρεμάστρα.": "Let's put on the red cape! Tap the hook.", "Ας μιλήσουμε με τη μαμά!": "Let's talk to Mum!", "Ας βάλουμε κουλουράκια στο καλάθι! Πάτα το τραπέζι.": "Let's put cookies in the basket! Tap the table.", "Πάμε στη γιαγιά! Πάτα την πόρτα.": "Let's go to Grandma's! Tap the door.", "Ας μαζέψουμε λουλουδάκια για τη γιαγιά!": "Let's pick little flowers for Grandma!", "Το λαγουδάκι είναι λυπημένο. Ας το βοηθήσουμε!": "The bunny is sad. Let's help!", "Βλέπεις κάτι πορτοκαλί στο χώμα;": "Can you see something orange in the ground?", "Το λαγουδάκι μάς άνοιξε δρόμο! Πάμε δεξιά!": "The bunny opened a path for us! Let's go right!", "Ας συνεχίσουμε στο μονοπάτι.": "Let's keep going along the path.", "Πάμε δεξιά, στο σπίτι της γιαγιάς!": "Let's go right, to Grandma's house!", "Ας πούμε καλημέρα στον ξυλοκόπο!": "Let's say good morning to the woodcutter!", "Κάτι κουνιέται μέσα στη ντουλάπα!": "Something is moving inside the wardrobe!", "Ας πλησιάσουμε τη «γιαγιά» στο κρεβάτι.": "Let's go closer to \"Grandma\" in the bed.", "Διάλεξε τη σφυρίχτρα από το καλάθι και πάτα τον λύκο!": "Pick the whistle from the basket and tap the wolf!", "Ας ζητήσουμε βοήθεια!": "Let's ask for help!", "Ο λύκος πεινάει. Δώσ’ του τα κουλουράκια από το καλάθι!": "The wolf is hungry. Give him the cookies from the basket!", "Πάτα όπου θέλεις να πάει η Κοκκινοσκουφίτσα!": "Tap wherever you want Little Red Riding Hood to go!", "Η Κοκκινοσκουφίτσα": "Little Red Riding Hood", "Μουσική:": "Music:", "ναι": "on", "όχι": "off", "Χμμ, όχι εδώ. Ας δοκιμάσουμε κάτι άλλο!": "Hmm, not here. Let's try something else!", "Όχι αυτό. Μήπως κάτι άλλο;": "Not that one. Maybe something else?", "Ωπ! Δεν ταιριάζει εδώ.": "Oops! That doesn't go here.", "Γεια σου! Εγώ είμαι η φωνή που θα σου διαβάζει το παραμύθι.": "Hello! I'm the voice that will read you the fairy tale.", "Μια φορά κι έναν καιρό, ήταν ένα κοριτσάκι που όλοι το έλεγαν Κοκκινοσκουφίτσα.": "Once upon a time, there was a little girl everyone called Little Red Riding Hood.", "Πάτα πάνω στα πράγματα και στους φίλους της για να τη βοηθήσεις!": "Tap on things and on her friends to help her!", "Καλώς ήρθες πάλι! Ας συνεχίσουμε το παραμύθι.": "Welcome back! Let's carry on with the story.", "Ένα παραμύθι που παίζεις με τα δαχτυλάκια σου": "A fairy tale you play with your fingers", "Παίξε!": "Play!", "Συνέχεια": "Continue", "Ρυθμίσεις": "Settings", "Φωνή που διαβάζει την ιστορία": "Voice that reads the story", "Ναι": "Yes", "Όχι": "No", "Δοκιμή φωνής": "Test voice", "Μέγεθος γραμμάτων": "Text size", "Γλώσσα": "Language", "Πλήρης οθόνη": "Full screen", "Στην αρχή": "Back to start", "Κλείσιμο": "Close", "Τέλος!": "The End!", "Ξανά από την αρχή": "Play again", "Γύρισε το κινητό οριζόντια.": "Turn your phone sideways.", "Πόντοι:": "Points:", "Πάτα": "Tap", "Τι ωραίο!": "How lovely!", "Περπάτα": "Walk", "Κοίτα": "Look", "Πάρε / Χρησιμοποίησε": "Take / Use", "Μίλα": "Talk", "Χρησιμοποίησε αντικείμενο": "Use item", "Αυτά τα δύο δεν συνδυάζονται.": "These two don't go together.", "Διάλεξε ένα αντικείμενο.": "Pick an item.", "Διάλεξε ένα αντικείμενο. Πάτα δεύτερο για να τα συνδυάσεις.": "Pick an item. Tap a second one to combine them.", "Ήχος:": "Sound:", "Στην αρχική": "Back to title", "Εξέταση": "Examine", "Οπτικά εφέ": "Visual effects", "Πλήρη": "Full", "Ελαφριά": "Light"};
 let T=0; let F={};
 const tr=t=>(LANG==='en'&&EN[t]!==undefined)?EN[t]:t;
 const W=320,H=180;
@@ -422,415 +486,407 @@ function room1(g,w,o){ // one-point perspective room shell: back wall [bx0,bx1]x
 function wallQuad(g,side,x0,x1,f0,f1,W2,c){ // draw a rect on a side wall between x0..x1, at heights f0..f1 (0=top,1=floor)
   const a=W2(x0), b=W2(x1); poly(g,[[x0,lerp(a[0],a[1],f0)],[x1,lerp(b[0],b[1],f0)],[x1,lerp(b[0],b[1],f1)],[x0,lerp(a[0],a[1],f1)]],c); }
 
-/* ================= ΑΠΟΓΡΑΦΗ · point & click ================= */
-function music(){} function musicTick(){}
-function ptSet(l){ return l; }
-const G={ key:'apografi-pc', title:'Απογραφή', maxPts:0, noScore:true, barTitle:'Απογραφή', outline:'#050404', outlineNight:'#000000', fadeBlack:true, darkRGB:'3,2,6',
-  DEF:{ look:['Τίποτα που να αξίζει να μπει στην απογραφή.'], hand:['Καλύτερα να μην το αγγίξω.'], talk:['Μιλάω μόνος μου. Το σπίτι ακούει.'] },
-  NOPE:['Δεν βγαίνει νόημα.','Όχι, δεν ταιριάζει εδώ.','Δεν νομίζω.','Αυτό δεν θα βοηθήσει.'],
-  titleScene:['street','start'], titleMusic:null, musicFor(){ return null; }, speed:44,
-  dust:{}, tapCol:'#c8bfa8',
-  playerFn(){ const k=has('candle_lit')&&SC[S.scene].dark>=.8; return S.dir==='side'?(g=>lefSide(g,S.phase,S.moving,k)):(g=>lefFront(g,S.phase,S.moving,S.dir==='back',k)); },
-  playerLight(s){ if(!(has('candle_lit')&&s.dark>=.8)) return null; const k=scl(S.y), fl=.9+Math.random()*.1, hx=S.dir==='side'?S.face*6*k:(S.dir==='back'?0:6*k); return [S.x+hx,S.y-40*k,66*fl,.97,[255,170,90]]; },
-  darkMul(s){ return 1-S.flash*(s.outdoor?.75:.45); },
-  newGame(){ F={}; S.inv=['form']; S.clockRun=0; enter('street','start'); },
-  intro(){ say(['Θεσσαλονίκη, Νοέμβριος 1987.','Με λένε Λευτέρη Σταθάκη. Είμαι εκτιμητής του Πρωτοδικείου.','Η δουλειά μου είναι να μετράω τι αφήνουν πίσω τους οι άνθρωποι.','Ευτέρπη Λάμπρου, ογδόντα ενός ετών. Χωρίς κληρονόμους. Το σπίτι περνάει στο Δημόσιο.','Μία απογραφή. Μία υπογραφή. Και μετά σπίτι μου.'],
-    ()=>tip('Διάλεξε ενέργεια από τη μπάρα: πόδια, μάτι, χέρι, στόμα ή αντικείμενο. Μετά πάτα πάνω στην εικόνα. Με ποντίκι, το δεξί κλικ αλλάζει ενέργεια.',9000)); },
-  resume(d){ return d.scene==='dream'?'hall':d.scene; },
-  noSave(){ return S.scene==='dream'; },
-  update(dt,s){
-    S.lampI = Math.random()<.04 ? rand(.15,.5) : Math.min(1,S.lampI+dt*3);
-    S.flick = Math.random()<.025 ? rand(.2,.6) : Math.min(1,S.flick+dt*4);
-    if(s.storm){ S.lt-=dt; if(S.lt<=0){ S.lt=rand(8,17); S.flash=1; after(rand(.5,1.4),()=>sfx('thunder')); after(.12,()=>{ S.flash=Math.max(S.flash,.7); }); } }
-    S.flash=Math.max(0,S.flash-dt*2.4); if(S.ghost){ S.ghost.t-=dt; if(S.ghost.t<=0) S.ghost=null; }
-    if((S.scene==='hall'||S.scene==='bedroom')&&S.clockRun){ S.tickT-=dt; if(S.tickT<=0){ S.tickT=S.scene==='hall'?1:1.6; sfx('tick'); } }
-    if(S.scene==='bedroom'){ S.creakT-=dt; if(S.creakT<=0){ S.creakT=rand(2.2,4); sfx('creak'); } }
-    if(s.dream){ const ls=[[140,'Τικ.'],[230,'Πού πας, Ανδρέα;'],[330,'Το τρένο δεν περιμένει κανέναν.'],[420,'Μείνε. Μόνο απόψε.'],[560,'3:17']];
-      for(const [x,t] of ls) if(S.x>x&&!F['dw'+x]){ F['dw'+x]=1; whisper(t); }
-      if(!F.dwFig&&S.x>440){ F.dwFig=1; S.flash=.9; sfx('sting'); shake(.7,3); }
-      S.heartT-=dt; if(S.heartT<=0){ S.heartT=.9; sfx('heart'); } S.tickT-=dt; if(S.tickT<=0){ S.tickT=.45; sfx('tickLoud'); } } },
-  extra(L,s){ if(s.dream&&!F.dwFig) L.push({y:150,draw(g){ actor(g,figure,480,150,scl(150),false,true,true); }}); },
-  lowPost(g,s){ if(s.dream){ tg.drawImage(cv,0,0); g.fillStyle='#000'; g.fillRect(0,0,W,H); for(let y=0;y<H;y+=2){ const o=Math.sin(y*.08+T*2.4)*1.8; g.drawImage(tmp,0,y,W,2,o,y,W,2); } g.globalAlpha=.22; g.drawImage(tmp,2,0); g.globalAlpha=1; g.fillStyle='rgba(110,0,0,.16)'; g.fillRect(0,0,W,H); }
-    if(S.ghost){ const k=scl(S.ghost.y); const cam=Math.round(S.cam); g.save(); g.translate(-cam,0); actor(g,gg=>figureEyes(gg),S.ghost.x,S.ghost.y,k,false,true,true); g.restore(); } },
-  hd(s,cam,td,dt,lights){
-    hdAdd(()=>{ for(const l of lights){ if(!l[4]) continue; hdGlow(l[0]-cam,l[1],l[2]*.9,l[4].join(','),.2*l[3]); hdGlow(l[0]-cam,l[1],Math.max(4,l[2]*.18),l[4].join(','),.35*l[3]); }
-      if(s.beams) for(const b of s.beams) hdBeam(b.map(([x,y])=>[x-cam,y]),'150,170,225',.07+S.flash*.35,0,30,170);
-      if(s===SC.street){ octx.save(); octx.translate(200-cam,168); octx.scale(1,3); hdGlow(0,0,9,'255,200,120',.3*S.lampI); octx.restore(); }
-      if(s===SC.street||s.dream) for(let i=0;i<6;i++){ const x=((i*90+T*(4+i))%460)-70, y=158+Math.sin(T*.3+i)*6; hdGlow(x,y,60,s.dream?'150,20,20':'150,160,190',.06); } });
-    if(s.rain||S.mode==='title'){ const dc=cam-(G.lc===undefined?cam:G.lc); G.lc=cam; octx.strokeStyle='rgba(175,190,215,.42)'; octx.lineWidth=.45; octx.beginPath();
-      for(const d of drops){ d.y+=d.v*dt; d.x-=d.v*dt*.16+dc; if(d.y>d.gy){ splashes.push({x:d.x,y:d.gy,t:.18}); d.y=-rand(4,40); d.x=Math.random()*340; d.gy=118+Math.random()*60; } if(d.x<-6) d.x+=332; if(d.x>326) d.x-=332; octx.moveTo(d.x,d.y); octx.lineTo(d.x+1.1,d.y-d.l*1.6); }
-      octx.stroke(); octx.strokeStyle='rgba(190,200,220,.5)'; octx.lineWidth=.35;
-      for(let i=splashes.length-1;i>=0;i--){ const p=splashes[i]; p.t-=dt; p.x-=dc; if(p.t<=0){ splashes.splice(i,1); continue; } const r=(.18-p.t)*14; octx.beginPath(); octx.ellipse(p.x,p.y,r,r*.3,0,Math.PI,0); octx.stroke(); }
-      for(const d of lens){ d.y+=d.v*dt; if(d.y>190){ d.y=-10; d.x=Math.random()*320; } const g=octx.createRadialGradient(d.x-d.r*.3,d.y-d.r*.3,0,d.x,d.y,d.r); g.addColorStop(0,'rgba(255,255,255,.22)'); g.addColorStop(.7,'rgba(200,210,230,.06)'); g.addColorStop(1,'rgba(255,255,255,.18)'); octx.fillStyle=g; octx.beginPath(); octx.arc(d.x,d.y,d.r,0,7); octx.fill(); } }
-    if(S.flash>0){ const g=octx.createLinearGradient(0,0,0,180); g.addColorStop(0,'rgba(210,220,245,'+(S.flash*(s.outdoor?.55:.2))+')'); g.addColorStop(1,'rgba(210,220,245,'+(S.flash*(s.outdoor?.2:.06))+')'); octx.fillStyle=g; octx.fillRect(0,0,320,180); }
-    if(s.dream) hdVignette(.55+.2*Math.sin(T*2.2),'110,0,0'); },
-  post(){ octx.save(); octx.setTransform(1,0,0,1,0,0); octx.drawImage(noise2[Math.abs(Math.floor(T*24))%3],0,0,OW,OH); octx.restore(); if(Math.random()<.04){ octx.fillStyle='rgba(255,240,220,.03)'; octx.fillRect(0,0,320,180); } },
-  vig(){ return .85; }, vigRGB:'0,0,0',
+/* ================= Η ΚΟΚΚΙΝΟΣΚΟΥΦΙΤΣΑ · point & click (kids) ================= */
+const G={ key:'kokkinoskoufitsa-pc', title:'Η Κοκκινοσκουφίτσα', maxPts:12, noScore:true, verbs:['act'], VNAME:{act:'Πάτα'}, outline:'#4a2c2a', soundLabel:'Μουσική:',
+  DEF:{look:['Τι ωραίο!'],hand:['Τι ωραίο!'],talk:['Τι ωραίο!']}, NOPE:['Χμμ, όχι εδώ. Ας δοκιμάσουμε κάτι άλλο!','Όχι αυτό. Μήπως κάτι άλλο;','Ωπ! Δεν ταιριάζει εδώ.'],
+  titleScene:['meadow','start'], titleMusic:'walk', musicFor(id){ return id==='home'||id==='bedroom'?'house':'walk'; }, speed:56,
+  dust:{meadow:'#e8d8a8',forest:'#c8b880',outside:'#e8d8a8'}, irisCol:'#fff8ec', irisRim:'rgba(255,211,77,.9)', vigRGB:'90,50,30', vig(){ return .16; }, tapCol:'#ffffff',
+  playerFn(){ return S.party?(g=>girlFront(g,T*8,true,false)):S.dir==='side'?(g=>girlSide(g,S.phase,S.moving)):(g=>girlFront(g,S.phase,S.moving,S.dir==='back')); },
+  newGame(){ F={stars:0}; S.inv=[]; enter('home','start'); },
+  intro(){ say(['Μια φορά κι έναν καιρό, ήταν ένα κοριτσάκι που όλοι το έλεγαν Κοκκινοσκουφίτσα.','Πάτα πάνω στα πράγματα και στους φίλους της για να τη βοηθήσεις!']); },
+  welcomeBack(){ say(['Καλώς ήρθες πάλι! Ας συνεχίσουμε το παραμύθι.']); },
+  onTitle(){ S.party=0; }, onInv(){ renderBasket(); },
+  setUI(on){ ['bSay'].forEach(id=>$(id).style.display=on?'':'none'); $('stars').hidden=!on; basketEl.hidden=!on; if(on) $('starN').textContent=F.stars||0; },
+  smart(sx,sy,touch){ if(!$('settings').hidden) return;
+    if(D.active){ if(!D.opts) advance(); return; }
+    if(S.mode!=='play'||S.lock||S.trans) return;
+    const wx=sx+S.cam, h=hotAt(wx,sy); S.idle=0; sfx('tap');
+    if(h){ const go2=()=>{ faceTo(h); kidInteract(h); }; if(h.at) walkTo(h.at[0],h.at[1],go2); else go2(); }
+    else { tapFx(wx,sy); walkTo(wx,Math.max(sy,SC[S.scene].far)); } },
+  dlgTick(dt){ if(D.active&&!D.opts&&D.shown<D.text.length){ D.shown=Math.min(D.text.length,D.shown+dt*40); dlgText.textContent=D.text.slice(0,Math.floor(D.shown)); }
+    if(D.auto>0){ D.auto-=dt; if(D.auto<=0){ D.auto=0; if(D.active&&!D.opts){ D.shown=D.text.length; nextLine(); } } }
+    moreEl.style.visibility=D.active&&!D.opts&&D.shown>=D.text.length&&!VOICE.speaking?'visible':'hidden'; },
+  update(dt,s){ if(F.wolfRun&&S.wolfX<760&&!D.active) S.wolfX+=dt*130;
+    if(s===SC.forest&&!F.wolfMet&&S.x>250&&!D.active&&!S.trans){ S.path=[]; meetWolf(); }
+    if(!D.active&&!S.lock&&!S.party){ S.idle+=dt; if(S.idle>20){ S.idle=0; say([hintText()]); } } },
+  overWorld(g,s){ const gl=S.mode==='play'&&!D.active&&!S.party?goal():null; if(!gl) return; const h=s.hs.find(q=>q.id===gl); if(!h) return; const r=hRect(h), bx=r[0]+r[2]/2, by=r[1]-6+Math.sin(T*4)*2.5;
+    g.globalAlpha=.9; for(const [dx,dy] of [[0,-3],[0,3],[-3,0],[3,0]]) R(g,bx+dx-1,by+dy-1,2,2,'#ffffff'); R(g,bx-2,by-2,5,5,'#ffd34d'); R(g,bx-1,by-4,3,9,'#ffd34d'); R(g,bx-4,by-1,9,3,'#ffd34d'); R(g,bx,by,1,1,'#ffffff'); g.globalAlpha=1; },
+  hd(s,cam){ if(s.outdoor) hdSun(s.sun[0]-cam*.3,s.sun[1],s.warm||0);
+    if(s===SC.forest) hdAdd(()=>{ for(const wx of [60,170,280,390,480]){ const x=wx-cam+Math.sin(T*.4+wx)*4; hdBeam([[x-6,0],[x+6,0],[x+34,170],[x+10,170]],'255,240,170',.16,.02,0,170); hdGlow(x+22,164,18,'255,240,170',.12); } });
+    if(s===SC.home) hdAdd(()=>{ const f=.8+.2*Math.sin(T*9)*Math.sin(T*5.3); hdGlow(226-cam,100,60,'255,150,60',.32*f); hdGlow(226-cam,100,16,'255,220,120',.4*f); hdBeam([[120-cam,40],[156-cam,40],[176-cam,170],[118-cam,170]],'255,245,200',.14,.02,40,170); });
+    if(s===SC.bedroom) hdAdd(()=>{ hdGlow(264-cam,96,46,'255,220,140',.35); hdBeam([[150-cam,40],[186-cam,40],[200-cam,170],[140-cam,170]],'255,245,200',.14,.02,40,170); if(S.party) hdGlow(170-cam,140,70,'255,210,120',.25); }); },
+  grade(s){ hdGrade('soft-light','255,200,130',s.outdoor?.18:.22); },
 };
-Object.assign(S,{lampI:1,flick:1,flash:0,lt:6,ghost:null,clockRun:0,tickT:0,heartT:0,creakT:0});
-const drops=[]; for(let i=0;i<150;i++) drops.push({x:Math.random()*W,y:Math.random()*H,v:200+Math.random()*130,l:3+((Math.random()*4)|0),gy:118+Math.random()*60});
-const splashes=[], lens=[]; for(let i=0;i<9;i++) lens.push({x:Math.random()*320,y:Math.random()*180,r:2+Math.random()*4,v:2+Math.random()*6});
-const tmp=document.createElement('canvas'); tmp.width=W; tmp.height=H; const tg=tmp.getContext('2d');
-const noise2=[0,1,2].map(()=>{ const c=document.createElement('canvas'); c.width=640; c.height=360; const g=c.getContext('2d'); const id=g.createImageData(640,360); for(let i=0;i<id.data.length;i+=4){ const v=Math.random()<.5?0:255; id.data[i]=id.data[i+1]=id.data[i+2]=v; id.data[i+3]=Math.random()<.5?(8+Math.random()*16):0; } g.putImageData(id,0,0); return c; });
-let whT2=0;
+Object.assign(S,{party:0,wolfX:330,idle:0,verb:'act'});
+function kidInteract(h){ S.idle=0;
+  if(S.sel){ const it=S.sel; S.sel=null; renderBasket(); if(h.item&&h.item(it)) return; if(it==='whistle') return blowWhistle(); return say([G.NOPE[(Math.random()*3)|0]]); }
+  if(h.act) h.act(); else if(h.exit) h.exit(); }
+function star(key){ if(F['s_'+key]) return; F['s_'+key]=1; F.stars=(F.stars||0)+1; $('starN').textContent=F.stars; const el=$('stars'); el.classList.remove('pop'); void el.offsetWidth; el.classList.add('pop'); sfx('star'); sparkle('★'); S.idle=0; POP.push({x:S.x,y:S.y-60*scl(S.y),t:0,txt:'★'}); }
 /* ---------- items ---------- */
-const ITEMS = {
-  form:{n:'Έντυπο απογραφής', d:['Απογραφή κινητής περιουσίας. Οδός Αγίας Σοφίας 41.','Στο τέλος, μια κενή γραμμή: «Υπογραφή εκτιμητή».']},
-  card:{n:'Παλιά κάρτα', d:['Μια κάρτα με ζωγραφισμένα γεράνια. Το χαρτί έχει κιτρινίσει.','«Ευτέρπη μου, το κλειδί εκεί που το άφηνες πάντα. Στο γεράνι. — Α.»']},
-  key_front:{n:'Σκουριασμένο κλειδί', d:['Βαρύ, παλιό, γεμάτο χώμα.']},
-  candle:{n:'Κερί', d:['Μισολιωμένο κερί σε τενεκεδένιο κηροπήγιο.']},
-  matches:{n:'Σπίρτα', d:['Ένα κουτί σπίρτα. Το κουνάω. Ακούγεται μόνο ένα.']},
-  candle_lit:{n:'Αναμμένο κερί', d:['Η φλόγα γέρνει προς τα κάτω. Σαν κάτι να τη φυσάει από εκεί.']},
-  string:{n:'Σπάγκος', d:['Ένα κουβάρι γερός σπάγκος.']},
-  magnet:{n:'Μαγνήτης', d:['Μαγνήτης-σουβενίρ: «Καβάλα 1966». Πιάνει γερά.']},
-  fishing:{n:'Μαγνήτης σε σπάγκο', d:['Ένα αυτοσχέδιο καλάμι. Ο πατέρας μου θα γελούσε.']},
-  key_study:{n:'Ορειχάλκινο κλειδάκι', d:['Ακόμα υγρό. Στη λαβή είναι χαραγμένο: «Γραφείο».']},
-  wind_key:{n:'Κλειδί κουρδίσματος', d:['Δεμένο με μια μαύρη κορδέλα.']},
-  letter:{n:'Γράμμα της Ευτέρπης', d:['«Σε όποιον έρθει να με μετρήσει.»','«Τα πράγματα εδώ μέσα δεν αξίζουν τίποτα. Μόνο το ρολόι.»','«Αν το κούρδισες, σε παρακαλώ: σταμάτησέ το ξανά στις 3:17.»','«Μην το αφήσεις να προχωρήσει χωρίς εκείνον. — Ευτέρπη»']},
+const ITEMS={
+  basket:{n:'Καλάθι με πίτα',d:'Ένα καλάθι με ζεστή μηλόπιτα για τη γιαγιά.'},
+  cookies:{n:'Κουλουράκια',d:'Μυρωδάτα κουλουράκια με ζάχαρη.'},
+  flowers:{n:'Λουλούδια',d:'Ένα μπουκέτο λουλούδια για τη γιαγιά.'},
+  carrot:{n:'Καρότο',d:'Ένα μεγάλο, πορτοκαλί καρότο.'},
+  berries:{n:'Φραουλίτσες',d:'Κόκκινες, γλυκές φραουλίτσες του δάσους.'},
+  whistle:{n:'Σφυρίχτρα',d:'Μια ξύλινη σφυρίχτρα. Φιιιιιτ!'},
 };
-const ICON = {
-  form:g=>{ R(g,2,1,8,10,'#d8d0bc'); for(let y=3;y<9;y+=2) R(g,3,y,6,1,'#7a7262'); R(g,5,9,4,1,'#2a2a6a'); },
-  card:g=>{ R(g,1,3,10,7,'#cfc3a6'); R(g,3,5,2,2,'#8a2a24'); R(g,4,4,1,1,'#a83a30'); R(g,4,7,1,2,'#3a5a30'); R(g,7,5,3,1,'#7a7262'); R(g,7,7,3,1,'#7a7262'); },
-  key_front:g=>{ disc(g,3,6,2,'#7e4a28'); g.clearRect(3,6,1,1); R(g,5,6,6,1,'#7e4a28'); R(g,9,7,1,2,'#7e4a28'); R(g,7,7,1,1,'#7e4a28'); },
-  candle:g=>{ R(g,3,9,7,2,'#6a6a62'); R(g,5,3,3,6,'#d8d0b8'); R(g,6,2,1,1,'#222'); },
-  candle_lit:g=>{ R(g,3,9,7,2,'#6a6a62'); R(g,5,4,3,5,'#d8d0b8'); R(g,6,3,1,1,'#222'); R(g,6,0,1,3,'#f2c25a'); R(g,5,1,3,1,'#e0903a'); R(g,6,1,1,1,'#fff3c0'); },
-  matches:g=>{ R(g,2,4,8,5,'#8a2a20'); R(g,3,5,6,3,'#c8b890'); R(g,4,6,4,1,'#3a2a1a'); },
-  string:g=>{ disc(g,6,6,4,'#b8a57a'); line(g,3,5,9,7,'#8a7a55'); line(g,4,8,8,3,'#8a7a55'); R(g,10,9,2,1,'#b8a57a'); },
-  magnet:g=>{ R(g,2,3,8,6,'#4a6a8a'); R(g,3,4,6,4,'#c8b070'); R(g,4,5,2,2,'#6a8aa0'); },
-  fishing:g=>{ R(g,6,0,1,6,'#b8a57a'); R(g,3,6,7,5,'#4a6a8a'); R(g,4,7,5,3,'#c8b070'); },
-  key_study:g=>{ disc(g,3,5,2,'#c0a050'); g.clearRect(3,5,1,1); R(g,5,5,6,1,'#c0a050'); R(g,9,6,1,2,'#c0a050'); R(g,7,6,1,1,'#c0a050'); },
-  wind_key:g=>{ R(g,1,1,4,4,'#a08a4a'); R(g,7,1,4,4,'#a08a4a'); R(g,5,2,2,2,'#a08a4a'); R(g,5,4,2,6,'#a08a4a'); R(g,4,10,4,1,'#a08a4a'); R(g,10,6,1,5,'#141414'); R(g,9,5,2,1,'#141414'); },
-  letter:g=>{ R(g,1,3,10,7,'#d8cfb8'); line(g,1,3,6,7,'#9a907a'); line(g,10,3,6,7,'#9a907a'); R(g,5,6,2,2,'#7a1a14'); },
+const ICON={
+  basket:g=>{ R(g,1,5,10,6,'#c98a4f'); R(g,1,5,10,1,'#e8a868'); R(g,2,4,8,1,'#e0262f'); line(g,2,5,6,1,'#8a5a36'); line(g,10,5,6,1,'#8a5a36'); R(g,4,4,4,1,'#ffd08a'); },
+  cookies:g=>{ disc(g,4,7,3,'#e8b060'); disc(g,8,5,3,'#f0c070'); R(g,3,6,1,1,'#fff'); R(g,8,4,1,1,'#fff'); R(g,5,8,1,1,'#fff'); },
+  flowers:g=>{ R(g,5,6,2,6,'#3f9a3f'); disc(g,3,4,2,'#ff8fb0'); disc(g,8,3,2,'#fff066'); disc(g,6,5,2,'#c8a0ff'); R(g,4,9,4,2,'#ffffff'); },
+  carrot:g=>{ for(let i=0;i<7;i++) R(g,3+i*.6,3+i,4-i*.5,1,'#ff8a2a'); R(g,3,0,1,3,'#3f9a3f'); R(g,5,0,1,3,'#3f9a3f'); R(g,4,1,1,2,'#5cb85c'); },
+  berries:g=>{ disc(g,4,6,2,'#e0262f'); disc(g,8,7,2,'#e0262f'); disc(g,6,9,2,'#ff3a44'); R(g,4,3,1,1,'#3f9a3f'); R(g,8,4,1,1,'#3f9a3f'); },
+  whistle:g=>{ R(g,1,4,8,4,'#c98a4f'); R(g,8,5,3,2,'#c98a4f'); R(g,3,5,2,1,'#5a3a2a'); disc(g,3,8,2,'#a8703e'); },
 };
-const RECIPES = {
-  'candle+matches':['candle_lit','Ανάβω το κερί με το τελευταίο σπίρτο. Η φλόγα τρεμοπαίζει, αλλά κρατάει.'],
-  'magnet+string':['fishing','Δένω τον μαγνήτη στην άκρη του σπάγκου. Σφιχτός κόμπος.'],
-};
-const rkey = (a,b) => [a,b].sort().join('+');
 function iconCanvas(id){ const c=document.createElement('canvas'); c.width=12; c.height=12; ICON[id](c.getContext('2d')); return c; }
 
 
 
-/* ---------- Λευτέρης ---------- */
-const LC={skin:'#c6b298',skinD:'#97856d',hair:'#1d1916',coat:'#564f41',coatD:'#3d382e',coatL:'#6a6250',shirt:'#c4bdab',tie:'#6a1913',tr:'#222127',tr2:'#2a2930',shoe:'#0d0c0c',gl:'#0a0a0a'};
-function candleHand(g,x,y){ R(g,x,y,4,1,'#5a5a52'); R(g,x+1,y-6,2,6,'#d6ceb6'); const w=Math.random()<.5?0:1; R(g,x+1,y-10-w,1,3+w,'#f4c868'); R(g,x+1,y-8,1,1,'#fff6d0'); }
-function lefSide(g,ph,mv,cdl){ const sw=mv?Math.sin(ph):0, l1=Math.round(sw*3), yb=mv?-Math.round(Math.abs(Math.cos(ph))):0, blink=(T%3.6)<.12;
-  for(const [dx,back] of [[-l1,1],[l1,0]]){ R(g,-2+dx,-22+yb,4,20,back?LC.tr:LC.tr2); R(g,-3+dx,-2+yb,6,2,LC.shoe); }
-  const ax=Math.round(-sw*2.5); R(g,-8-ax,-44+yb,3,16,LC.coatD); R(g,-8-ax,-29+yb,3,3,LC.skinD);
-  R(g,-6,-46+yb,13,26,LC.coat); R(g,-6,-46+yb,3,26,LC.coatD); R(g,-6,-21+yb,13,1,LC.coatD); R(g,6,-46+yb,1,24,LC.coatD);
-  R(g,2,-46+yb,4,6,LC.shirt); R(g,3,-45+yb,2,9,LC.tie); R(g,1,-46+yb,1,10,LC.coatL);
-  if(cdl){ R(g,3,-44+yb,3,10,LC.coatL); R(g,4,-35+yb,6,3,LC.coatL); R(g,8,-36+yb,3,3,LC.skin); candleHand(g,8,-36+yb); }
-  else { R(g,4+ax,-44+yb,3,15,LC.coatL); R(g,4+ax,-29+yb,3,3,LC.skin); }
-  R(g,-1,-49+yb,4,3,LC.skinD);
-  R(g,-4,-61+yb,10,12,LC.skin); R(g,-4,-61+yb,1,12,LC.skinD); R(g,-5,-62+yb,10,3,LC.hair); R(g,-6,-61+yb,4,7,LC.hair);
-  R(g,-1,-57+yb,2,3,LC.skinD); R(g,2,-57+yb,5,1,LC.gl); R(g,3,-56+yb,2,2,blink?LC.skin:'#9aa8b0'); R(g,4,-56+yb,1,1,blink?LC.skin:'#1a1210'); R(g,6,-54+yb,2,3,LC.skin); R(g,7,-52+yb,1,1,LC.skinD); R(g,2,-51+yb,3,1,LC.skinD); }
-function lefFront(g,ph,mv,back,cdl){ const s=mv?Math.sin(ph):0, la=s>0?Math.round(s*2):0, ra=s<0?Math.round(-s*2):0, yb=mv?-Math.round(Math.abs(Math.cos(ph))):0, blink=(T%3.6)<.12;
-  R(g,-5,-22-la+yb,4,20,LC.tr); R(g,1,-22-ra+yb,4,20,LC.tr2); R(g,-6,-2-la+yb,6,2,LC.shoe); R(g,0,-2-ra+yb,6,2,LC.shoe);
-  R(g,-8,-46+yb,16,26,LC.coat); R(g,-8,-46+yb,3,26,LC.coatD); R(g,-8,-21+yb,16,1,LC.coatD);
-  R(g,-10,-45+ra+yb,3,15,LC.coatD); R(g,-10,-30+ra+yb,3,3,LC.skinD);
-  if(cdl&&!back){ R(g,7,-45+yb,3,10,LC.coat); R(g,6,-36+yb,4,3,LC.skin); candleHand(g,6,-36+yb); } else { R(g,7,-45+la+yb,3,15,LC.coat); R(g,7,-30+la+yb,3,3,LC.skin); }
-  R(g,-2,-49+yb,4,3,LC.skinD);
-  if(back){ R(g,-5,-61+yb,10,12,LC.skin); R(g,-6,-62+yb,12,10,LC.hair); R(g,-6,-56+yb,1,3,LC.skin); R(g,5,-56+yb,1,3,LC.skin); return; }
-  R(g,-2,-46+yb,4,8,LC.shirt); R(g,-1,-45+yb,2,10,LC.tie); R(g,-3,-46+yb,1,12,LC.coatL); R(g,2,-46+yb,1,12,LC.coatL);
-  R(g,-5,-61+yb,10,12,LC.skin); R(g,-5,-61+yb,1,12,LC.skinD); R(g,-6,-62+yb,12,4,LC.hair); R(g,-6,-58+yb,2,5,LC.hair); R(g,4,-58+yb,2,5,LC.hair);
-  for(const ex of [-4,1]){ R(g,ex,-57+yb,4,1,LC.gl); R(g,ex,-54+yb,4,1,LC.gl); R(g,ex,-56+yb,1,2,LC.gl); R(g,ex+3,-56+yb,1,2,LC.gl); R(g,ex+1,-56+yb,2,2,blink?LC.skin:'#9aa8b0'); if(!blink) R(g,ex+1,-55+yb,1,1,'#1a1210'); }
-  R(g,0,-54+yb,1,3,LC.skinD); R(g,-1,-51+yb,3,1,LC.skinD); }
-function figure(g){ const c='#030202'; R(g,-5,-50,10,36,c); R(g,-4,-58,8,8,c); R(g,-6,-59,12,2,c); R(g,-7,-57,14,1,c); R(g,-4,-14,3,14,c); R(g,1,-14,3,14,c); R(g,-8,-46,3,24,c); R(g,5,-46,3,24,c); }
-function figureEyes(g){ figure(g); R(g,-2,-54,1,1,'#d8d0b8'); R(g,1,-54,1,1,'#d8d0b8'); }
+/* ---------- characters (SCI scale) ---------- */
+const GC={skin:'#ffe3cf',skinD:'#f3d0b8',hair:'#7a4a2a',dress:'#4a7bd8',dressD:'#3a63b8',apron:'#ffffff',cape:'#e0262f',capeD:'#c81e28',shoe:'#5a2e2a'};
+function basketSprite(g,x,y){ R(g,x,y,10,7,'#c98a4f'); R(g,x,y,10,1,'#e8a868'); R(g,x+1,y-1,8,1,'#e0262f'); R(g,x+3,y-1,2,1,'#fff'); line(g,x+1,y,x+5,y-6,'#8a5a36'); line(g,x+9,y,x+5,y-6,'#8a5a36'); }
+function girlSide(g,ph,mv){ const sw=mv?Math.sin(ph):0, l1=Math.round(sw*3), yb=mv?-Math.round(Math.abs(Math.cos(ph))):0, blink=(T%3.2)<.12;
+  for(const [dx,b] of [[-l1,1],[l1,0]]){ R(g,-2+dx,-16+yb,3,12,b?GC.skinD:GC.skin); R(g,-2+dx,-9+yb,3,5,'#ffffff'); R(g,-3+dx,-4+yb,6,4,GC.shoe); }
+  if(F.cape){ R(g,-9,-44+yb,7,30,GC.capeD); R(g,-10,-18+yb,7,4,GC.capeD); }
+  R(g,-8,-32+yb,15,17,GC.dress); R(g,-9,-20+yb,17,4,GC.dress); R(g,-9,-17+yb,17,1,GC.dressD); R(g,-2,-31+yb,7,15,GC.apron);
+  R(g,-6,-40+yb,12,9,'#ffffff'); R(g,-1,-40+yb,2,2,GC.cape);
+  const ax=Math.round(-sw*2); R(g,-8-ax,-39+yb,3,11,GC.skinD);
+  if(has('basket')){ R(g,4,-38+yb,3,8,GC.skin); basketSprite(g,4,-30+yb); } else R(g,4+ax,-39+yb,3,11,GC.skin);
+  R(g,-6,-56+yb,14,16,GC.skin); R(g,-6,-41+yb,14,1,GC.skinD);
+  R(g,3,-50+yb,2,3,blink?GC.skin:'#3a2420'); if(!blink) R(g,3,-50+yb,1,1,'#ffffff'); R(g,5,-45+yb,3,2,'#ff9fb0'); R(g,2,-44+yb,3,1,'#c8505a'); R(g,8,-48+yb,1,2,GC.skinD);
+  if(F.cape){ R(g,-8,-60+yb,16,6,GC.cape); R(g,-9,-56+yb,5,16,GC.cape); R(g,7,-58+yb,2,6,GC.cape); R(g,-7,-61+yb,13,1,'#ff4a52'); R(g,-6,-55+yb,13,2,GC.hair); }
+  else { R(g,-7,-59+yb,15,6,GC.hair); R(g,-8,-55+yb,4,10,GC.hair); R(g,-11,-46+yb,3,9,GC.hair); R(g,-11,-37+yb,3,2,GC.cape); } }
+function girlFront(g,ph,mv,back){ const s=mv?Math.sin(ph):0, la=s>0?Math.round(s*2):0, ra=s<0?Math.round(-s*2):0, yb=mv?-Math.round(Math.abs(Math.cos(ph))):0, blink=(T%3.2)<.12;
+  R(g,-5,-16-la+yb,3,12,GC.skin); R(g,2,-16-ra+yb,3,12,GC.skin); R(g,-5,-9-la+yb,3,5,'#fff'); R(g,2,-9-ra+yb,3,5,'#fff'); R(g,-6,-4-la+yb,5,4,GC.shoe); R(g,1,-4-ra+yb,5,4,GC.shoe);
+  if(F.cape&&!back){ R(g,-11,-42+yb,3,26,GC.capeD); R(g,8,-42+yb,3,26,GC.capeD); }
+  R(g,-9,-32+yb,18,17,GC.dress); R(g,-10,-20+yb,20,4,GC.dress); R(g,-10,-17+yb,20,1,GC.dressD);
+  if(back){ if(F.cape) R(g,-10,-44+yb,20,32,GC.cape); R(g,-7,-58+yb,14,16,F.cape?GC.cape:GC.hair); if(!F.cape){ R(g,-9,-46+yb,3,9,GC.hair); R(g,6,-46+yb,3,9,GC.hair); } return; }
+  R(g,-4,-31+yb,8,15,GC.apron); R(g,-7,-40+yb,14,9,'#fff'); R(g,-1,-40+yb,2,2,GC.cape);
+  R(g,-11,-39+ra+yb,3,11,GC.skin); if(has('basket')) basketSprite(g,7,-31+yb); else R(g,8,-39+la+yb,3,11,GC.skin);
+  R(g,-7,-56+yb,14,16,GC.skin); R(g,-7,-41+yb,14,1,GC.skinD);
+  for(const ex of [-4,2]){ R(g,ex,-50+yb,2,3,blink?GC.skin:'#3a2420'); if(!blink) R(g,ex,-50+yb,1,1,'#fff'); } R(g,-6,-45+yb,2,2,'#ff9fb0'); R(g,4,-45+yb,2,2,'#ff9fb0'); R(g,-1,-44+yb,3,1,'#c8505a');
+  if(F.cape){ R(g,-9,-61+yb,18,7,GC.cape); R(g,-10,-56+yb,4,16,GC.cape); R(g,6,-56+yb,4,16,GC.cape); R(g,-7,-55+yb,14,2,GC.hair); R(g,-8,-62+yb,16,1,'#ff4a52'); }
+  else { R(g,-8,-59+yb,16,6,GC.hair); R(g,-9,-54+yb,3,10,GC.hair); R(g,6,-54+yb,3,10,GC.hair); R(g,-11,-45+yb,3,8,GC.hair); R(g,8,-45+yb,3,8,GC.hair); } }
+function wolfPaint(g,mood){ const k=mood==='run'?Math.round(Math.abs(Math.sin(T*14))*3):Math.round(Math.abs(Math.sin(T*2))); const c='#8a94a3', d='#7d8796', l='#dfe3e8';
+  R(g,-16,-30-k,10,6,c); R(g,-20,-34-k,6,6,c); R(g,-22,-36-k,3,3,'#e8ecf0');
+  R(g,-7,-16,6,16,d); R(g,2,-16,6,16,d); R(g,-8,-2,8,2,'#4a5260'); R(g,1,-2,8,2,'#4a5260');
+  R(g,-9,-44-k,19,30,c); R(g,-3,-40-k,10,22,l); R(g,-12,-42-k,4,16,d); R(g,9,-42-k,4,16,d);
+  R(g,-8,-62-k,17,18,c); R(g,8,-55-k,12,8,c); R(g,10,-48-k,10,2,l); R(g,18,-56-k,3,3,'#2a2a33');
+  R(g,-7,-70-k,5,9,c); R(g,4,-70-k,5,9,c); R(g,-6,-68-k,3,6,'#f5b8c4'); R(g,5,-68-k,3,6,'#f5b8c4');
+  R(g,3,-58-k,4,4,'#fff'); R(g,4,-57-k,2,2,'#2a2a33');
+  if(mood==='sad'){ R(g,2,-60-k,5,1,'#4a5260'); R(g,7,-52-k,1,3,'#7fd0ff'); } else if(mood==='happy'){ R(g,12,-48-k,7,1,'#c8505a'); R(g,13,-47-k,5,1,'#c8505a'); R(g,-6,-58-k,4,2,'#ff9fb0'); }
+  else { R(g,12,-48-k,6,1,'#4a5260'); R(g,13,-47-k,1,1,'#fff'); R(g,16,-47-k,1,1,'#fff'); } }
+function bunnyPaint(g,happy){ const hop=happy?Math.round(Math.abs(Math.sin(T*6))*6):0; g.translate(0,-hop);
+  R(g,-8,-12,14,12,'#ffffff'); disc(g,-8,-8,3,'#ffffff'); R(g,1,-20,10,9,'#ffffff'); R(g,2,-31,3,11,'#ffffff'); R(g,7,-31,3,11,'#ffffff'); R(g,3,-30,1,8,'#ffb8c8'); R(g,8,-30,1,8,'#ffb8c8');
+  R(g,7,-16,1,2,'#2a2a33'); R(g,10,-14,1,1,'#ff7fa0'); if(!happy) R(g,7,-13,1,3,'#7fd0ff'); else R(g,8,-13,2,1,'#c8505a'); }
+function chick(g){ R(g,-4,-6,8,6,'#ffffff'); R(g,2,-9,4,4,'#ffffff'); R(g,3,-10,2,1,'#e0262f'); R(g,6,-7,1,1,'#ffa030'); R(g,4,-8,1,1,'#2a2a33'); R(g,-2,0,1,0,'#ffa030'); }
 
-/* ---------- STREET ---------- */
-function nWin(g,cx,y,h,sh){ R(g,cx-9,y-4,18,3,'#5d5644'); R(g,cx-7,y,14,h,'#090b0f'); R(g,cx,y,1,h,'#29251d'); R(g,cx-7,y+(h>>1),14,1,'#29251d'); R(g,cx-8,y+h,16,2,'#5d5644'); if(sh){ R(g,cx-14,y,6,h,'#2b352f'); R(g,cx+8,y,6,h,'#2b352f'); for(let yy=y+2;yy<y+h;yy+=2){ R(g,cx-14,yy,6,1,'#212823'); R(g,cx+8,yy,6,1,'#212823'); } } }
-SC.street={ w:480, far:118, near:176, sFar:.62, dark:.55, rain:true, storm:true, outdoor:true,
-  bg(g,w){ const r=rng(11);
-    bands(g,w,0,110,['#06080d','#0a0d14','#0e121a','#121722','#161c28']);
-    let x=-10; while(x<w){ const bw=18+((r()*36)|0), top=26+((r()*50)|0); R(g,x,top,bw,110-top,'#0c0f16'); for(let wy=top+5;wy<104;wy+=8) for(let wx=x+3;wx<x+bw-3;wx+=6) if(r()<.08) R(g,wx,wy,2,3,r()<.6?'#4a3e25':'#2b2925'); x+=bw+1; }
-    R(g,0,30,236,82,'#1e2024'); for(let i=0;i<900;i++) R(g,r()*236,30+r()*82,1,1,r()<.5?'#191b1e':'#25272b'); for(let wx=12;wx<226;wx+=30) for(const wy of [38,66]){ R(g,wx,wy,12,18,'#0a0c11'); R(g,wx-1,wy+18,14,2,'#2c2e32'); if(r()<.12) R(g,wx+1,wy+1,5,16,'#33291b'); }
-    R(g,236,16,234,96,'#4a4435'); for(let i=0;i<2400;i++) R(g,236+r()*234,16+r()*96,1,1,r()<.5?'#433e30':'#524b3b');
-    R(g,232,16,242,4,'#5d5644'); for(let i=0;i<14;i++){ const hw=56-i*3.6; R(g,368-hw,15-i,hw*2,1,'#544d3d'); }
-    R(g,236,60,234,3,'#5d5644'); for(const px of [240,464]) R(g,px,20,6,92,'#544d3d');
-    nWin(g,270,24,30,true); nWin(g,320,24,30,true); nWin(g,416,24,30,true); nWin(g,446,24,30,true); nWin(g,270,68,32,true); nWin(g,430,68,32,false);
-    R(g,358,68,22,44,'#2a2018'); R(g,360,70,8,18,'#1f1710'); R(g,370,70,8,18,'#1f1710'); R(g,360,91,8,19,'#1f1710'); R(g,370,91,8,19,'#1f1710'); R(g,355,64,28,4,'#5d5644'); R(g,375,92,2,2,'#8a7a46');
-    R(g,350,108,40,2,'#5a5446'); R(g,346,110,48,2,'#625b4c');
-    R(g,236,104,234,8,'#3a3529');
-    for(let fx=236;fx<470;fx+=5){ if(fx>338&&fx<396) continue; R(g,fx,92,1,20,'#101010'); R(g,fx-1,91,3,1,'#101010'); } R(g,236,94,102,1,'#101010'); R(g,396,94,74,1,'#101010');
-    for(const px of [332,396]){ R(g,px,84,7,28,'#4a4538'); R(g,px-1,82,9,3,'#5a5444'); }
-    floorFill(g,[[0,112],[w,112],[w,180],[0,180]],40,240,58,3200,(X,Z,x,y)=>{ const pud=hash2(Math.floor(X/9),Math.floor(Z/3))>.78, fz=Z/4, fx=X/14;
-      if(pud) return [44+((x+y)&1)*6,54,74]; if(frac(fz)<.06||frac(fx)<.04) return [26,27,30]; const n=hash2(x>>1,y>>1)>.6?5:0; return [40+n,42+n,46+n]; });
-    const gr=g.createLinearGradient(0,112,0,124); gr.addColorStop(0,'rgba(0,0,0,.5)'); gr.addColorStop(1,'rgba(0,0,0,0)'); g.fillStyle=gr; g.fillRect(0,112,w,12);
-  },
-  walk:[[96,120],[470,120],[470,177],[96,177]], block:[[194,146,12,8]],
-  lights(){ return [[200,30,90,.95*S.lampI,[255,196,120]],[370,72,24,.35,[255,180,110]]]; },
-  anim(g){ if(Math.sin(T*.37)>.985){ R(g,442,34,4,10,'#050505'); } },
-  props(){ return [
-    {y:150,draw(g){ R(g,199,32,3,118,'#0e0f11'); R(g,196,146,8,4,'#0e0f11'); R(g,194,28,12,3,'#0e0f11'); R(g,196,18,8,10,'#141517'); const k=S.lampI; R(g,197,20,6,7,k>.5?'#f2d690':'#2a2418'); }},
-    {y:116,draw(g){ R(g,326,96,12,11,'#24302a'); R(g,326,96,12,1,'#344238'); R(g,328,99,8,1,'#0a0d0b'); R(g,331,107,2,9,'#1a1a1a'); }},
-    {y:116,draw(g){ for(const [px,k] of [[400,0],[416,1],[432,2]]){ R(g,px-5,104,11,2,'#6e4029'); R(g,px-4,106,9,8,'#5e3523'); R(g,px-4,106,1,8,'#7a4a31'); if(k===0) for(let i=0;i<5;i++) R(g,px-2+i,96+(i%3),1,8,'#4a4630'); if(k===1&&!F.geranium){ R(g,px-4,98,9,6,'#34321f'); R(g,px-2,96,3,3,'#5e2620'); R(g,px+1,95,3,3,'#55211b'); } if(k===1&&F.geranium) R(g,px-3,100,7,4,'#34321f'); } }},
-    {y:178,draw(g){ const x=10,y=178; R(g,x,y-34,110,24,'#14191b'); R(g,x+24,y-56,62,22,'#111517'); R(g,x+28,y-52,24,16,'#06080a'); R(g,x+56,y-52,26,16,'#06080a'); R(g,x,y-14,114,4,'#2a2c2c'); R(g,x+108,y-30,6,5,'#4a4636');
-      disc(g,x+24,y-8,10,'#050505'); disc(g,x+88,y-8,10,'#050505'); disc(g,x+24,y-8,4,'#2a2a2a'); disc(g,x+88,y-8,4,'#2a2a2a'); g.fillStyle='rgba(170,185,205,.35)'; for(let i=0;i<16;i++) g.fillRect(x+30+((i*11.3)%50),y-50+((i*5.7+T*6)%14),1,1); }},
-  ]; },
-  hs:[
-    {id:'car',n:'Αυτοκίνητο',rect:[10,122,114,56],at:[128,162],face:'left',look:['Το Φιατάκι μου. Τα τζάμια θολώνουν από τη μέσα μεριά.'],hand:['Όχι ακόμα. Πρώτα η δουλειά.']},
-    {id:'lamp',n:'Φανοστάτης',rect:[192,16,16,134],at:[214,152],face:'left',look:['Η λάμπα τρεμοπαίζει. Μοιάζει να ανασαίνει.']},
-    {id:'mail',n:'Γραμματοκιβώτιο',rect:[324,94,16,22],at:[332,124],face:'back',look:['Ένα σκουριασμένο γραμματοκιβώτιο. Γεμάτο ως πάνω.'],
-      hand(){ if(!F.card){ F.card=1; give('card'); sfx('pick'); say(['Λογαριασμοί της ΔΕΗ, απλήρωτοι. Διαφημιστικά.','Και στο βάθος, μια παλιά κάρτα. Την κρατάω.']); } else say(['Μόνο λογαριασμοί. Κανείς δεν θα τους πληρώσει.']); }},
-    {id:'door',n:'Εξώπορτα',rect:[356,64,26,48],at:[368,122],face:'back',look:['Μια βαριά ξύλινη πόρτα. Το βερνίκι έχει φουσκώσει από την υγρασία.'],
-      hand(){ if(F.doorOpen){ sfx('door'); go('hall','street'); } else say(['Κλειδωμένη.','Το έγγραφο του δικαστηρίου λέει πως το κλειδί «βρίσκεται εντός του ακινήτου».','Πολύ βοηθητικό.']); },
-      exit(){ if(F.doorOpen){ sfx('door'); go('hall','street'); } else this.hand(); },
-      item(i){ if(i==='key_front'){ take('key_front'); F.doorOpen=1; sfx('unlock'); say(['Το κλειδί γυρνάει με κόπο. Κάτι μέσα στην κλειδαριά τρίζει σαν κόκαλο.'],()=>{ sfx('door'); go('hall','street'); }); return true; } }},
-    {id:'basil',n:'Γλάστρα',rect:[394,94,12,20],at:[400,124],face:'back',look:['Βασιλικός. Ξερός εδώ και χρόνια.']},
-    {id:'geranium',n:'Γλάστρα με γεράνι',rect:[410,92,12,22],at:[416,124],face:'back',look:['Ένα μαραμένο γεράνι.'],
-      hand(){ if(F.geranium) return say(['Ένα μαραμένο γεράνι. Του πήρα ό,τι είχε.']); if(!F.card) return say(['Ένα μαραμένο γεράνι. Το χώμα είναι σκληρό σαν πέτρα.']);
-        F.geranium=1; give('key_front'); sfx('pick'); say(['«Στο γεράνι.»','Σκάβω με τα δάχτυλα. Το χώμα είναι παγωμένο.','Ένα κλειδί. Σκουριασμένο.']); }},
-    {id:'empty',n:'Άδεια γλάστρα',rect:[426,96,12,18],at:[432,124],face:'back',look:['Άδεια. Μόνο βρόχινο νερό και ένα πεσμένο φύλλο.']},
-    {id:'house',n:'Το σπίτι',rect:[236,14,234,78],at:null,look:['Ένα νεοκλασικό του 1910. Κάποτε θα ήταν το ωραιότερο σπίτι του δρόμου.','Σε ένα παράθυρο του πάνω ορόφου, νομίζω πως κουνήθηκε μια κουρτίνα.']},
-  ],
-  entries:{start:[136,160,'side',1], hall:[368,124,'front']} };
+/* ---------- storybook helpers ---------- */
+function treeP(g,x,y,s){ R(g,x-2*s,y-20*s,4*s,20*s,'#8a5a36'); R(g,x-2*s,y-20*s,1*s,20*s,'#6e4428'); disc(g,x,y-28*s,11*s,'#5cb85c'); disc(g,x-7*s,y-22*s,8*s,'#5cb85c'); disc(g,x+7*s,y-23*s,8*s,'#5cb85c'); disc(g,x-3*s,y-32*s,6*s,'#7fd46e'); disc(g,x+4*s,y-28*s,4*s,'#7fd46e'); }
+function pineP(g,x,y,s,c1,c2){ R(g,x-2,y-10,4,10,'#7a4e2e'); for(let i=0;i<4;i++){ const w=(16-i*3)*s; for(let k=0;k<8*s;k++) R(g,x-w/2*(k/(8*s))-1,y-10-i*7*s-k,w*(k/(8*s))+2,1,k%3?c1:c2); } }
+function grassFloor(g,w,y0,hz,vx,path){ floorFill(g,[[0,y0],[w,y0],[w,180],[0,180]],hz,vx,50,3000,(X,Z,x,y)=>{ if(path&&Math.abs(X-(path(Z)||0))<12) return hash2(x>>1,y>>1)>.8?[220,191,130]:[236,211,154];
+  const n=hash2(x,y); if(n>.985) return [[255,143,176],[255,240,102],[255,255,255],[200,160,255]][(x*7+y)%4]; return n>.6?[116,187,76]:n<.15?[154,216,106]:[134,204,92]; }); }
+function skyHills(g,w,c1,c2){ for(let y=0;y<100;y++){ const k=y/100; R(g,0,y,w,1,'rgb('+Math.round(lerp(c1[0],c2[0],k))+','+Math.round(lerp(c1[1],c2[1],k))+','+Math.round(lerp(c1[2],c2[2],k))+')'); } }
 
-/* ---------- HALL ---------- */
-SC.hall={ w:420, far:122, near:176, sFar:.66, dark:.8, storm:true,
-  bg(g,w){ const r=rng(3);
-    const RM=room1(g,w,{bx0:60,bx1:360,by0:26,by1:114,vx:210,vy:50,ceil:'#141110',left:'#2e2b24',right:'#2e2b24',back:'#39362d',S1:44,S2:6400,
-      floor:(X,Z,x,y)=>{ if(Math.abs(X)<9) return (Math.floor(Z/4)&1)?[56,23,18]:[66,30,22]; const fz=Z/2.6, fx=X/7; if(frac(fx)<.06) return [16,11,9]; const k=hash2(Math.floor(fx),Math.floor(fz+fx*7)); return k<.5?[41,32,25]:[36,27,21]; }});
-    for(let x=62;x<358;x+=8) R(g,x,26,1,64,'#33302a'); for(let y=36,k=0;y<86;y+=12,k++) for(let x=64+(k%2)*4;x<358;x+=8){ R(g,x,y,1,1,'#46423a'); R(g,x-1,y+1,3,1,'#46423a'); }
-    R(g,60,90,300,24,'#2b2018'); R(g,60,90,300,2,'#3a2b20'); for(let x=64;x<356;x+=24) R(g,x,94,20,16,'#20170f');
-    for(let i=0;i<12;i++){ g.globalAlpha=.25; R(g,62+r()*290,26,1,10+r()*40,'#120f0c'); g.globalAlpha=1; }
-    R(g,78,58,24,56,'#0f0c0a'); R(g,80,60,20,54,'#2a1d15'); R(g,82,64,7,20,'#21170f'); R(g,91,64,7,20,'#21170f'); R(g,96,88,2,2,'#9a844a');
-    R(g,312,58,24,56,'#0f0c0a'); R(g,314,60,20,54,'#241912'); R(g,316,64,7,20,'#21170f'); R(g,325,64,7,20,'#21170f'); R(g,330,88,2,2,'#9a844a');
-    R(g,152,40,22,28,'#5e4f28'); R(g,154,42,18,24,'#28282a'); R(g,158,56,10,10,'#1c2330'); R(g,159,46,8,9,'#8c7a63'); R(g,158,44,10,3,'#131822'); for(let i=0;i<16;i++) R(g,159+r()*8,46+r()*9,1,1,i%3?'#d6cebd':'#6a1c16');
-    R(g,262,30,30,58,'#271c15'); R(g,264,32,26,54,'#0a0e16'); R(g,277,32,1,54,'#271c15'); R(g,264,58,26,1,'#271c15'); R(g,256,28,9,64,'#3a1d1a'); R(g,290,28,9,64,'#3a1d1a');
-    const wl=RM.wallL; wallQuad(g,'L',14,46,.28,1,wl,'#0f0c0a'); wallQuad(g,'L',17,43,.31,1,wl,'#2b1f16'); wallQuad(g,'L',20,40,.33,.42,wl,'#121822');
-    for(let i=0;i<10;i++){ const t=i/10, x0=lerp(418,364,t), y0=lerp(178,64,t), ww=lerp(24,10,t), hh=lerp(12,7,t); R(g,x0-ww,y0-hh,ww,hh,i%2?'#2a1f17':'#2f231a'); R(g,x0-ww,y0-hh,ww,1,'#3c2d21'); }
-    line(g,398,140,364,52,'#1a120c'); line(g,399,140,365,52,'#3a2a1e');
-  },
-  walk:[[70,122],[350,122],[398,177],[22,177]], block:[],
-  beams:[[[264,32],[290,32],[300,170],[244,170]]],
-  lights(){ return [[210,22,110,.8*S.flick,[255,190,120]],[277,60,54,.42,[150,170,210]]]; },
-  anim(g){ R(g,207,14,6,6,S.flick>.6?'#e8c880':'#5a4a30'); R(g,209,0,1,14,'#0e0e0e'); const f=S.flash; R(g,264,32,26,54,f>.05?'#8a96ac':'#0a0e16'); R(g,277,32,1,54,'#271c15'); R(g,264,58,26,1,'#271c15'); },
+/* ---------- HOME ---------- */
+SC.home={ w:320, far:126, near:176, sFar:.72,
+  bg(g,w){ const RM=room1(g,w,{bx0:60,bx1:260,by0:22,by1:114,vx:160,vy:44,ceil:'#a8703e',left:'#e8bd8a',right:'#e8bd8a',back:'#f2c99a',S1:40,S2:7000,
+      floor:(X,Z)=>{ const fz=Z/4; if(frac(X/14)<.05) return [168,112,62]; return (Math.floor(fz+Math.floor(X/14)*.5)&1)?[201,138,79]:[190,128,70]; }});
+    for(let y=28;y<114;y+=9) R(g,60,y,200,1,'#e0b07c'); for(let x=80;x<260;x+=60) R(g,x,22,4,92,'#d89a62');
+    R(g,120,40,36,30,'#8a5a36'); R(g,122,42,32,26,'#9fdcff'); R(g,122,58,32,10,'#8fd06a'); disc(g,146,48,3,'#fff3a0'); R(g,137,42,2,26,'#8a5a36'); R(g,122,54,32,2,'#8a5a36'); R(g,116,38,8,36,'#ff8fa3'); R(g,152,38,8,36,'#ff8fa3');
+    R(g,70,46,36,3,'#8a5a36'); for(let i=0;i<4;i++) R(g,72+i*8,36,6,10,['#ff9fb0','#9fd0ff','#ffe066','#9ad46a'][i]);
+    R(g,206,60,40,54,'#b8b0a8'); for(let y=62;y<114;y+=7) for(let x=206+((y/7)%2)*6;x<244;x+=12) R(g,x,y,11,6,'#a8a098'); R(g,202,56,48,6,'#8a5a36'); R(g,214,86,24,28,'#3a2a26');
+    const wl=RM.wallL, wr=RM.wallR; wallQuad(g,'L',30,40,.38,.42,wl,'#8a5a36');
+    wallQuad(g,'R',276,306,.32,1,wr,'#2f8f5f'); wallQuad(g,'R',279,303,.35,1,wr,'#3fae6e'); wallQuad(g,'R',282,300,.42,.6,wr,'#9fdcff');
+    floorFill(g,[[110,150],[210,150],[220,172],[100,172]],44,160,40,7000,(X,Z)=>(Math.floor(X/4)&1)?[224,90,100]:[255,138,146]); },
+  walk:[[70,126],[250,126],[300,177],[20,177]], block:[[124,128,72,16]],
+  anim(g){ for(let i=0;i<6;i++){ const f=Math.sin(T*9+i)*2; R(g,218+i*3,104-Math.abs(f)-i%3*2,3,10+f,['#ff8a2a','#ffd34d','#ff5a2a'][i%3]); } },
   props(){ const L=[];
-    L.push({y:114,draw(g){ R(g,120,56,2,58,'#1e150e'); R(g,116,112,10,2,'#1e150e'); R(g,114,58,14,2,'#1e150e'); R(g,111,60,10,40,'#2c3127'); R(g,111,60,2,40,'#20241c'); R(g,123,60,7,4,'#191919'); }});
-    L.push({y:114,draw(g){ R(g,182,96,26,3,'#3a2a1e'); R(g,184,99,2,15,'#281c14'); R(g,204,99,2,15,'#281c14'); if(!F.candle){ R(g,192,93,6,3,'#5a5a52'); R(g,194,86,2,7,'#d0c8b0'); } }});
-    L.push({y:115,draw(g){ R(g,212,28,24,6,'#3a281b'); R(g,214,34,20,22,'#2f2119'); R(g,215,56,18,40,'#2a1c14'); R(g,216,60,16,32,'#0c0907'); R(g,213,96,22,19,'#2f2119');
-      disc(g,224,44,7,'#2a2016'); disc(g,224,44,6,'#c4bba2'); const run=S.clockRun, hr=run?3+T*.02:3, mn=run?(17+T*1.4)%60:17, ah=(hr%12+mn/60)/12*Math.PI*2, am=mn/60*Math.PI*2;
-      line(g,224,44,224+Math.sin(ah)*3,44-Math.cos(ah)*3,'#120e0a'); line(g,224,44,224+Math.sin(am)*5,44-Math.cos(am)*5,'#120e0a');
-      const a=run?Math.sin(T*Math.PI)*.2:0, px=224+Math.sin(a)*26, py=62+Math.cos(a)*26; line(g,224,62,px,py,'#8a7440'); disc(g,Math.round(px),Math.round(py),2,'#b09450'); }});
-    if(!F.clockDone) L.push({y:150,draw(g){ R(g,370,92,40,58,'#86857c'); R(g,374,80,30,14,'#8e8d84'); R(g,370,92,40,1,'#a2a198'); for(let i=0;i<5;i++) R(g,372+i*8,94,1,56,'#6a6962'); }});
-    else L.push({y:170,draw(g){ R(g,362,166,52,4,'#76756c'); }});
+    if(!F.cape) L.push({y:116,draw(g){ R(g,34,62,12,22,'#e0262f'); R(g,33,62,14,4,'#ff4a52'); }});
+    L.push({y:146,draw(g){ shadowE(g,160,147,40,3,.2); R(g,122,124,76,4,'#a8703e'); R(g,124,128,4,18,'#8a5a36'); R(g,192,128,4,18,'#8a5a36'); R(g,120,118,80,7,'#ffffff'); for(let x=120;x<200;x+=6) R(g,x,118,3,7,'#e0262f');
+      if(!F.basket){ R(g,140,112,18,5,'#c98a4f'); R(g,140,110,18,2,'#e0262f'); disc(g,149,110,4,'#e8a868'); } if(!F.cookies){ R(g,170,114,16,2,'#ffffff'); disc(g,174,112,2,'#e8b060'); disc(g,179,112,2,'#f0c070'); disc(g,184,112,2,'#e8b060'); } }});
+    L.push({y:118,draw(g){ actor(g,gg=>{ R(gg,-8,-6,14,6,'#f0a050'); R(gg,4,-10,6,6,'#f0a050'); R(gg,4,-12,2,2,'#f0a050'); R(gg,8,-12,2,2,'#f0a050'); R(gg,6,-8,1,1,'#3a2420'); },244,118,.8); }});
+    L.push({y:140,draw(g){ actor(g,gg=>person(gg,{skin:'#ffe3cf',hair:'#7a4a2a',hs:'bun',top:'#3fae6e',bottom:'#3fae6e',apron:'#ffffff',dress:true,view:'front',bob:1.2,blush:true,seed:1}),232,140,scl(140)); }});
     return L; },
   hs:[
-    {id:'kdoor',n:'Πόρτα της κουζίνας',rect:[78,58,24,56],at:[90,126],face:'back',look:['Η πόρτα της κουζίνας. Μισάνοιχτη.'],hand(){ sfx('door'); go('kitchen','hall'); },exit(){ sfx('door'); go('kitchen','hall'); }},
-    {id:'coat',n:'Κρεμάστρα',rect:[108,54,24,60],at:[120,126],face:'back',look:['Ένα ανδρικό παλτό, φαγωμένο από τον σκόρο.'],
-      hand(){ if(!F.string){ F.string=1; give('string'); sfx('pick'); say(['Ένα ανδρικό παλτό, φαγωμένο από τον σκόρο.','Στην τσέπη: ένα κουβάρι σπάγκος. Και ένα μισοσκισμένο εισιτήριο τρένου.','Θεσσαλονίκη – Αθήνα. 17 Νοεμβρίου 1967.']); } else say(['Το παλτό μυρίζει ακόμα καπνό.']); }},
-    {id:'portrait',n:'Πορτρέτο',rect:[150,38,26,32],at:[162,126],face:'back',look:['Ένας άντρας με στολή σιδηροδρομικού.','Κάποιος έχει ξύσει το πρόσωπο με κάτι αιχμηρό. Επίμονα.']},
-    {id:'table',n:'Τραπεζάκι',rect:[180,84,30,30],at:[194,126],face:'back',look(){ say(F.candle?['Σκόνη. Και ένας καθαρός κύκλος εκεί που ήταν το κερί.']:['Ένα κερί σε τενεκεδένιο κηροπήγιο.']); },
-      hand(){ if(!F.candle){ F.candle=1; give('candle'); sfx('pick'); say(['Ένα κερί σε τενεκεδένιο κηροπήγιο. Το παίρνω.']); } else say(['Σκόνη. Και ένας καθαρός κύκλος εκεί που ήταν το κερί.']); }},
-    {id:'clock',n:'Εκκρεμές ρολόι',rect:[212,26,24,90],at:[224,126],face:'back',look(){ say(F.clockDone?['Χτυπάει. Κάθε χτύπος αντηχεί μέσα στο στήθος μου.']:['Ένα ψηλό εκκρεμές ρολόι. Σταματημένο στις 3:17.','Θα πιάσει καλή τιμή. Το σημειώνω.']); },
-      hand(){ this.look(); }, item(i){ if(i==='wind_key'&&!F.clockDone){ take('wind_key'); clockEvent(); return true; } }},
-    {id:'window',n:'Παράθυρο',rect:[256,28,44,64],at:[277,126],face:'back',look:['Βροχή. Ο δρόμος από εδώ μέσα μοιάζει πολύ πιο μακριά απ’ ό,τι είναι.']},
-    {id:'sdoor',n:'Πόρτα του γραφείου',rect:[312,58,24,56],at:[324,126],face:'back',look:['Κλειδωμένη. Η κλειδαριά είναι μικρή, ορειχάλκινη.'],
-      hand(){ if(F.studyOpen){ sfx('door'); go('study','hall'); } else say(['Κλειδωμένη. Η κλειδαριά είναι μικρή, ορειχάλκινη.']); }, exit(){ this.hand(); },
-      item(i){ if(i==='key_study'){ take('key_study'); F.studyOpen=1; sfx('unlock'); say(['Ταιριάζει.'],()=>{ sfx('door'); go('study','hall'); }); return true; } }},
-    {id:'front',n:'Εξώπορτα',rect:[12,52,36,120],at:[38,152],face:'left',look:['Η εξώπορτα. Πίσω της, η βροχή.'],hand(){ sfx('door'); go('street','hall'); },exit(){ sfx('door'); go('street','hall'); }},
-    {id:'stairs',n:'Σκάλα',rect:[362,44,58,128],at:[380,152],face:'right',look(){ say(F.clockDone?['Η σκάλα είναι ελεύθερη τώρα. Από πάνω, μια πολυθρόνα τρίζει.']:['Η σκάλα είναι φραγμένη με έπιπλα κάτω από σεντόνια.','Από πάνω ακούγεται κάτι. Σαν κουνιστή πολυθρόνα.','…Θα είναι ο αέρας.']); },
-      hand(){ if(F.clockDone){ sfx('door'); go('bedroom','hall'); } else this.look(); }, exit(){ this.hand(); }},
+    {id:'hook',n:'Κόκκινη κάπα',rect:[28,56,24,32],at:[60,140],face:'left',act(){ if(F.cape) return say(['Η κρεμάστρα είναι άδεια. Η κάπα είναι πάνω σου!']); F.cape=1; star('cape'); say(['Η Κοκκινοσκουφίτσα φοράει την αγαπημένη της κόκκινη κάπα.','Κοκκινοσκουφίτσα: «Τι ωραία που είναι!»']); }},
+    {id:'table',n:'Τραπέζι',rect:[118,104,84,42],at:[160,154],face:'back',act(){
+      if(!F.basket) return say(['Πάνω στο τραπέζι μυρίζει ζεστή μηλόπιτα!','Ας ρωτήσουμε τη μαμά τι να κάνουμε.']);
+      if(!F.cookies){ F.cookies=1; give('cookies'); star('cookies'); return say(['Η Κοκκινοσκουφίτσα βάζει και κουλουράκια στο καλάθι.','Κοκκινοσκουφίτσα: «Η γιαγιά τα λατρεύει!»']); }
+      say(['Το τραπέζι είναι άδειο. Όλα τα καλούδια είναι στο καλάθι!']); }},
+    {id:'cat',n:'Γατούλα',rect:[234,106,18,14],at:[236,130],face:'back',act(){ sfx('meow'); say(['Νιάου! Η γατούλα χουζουρεύει δίπλα στη φωτιά.']); }},
+    {id:'mom',n:'Μαμά',rect:()=>npcRect(232,140,scl(140)),at:[214,148],face:'right',act(){
+      if(!F.cape) return say(['Μαμά: «Καλημέρα, αγάπη μου! Η γιαγιά είναι λίγο άρρωστη.»','Μαμά: «Φόρεσε πρώτα την κόκκινη κάπα σου. Είναι κρεμασμένη δίπλα στο ράφι.»']);
+      if(!F.basket){ F.basket=1; give('basket'); star('basket'); return say(['Μαμά: «Τι όμορφη που είσαι! Πάρε αυτό το καλάθι με τη μηλόπιτα για τη γιαγιά.»','Μαμά: «Βάλε μέσα και κουλουράκια από το τραπέζι.»']); }
+      if(!F.cookies) return say(['Μαμά: «Μην ξεχάσεις τα κουλουράκια στο τραπέζι!»']);
+      say(['Μαμά: «Να προσέχεις! Μη μιλάς με αγνώστους και μη φεύγεις από το μονοπάτι.»','Κοκκινοσκουφίτσα: «Το υπόσχομαι, μαμά!»']); }},
+    {id:'door',n:'Πόρτα',rect:[274,60,36,116],at:[290,156],face:'right',act(){
+      if(!F.basket||!F.cookies) return say(['Μαμά: «Περίμενε! Πρώτα ετοιμάζουμε το καλάθι για τη γιαγιά.»']);
+      if(!F.advice){ F.advice=1; return say(['Μαμά: «Να προσέχεις! Μη μιλάς με αγνώστους και μη φεύγεις από το μονοπάτι.»','Κοκκινοσκουφίτσα: «Το υπόσχομαι, μαμά! Γεια σου!»'],()=>go('meadow','home')); }
+      go('meadow','home'); }},
   ],
-  entries:{street:[40,154,'side',1], kitchen:[90,128,'front'], study:[324,128,'front'], bedroom:[380,154,'side',-1], dream:[224,134,'front']},
-  onEnter(){ if(!F.hSeen){ F.hSeen=1; say(['Μέσα μυρίζει υγρασία και λεβάντα.','Το σπίτι είναι πιο ζεστό απ’ όσο θα έπρεπε. Σαν να το κατοικεί ακόμα κάποιος.']); } } };
-function clockEvent(){
-  say(['Βάζω το κλειδί στο καντράν. Μία, δύο, τρεις στροφές.','Σπρώχνω το εκκρεμές.','Τικ.'],()=>{
-    S.clockRun=1; S.lock=1; S.frozen=1; sfx('tickLoud'); shake(1,2);
-    after(.8,()=>{ sfx('tickLoud'); shake(.6,3); }); after(1.5,()=>{ sfx('sting'); S.flash=1; shake(1,4); });
-    after(2.3,()=>{ S.lock=0; S.frozen=0; go('dream','hall',()=>after(.6,()=>whisper('Τικ…'))); }); }); }
-function wake(){ F.clockDone=1; S.flash=1; sfx('sting'); after(.4,()=>go('hall','dream',()=>say(['…','Είμαι στο χολ. Το ρολόι χτυπάει κανονικά.','Τα σεντόνια από τη σκάλα έχουν γλιστρήσει στο πάτωμα. Σαν να τα τράβηξε κάποιος.']))); }
+  entries:{start:[90,150,'front'], meadow:[286,156,'side',-1]} };
 
-/* ---------- KITCHEN ---------- */
-SC.kitchen={ w:320, far:124, near:176, sFar:.7, dark:.84, storm:true,
-  bg(g,w){ const RM=room1(g,w,{bx0:70,bx1:250,by0:30,by1:114,vx:160,vy:46,ceil:'#151412',left:'#3e3d37',right:'#3e3d37',back:'#4a4942',S1:40,S2:7000,
-      floor:(X,Z)=>((Math.floor(X/9)+Math.floor(Z/9))&1)?[51,49,44]:[37,35,31]});
-    for(let y=32,k=0;y<114;y+=7,k++){ R(g,70,y,180,1,'#3a3934'); for(let x=70+(k%2)*4;x<250;x+=8) R(g,x,y,1,7,'#3a3934'); }
-    R(g,76,44,26,70,'#79776c'); R(g,76,44,26,2,'#8c8a7e'); R(g,76,70,26,1,'#57554e'); R(g,98,52,2,12,'#9a988a'); R(g,98,76,2,18,'#9a988a');
-    R(g,110,86,66,28,'#36291e'); R(g,108,83,70,3,'#57514a'); for(const dx of [112,134,156]){ R(g,dx,89,18,7,'#2b2017'); R(g,dx+7,92,4,1,'#86764c'); R(g,dx,99,18,13,'#2b2017'); }
-    R(g,180,86,46,28,'#36291e'); R(g,178,83,50,3,'#57514a'); R(g,186,80,30,4,'#2a2a28'); R(g,200,68,2,12,'#8a8a82'); R(g,196,68,6,2,'#8a8a82');
-    R(g,186,40,34,30,'#271c15'); R(g,188,42,30,26,'#0a0e16'); R(g,203,42,1,26,'#271c15'); R(g,188,55,30,1,'#271c15');
-    const wl=RM.wallL, wr=RM.wallR; wallQuad(g,'L',14,46,.3,1,wl,'#0f0c0a'); wallQuad(g,'L',17,43,.33,1,wl,'#1d1814'); wallQuad(g,'L',30,40,.4,.45,wl,'#55554d');
-    wallQuad(g,'L',50,62,.35,.5,wl,'#c4bcaa'); wallQuad(g,'L',50,62,.35,.39,wl,'#5c1812');
-    wallQuad(g,'R',276,306,.3,1,wr,'#0f0c0a'); wallQuad(g,'R',279,303,.33,1,wr,'#2a1d15');
-  },
-  walk:[[80,124],[240,124],[300,177],[20,177]], block:[[136,140,70,16]],
-  beams:[[[188,42],[218,42],[230,170],[170,170]]],
-  lights(){ return [[203,56,58,.48,[150,170,210]],[160,30,78,.5*S.flick,[230,220,170]]]; },
-  anim(g){ const f=S.flash; R(g,188,42,30,26,f>.05?'#8a96ac':'#0a0e16'); R(g,203,42,1,26,'#271c15'); R(g,188,55,30,1,'#271c15'); R(g,158,30,5,5,S.flick>.6?'#d8d4a0':'#4a4838'); R(g,160,0,1,30,'#0e0e0e');
-    if(!F.magnet){ R(g,84,58,5,4,'#a04030'); } const p=(T*.7)%1; if(p<.6) R(g,201,72+p*10,1,2,'#9ab0c8'); },
-  props(){ return [{y:154,draw(g){ shadowE(g,170,156,36,3,.3); R(g,140,132,62,4,'#3a291e'); R(g,142,136,3,20,'#2a1d15'); R(g,197,136,3,20,'#2a1d15'); R(g,130,118,3,38,'#2a1d15'); R(g,130,138,10,2,'#2a1d15'); R(g,209,118,3,38,'#2a1d15'); R(g,202,138,10,2,'#2a1d15');
-      R(g,152,127,6,5,'#c4bcaa'); R(g,180,127,6,5,'#a8a090'); }}]; },
+/* ---------- MEADOW ---------- */
+SC.meadow={ w:520, far:122, near:176, sFar:.6, outdoor:true, sun:[300,26],
+  bg(g,w){ const r=rng(4); skyHills(g,w,[143,213,255],[226,246,255]); for(let i=0;i<6;i++) cloud(g,20+i*90+r()*30,14+r()*24,1+r()*.4);
+    for(let x=0;x<w;x++){ const h=22+8*Math.sin(x*.012+.4)+4*Math.sin(x*.04); R(g,x,112-h,1,h+8,'#a8dc78'); const h2=12+6*Math.sin(x*.02+2); R(g,x,116-h2,1,h2+8,'#8fd06a'); }
+    R(g,8,76,50,40,'#fff3dd'); poly(g,[[2,78],[33,58],[64,78]],'#e0262f'); R(g,26,94,12,22,'#3fae6e'); R(g,12,86,10,8,'#9fdcff');
+    treeP(g,90,118,1.1); treeP(g,380,114,1); treeP(g,460,116,1.2);
+    grassFloor(g,w,116,30,260,Z=>Math.sin(Z*.08)*10); },
+  walk:[[8,124],[500,124],[512,177],[8,177]], block:[[470,118,50,60]],
+  anim(g){ for(let i=0;i<3;i++){ const bx=(i*180+T*12)%560-20, by=60+Math.sin(T*2+i)*10, f=Math.sin(T*12+i)>0; R(g,bx,by,1,3,'#3a2420'); R(g,bx-(f?3:2),by-1,f?3:2,3,['#ff8fb0','#ffe066','#9fd0ff'][i]); R(g,bx+1,by-1,f?3:2,3,['#ff8fb0','#ffe066','#9fd0ff'][i]); } },
+  props(){ const L=[], FL=[[140,150,'#ff5a8a'],[200,134,'#ffd34d'],[330,160,'#a070ff']];
+    FL.forEach(([fx,fy,c],i)=>{ if(!F['fl'+i]) L.push({y:fy,draw(g){ R(g,fx,fy-12,2,12,'#3f9a3f'); disc(g,fx+1,fy-14,4,c); disc(g,fx+1,fy-14,1,'#fff3a0'); R(g,fx-2,fy-6,3,2,'#3f9a3f'); }}); });
+    if(!F.carrot&&!F.bunny) L.push({y:138,draw(g){ ell(g,262,138,7,2,'#8a5a36'); R(g,261,128,2,8,'#3f9a3f'); R(g,258,129,2,6,'#5cb85c'); R(g,264,129,2,6,'#5cb85c'); R(g,259,136,6,3,'#ff8a2a'); }});
+    L.push({y:146,draw(g){ actor(g,gg=>bunnyPaint(gg,!!F.bunny),F.bunny?412+Math.sin(T*2)*8:412,146,scl(146)); }});
+    if(!F.bunny) L.push({y:176,draw(g){ for(let i=0;i<10;i++){ disc(g,480+(i%3)*14,128+Math.floor(i/3)*14,12,'#3f9a3f'); disc(g,482+(i%3)*14,125+Math.floor(i/3)*14,7,'#5cb85c'); } }});
+    else L.push({y:176,draw(g){ disc(g,470,132,12,'#3f9a3f'); disc(g,514,132,12,'#3f9a3f'); }});
+    return L; },
   hs:[
-    {id:'bdoor',n:'Πόρτα του υπογείου',rect:[12,60,36,110],at:[42,160],face:'left',look:['Σκαλοπάτια που χάνονται στο απόλυτο σκοτάδι.'],
-      hand(){ if(has('candle_lit')){ sfx('door'); go('basement','kitchen'); } else if(has('candle')) say(['Σκαλοπάτια που χάνονται στο απόλυτο σκοτάδι.','Έχω ένα κερί. Χρειάζομαι κάτι για να το ανάψω.']); else say(['Σκαλοπάτια που χάνονται στο απόλυτο σκοτάδι.','Χωρίς φως δεν κατεβαίνω.']); },
-      exit(){ this.hand(); }, item(i){ if(i==='candle_lit'){ sfx('door'); go('basement','kitchen'); return true; } if(i==='candle'){ say(['Πρέπει πρώτα να το ανάψω.']); return true; } }},
-    {id:'cal',n:'Ημερολόγιο τοίχου',rect:[48,56,16,26],at:[60,140],face:'left',look:['Ημερολόγιο τοίχου. Νοέμβριος 1967.','Η 17η είναι κυκλωμένη με κόκκινο. Κανείς δεν γύρισε τη σελίδα από τότε.']},
-    {id:'fridge',n:'Ψυγείο',rect:[76,44,26,70],at:[90,128],face:'back',look:['Το ψυγείο είναι αποσυνδεδεμένο. Δεν τολμώ να το ανοίξω.'],
-      hand(){ if(!F.magnet){ F.magnet=1; give('magnet'); sfx('pick'); say(['Το ψυγείο είναι αποσυνδεδεμένο. Δεν τολμώ να το ανοίξω.','Στην πόρτα, ένας μαγνήτης-σουβενίρ. Τον παίρνω.']); } else say(['Δεν το ανοίγω. Όχι.']); }},
-    {id:'drawers',n:'Συρτάρια',rect:[110,84,66,30],at:[143,128],face:'back',look:['Συρτάρια κουζίνας. Το ένα δεν κλείνει καλά.'],
-      hand(){ if(!F.matches){ F.matches=1; give('matches'); sfx('pick'); say(['Κουτάλια, ένα σπασμένο ψαλίδι… και σπίρτα.']); } else say(['Τίποτε άλλο χρήσιμο.']); }},
-    {id:'sink',n:'Νεροχύτης',rect:[180,66,46,48],at:[203,128],face:'back',look:['Η βρύση στάζει. Ρυθμικά. Σαν να μετράει κάτι.'],hand:['Κλείνω τη βρύση. Σε λίγα δευτερόλεπτα ξαναρχίζει να στάζει.']},
-    {id:'table',n:'Τραπέζι',rect:[130,116,82,40],at:[170,166],face:'back',look:['Δύο φλιτζάνια, στρωμένα αντικριστά.','Το ένα δεν το έπιασε ποτέ κανείς. Έχει σκόνη μέσα.']},
-    {id:'hdoor',n:'Προς το χολ',rect:[274,60,34,114],at:[288,160],face:'right',hand(){ sfx('door'); go('hall','kitchen'); },exit(){ sfx('door'); go('hall','kitchen'); }},
+    {id:'back',n:'Σπίτι',rect:[0,60,64,64],at:[24,130],face:'back',act(){ go('home','meadow'); }},
+    {id:'f0',n:'Λουλουδάκι',rect:[132,130,18,22],at:[130,156],face:'right',act(){ pickFlower(0); }},
+    {id:'f1',n:'Λουλουδάκι',rect:[192,114,18,22],at:[190,140],face:'right',act(){ pickFlower(1); }},
+    {id:'f2',n:'Λουλουδάκι',rect:[322,140,18,22],at:[320,166],face:'right',act(){ pickFlower(2); }},
+    {id:'carrot',n:'Καρότο',rect:[252,122,20,20],at:[262,148],face:'back',act(){ if(F.carrot||F.bunny) return say(['Εδώ ήταν το καρότο.']); F.carrot=1; give('carrot'); sfx('pop'); say(['Ωπ! Η Κοκκινοσκουφίτσα τραβάει ένα μεγάλο καρότο από το χώμα!']); }},
+    {id:'bunny',n:'Λαγουδάκι',rect:[396,116,34,32],at:[392,152],face:'right',act(){
+      if(F.bunny) return say(['Λαγουδάκι: «Ευχαριστώ, φίλη μου! Το μονοπάτι για τη γιαγιά είναι από εκεί!»']);
+      F.bunnyMet=1; say(['Λαγουδάκι: «Ουουου… Πεινάω πολύ και δεν βρίσκω ούτε ένα καρότο!»', F.carrot?'Κοκκινοσκουφίτσα: «Έχω ένα καρότο στο καλάθι μου!»':'Κοκκινοσκουφίτσα: «Μην κλαις, λαγουδάκι! Θα σου βρω εγώ ένα.»']); },
+      item(i){ if(i==='carrot'&&!F.bunny){ take('carrot'); F.bunny=1; star('bunny'); sfx('yay'); buildGrid2(); say(['Λαγουδάκι: «Ένα καρότο! Ευχαριστώ, ευχαριστώ!»','Το λαγουδάκι χοροπηδάει από τη χαρά του και ανοίγει δρόμο μέσα από τους θάμνους!']); return true; } }},
+    {id:'bush',n:'Θάμνοι',rect:[466,112,54,66],at:[460,150],face:'right',act(){ if(!F.bunny) return say(['Οι θάμνοι είναι πολύ πυκνοί. Δεν μπορούμε να περάσουμε.','Μήπως ξέρει κάποιος ένα μυστικό περασματάκι;']); go('forest','meadow'); }},
   ],
-  entries:{hall:[284,160,'side',-1], basement:[46,160,'side',1]},
-  onEnter(){ if(!F.kSeen){ F.kSeen=1; say(['Η κουζίνα. Πιο κρύα από τον δρόμο.']); } } };
+  entries:{start:[200,150,'front'], home:[30,140,'front'], forest:[456,150,'side',-1]} };
+function buildGrid2(){ SC.meadow.block=F.bunny?[]:[[470,118,50,60]]; buildGrid(SC.meadow); }
+function pickFlower(i){ if(F['fl'+i]) return; F['fl'+i]=1; sfx('pop'); const n=[0,1,2].filter(k=>F['fl'+k]).length;
+  if(n===1){ give('flowers'); say(['Ένα λουλουδάκι για τη γιαγιά! Ας μαζέψουμε κι άλλα.']); } else if(n===2) say(['Δύο λουλουδάκια! Ακόμα ένα!']); else { star('flowers'); say(['Τρία λουλουδάκια! Τι όμορφο μπουκέτο!']); } }
 
-/* ---------- BASEMENT ---------- */
-SC.basement={ w:320, far:124, near:176, sFar:.68, dark:.975,
-  bg(g,w){ const r=rng(9); room1(g,w,{bx0:60,bx1:260,by0:20,by1:114,vx:160,vy:44,ceil:'#100e0c',left:'#24201b',right:'#24201b',back:'#2a2620',S1:40,S2:7000,
-      floor:(X,Z,x,y)=>{ const n=hash2(x>>1,y>>1); return n>.85?[42,37,30]:n<.15?[20,17,14]:[31,27,22]; }});
-    for(let y=22,k=0;y<114;y+=6,k++){ const off=(k%2)*7; for(let x=60-off;x<260;x+=14) R(g,Math.max(60,x),y,13,5,['#2a2620','#332d25','#39332a'][(r()*3)|0]); }
-    R(g,92,40,2,74,'#2a1f15'); R(g,148,40,2,74,'#2a1f15'); for(const sy of [58,80,102]){ R(g,90,sy,62,3,'#33261a'); for(let jx=96;jx<146;jx+=7){ R(g,jx,sy-8,5,8,['#6a4a1c','#5a2020','#4a4a2a'][(r()*3)|0]); R(g,jx,sy-9,5,1,'#5a5448'); R(g,jx+1,sy-4,3,2,'#c4bcaa'); } }
-    for(let i=0;i<10;i++){ R(g,0,46+i*12,52-i*5,12,i%2?'#2b2219':'#30261c'); R(g,0,46+i*12,52-i*5,1,'#3d3124'); }
-    line(g,60,20,78,40,'#3a3630'); line(g,260,20,240,42,'#3a3630');
-  },
-  walk:[[50,124],[270,124],[300,177],[20,177]], block:[[132,130,60,20],[244,136,44,12]],
-  lights(){ const L=[]; if(!F.keyStudy) L.push([162,128,10,.5+.3*Math.sin(T*3)]); return L; },
-  anim(g){ if(!F.keyStudy&&Math.sin(T*2.1)>.3) R(g,162,127,1,1,'#e8dca0'); const p=(T*.45)%1; if(p<.5) R(g,166,30+p*190,1,2,'#7a8a9a'); },
-  props(){ return [
-    {y:150,draw(g){ shadowE(g,162,152,32,4,.3); ell(g,162,136,30,9,'#4a453c'); ell(g,162,135,26,7,'#060606'); R(g,132,136,60,14,'#38342d'); for(let sx=134;sx<190;sx+=8) R(g,sx,136,1,14,'#26231e'); ell(g,162,150,30,4,'#2a2620'); }},
-    {y:148,draw(g){ shadowE(g,266,149,22,2,.3); R(g,248,128,40,6,'#4a301c'); R(g,250,134,36,14,'#3a2616'); R(g,256,128,2,20,'#5a5040'); R(g,278,128,2,20,'#5a5040'); }},
-  ]; },
+/* ---------- FOREST ---------- */
+SC.forest={ w:520, far:122, near:176, sFar:.6, outdoor:true, sun:[60,10],
+  bg(g,w){ const r=rng(8); skyHills(g,w,[184,230,200],[230,246,220]); R(g,0,94,w,26,'#7cc864'); for(let x=0;x<w;x+=3) R(g,x,94+((x*7)%5),2,2,'#6fbf55');
+    for(let i=0;i<16;i++) pineP(g,r()*w,120,1+r()*.6,'#5aa86a','#4a9a5c'); for(let i=0;i<8;i++) treeP(g,20+i*66+r()*20,122,1.2);
+    floorFill(g,[[0,118],[w,118],[w,180],[0,180]],30,260,50,3000,(X,Z,x,y)=>{ if(Z>30&&Z<36){ if(Math.abs(X)<10) return (Math.floor(X/2.5)&1)?[201,138,79]:[168,112,62]; const n=hash2(x,y); return n>.9?[159,220,255]:[90,176,240]; }
+      if(Math.abs(X-Math.sin(Z*.07)*8)<11) return hash2(x>>1,y>>1)>.8?[220,191,130]:[236,211,154]; const n=hash2(x,y); return n>.7?[95,174,72]:n<.12?[134,204,92]:[111,191,85]; });
+    for(const mx of [60,180,400,470]){ R(g,mx-1,154,3,4,'#fff3dd'); R(g,mx-4,151,9,3,'#e0262f'); R(g,mx-2,151,1,1,'#fff'); R(g,mx+2,152,1,1,'#fff'); } },
+  walk:[[8,124],[512,124],[512,177],[8,177]], block:[[110,128,40,16]],
+  anim(g){ for(let i=0;i<4;i++){ const sx=((T*12+i*40)%480); R(g,sx,142+i*3,5,1,'#ffffff'); } },
+  props(){ const L=[];
+    L.push({y:144,draw(g){ disc(g,120,134,10,'#3f9a3f'); disc(g,136,132,11,'#4fa84f'); if(!F.berries) for(let i=0;i<7;i++) disc(g,114+(i*7)%30,128+(i*5)%12,2,'#e0262f'); }});
+    if(!F.wolfRun) L.push({y:150,draw(g){ actor(g,gg=>wolfPaint(gg,'sly'),330,150,scl(150),true); }});
+    else if(S.wolfX<760) L.push({y:150,draw(g){ actor(g,gg=>wolfPaint(gg,'run'),S.wolfX,150,scl(150)); }});
+    return L; },
   hs:[
-    {id:'stairs',n:'Σκάλα',rect:[0,40,56,130],at:[46,160],face:'left',hand(){ sfx('door'); go('kitchen','basement'); },exit(){ sfx('door'); go('kitchen','basement'); },look:['Τα σκαλοπάτια προς την κουζίνα. Και προς το φως.']},
-    {id:'shelves',n:'Ράφια',rect:[88,36,66,78],at:[120,128],face:'back',look:['Βάζα με γλυκό του κουταλιού. Δεκάδες.','Όλα έχουν την ίδια ετικέτα, με το ίδιο χέρι: «Για τον Α., όταν γυρίσει».']},
-    {id:'cistern',n:'Στέρνα',rect:[130,122,64,30],at:[162,158],face:'back',look(){ say(F.keyStudy?['Μαύρο νερό. Δεν βλέπω πια τον πάτο. Ή μήπως εκείνος δεν βλέπει εμένα;']:['Μια παλιά στέρνα. Το νερό είναι ακίνητο σαν γυαλί.','Κάτι μεταλλικό γυαλίζει στον πάτο. Πολύ βαθιά για το χέρι μου.']); }, hand(){ this.look(); },
-      item(i){ if(F.keyStudy) return false; if(i==='fishing'){ F.keyStudy=1; take('fishing'); give('key_study'); sfx('pick'); shake(.4,1); say(['Κατεβάζω τον μαγνήτη αργά…','Κάτι τραβάει τον σπάγκο. Μια στιγμή μόνο. Πιο δυνατά απ’ όσο θα έπρεπε.','Ένα μικρό ορειχάλκινο κλειδί.']); return true; }
-        if(i==='magnet'||i==='string'){ say(['Δεν φτάνει ως κάτω. Αν το συνδύαζα με κάτι…']); return true; } }},
-    {id:'trunk',n:'Μπαούλο',rect:[246,124,44,26],at:[262,158],face:'back',look:['Ανδρικά ρούχα, διπλωμένα με προσοχή. Ναφθαλίνη.','Από πάνω, ένα πηλήκιο σιδηροδρομικού.']},
+    {id:'back',n:'Πίσω στο λιβάδι',rect:[0,60,10,120],at:[10,152],face:'left',act(){ go('meadow','forest'); }},
+    {id:'berries',n:'Φραουλίτσες',rect:[108,118,40,26],at:[128,152],face:'back',act(){ if(F.berries) return say(['Τις μαζέψαμε όλες!']); F.berries=1; give('berries'); star('berries'); sfx('pop'); say(['Φραουλίτσες του δάσους! Μπαίνουν κι αυτές στο καλάθι.']); }},
+    {id:'stream',n:'Ρυάκι',rect:[0,128,520,14],at:null,act(){ sfx('splash'); say(['Το ρυάκι κελαρύζει κάτω από το γεφυράκι. Γλου γλου γλου!']); }},
+    {id:'wolf',n:'Λύκος',rect:()=>F.wolfRun?[0,0,0,0]:npcRect(330,150,scl(150)),at:[300,154],face:'right',act(){ meetWolf(); }},
+    {id:'next',n:'Στο σπίτι της γιαγιάς',rect:[506,60,14,120],at:[510,150],face:'right',act(){ if(!F.wolfMet) return meetWolf(); go('outside','forest'); }},
   ],
-  entries:{kitchen:[48,160,'side',1]},
-  onEnter(){ if(!F.bSeen){ F.bSeen=1; after(1.6,()=>{ S.ghost={x:268,y:126,t:.55}; sfx('sting'); }); after(2.6,()=>say(['…Υπάρχει κανείς εδώ κάτω;','Μόνο η σταγόνα που πέφτει στη στέρνα.'])); } } };
+  entries:{meadow:[20,150,'side',1], outside:[500,150,'side',-1]} };
+function meetWolf(){ if(F.wolfAsk) return; F.wolfAsk=1; S.path=[]; sfx('wolf');
+  say(['Ξαφνικά, πίσω από ένα δέντρο, εμφανίζεται ένας μεγάλος γκρίζος λύκος!','Λύκος: «Καλημέρα, μικρούλα! Πού πηγαίνεις με αυτό το ωραίο καλάθι;»'],()=>
+    choose('Τι λέει η Κοκκινοσκουφίτσα;',[
+      {t:'«Η μαμά λέει να μη μιλάω με αγνώστους!»',f:()=>{ F.wolfMet=1; star('wolf'); say(['Κοκκινοσκουφίτσα: «Η μαμά λέει να μη μιλάω με αγνώστους!»','Μπράβο! Έτσι είπε η μαμά.','Λύκος: «Χμ! Μυρίζει μηλόπιτα… Θα πάει σίγουρα στη γιαγιά της!»','Και ο λύκος τρέχει γρήγορα μέσα στο δάσος!'],()=>{ S.wolfX=330; F.wolfRun=1; }); }},
+      {t:'«Πάω στη γιαγιά μου!»',f:()=>{ F.wolfMet=1; star('wolf'); say(['Κοκκινοσκουφίτσα: «Πάω στη γιαγιά μου, στο σπιτάκι με τα λουλούδια!»','Λύκος: «Α, στη γιαγιά! Τι ωραία… Πρέπει να φύγω! Γεια!»','Ωχ! Η μαμά είπε να μη μιλάμε με αγνώστους. Την επόμενη φορά θα το θυμόμαστε!','Και ο λύκος τρέχει γρήγορα μέσα στο δάσος!'],()=>{ S.wolfX=330; F.wolfRun=1; }); }},
+    ])); }
 
-/* ---------- STUDY ---------- */
-SC.study={ w:320, far:124, near:176, sFar:.7, dark:.86, storm:true,
-  bg(g,w){ const r=rng(44); const RM=room1(g,w,{bx0:70,bx1:250,by0:28,by1:114,vx:160,vy:46,ceil:'#141110',left:'#262e23',right:'#262e23',back:'#2b3428',S1:40,S2:7000,
-      floor:(X,Z)=>{ const fx=X/7; if(frac(fx)<.06) return [16,11,9]; return hash2(Math.floor(fx),Math.floor(Z/3+fx*5))<.5?[41,30,22]:[35,26,19]; }});
-    for(let x=72;x<250;x+=8) R(g,x,28,1,62,'#262e23'); R(g,70,90,180,24,'#29190f'); R(g,70,90,180,2,'#38251a');
-    const wl=RM.wallL; wallQuad(g,'L',6,64,.1,.92,wl,'#26180f'); for(let k=0;k<5;k++) wallQuad(g,'L',8,62,.18+k*.15,.2+k*.15,wl,'#30200f');
-    for(let k=0;k<5;k++) for(let x=10;x<60;x+=3){ const a=wl(x), y0=lerp(a[0],a[1],.2+k*.15)-1, h=lerp(4,9,1-x/64); R(g,x,y0-h,2,h,['#4a1f1a','#2a3a2a','#3a3020','#22283a','#5a4a2a'][(x+k)%5]); }
-    R(g,116,42,20,16,'#5e4f28'); R(g,118,44,16,12,'#8a8a80'); R(g,118,50,16,6,'#a89a7a'); R(g,123,49,2,6,'#2a2420'); R(g,127,49,2,6,'#2a2420');
-    R(g,194,40,30,24,'#5e4f28'); R(g,196,42,26,20,'#b4a888'); line(g,198,58,208,48,'#3a2a1a'); line(g,208,48,220,44,'#3a2a1a'); R(g,207,47,3,3,'#7a1a14');
-    const wr=RM.wallR; wallQuad(g,'R',266,302,.18,.62,wr,'#271c15'); wallQuad(g,'R',269,299,.21,.59,wr,'#0a0e16');
-  },
-  walk:[[80,124],[240,124],[300,177],[20,177]], block:[[126,130,72,14]],
-  beams:[[[270,40],[298,34],[290,170],[240,170]]],
-  lights(){ return [[146,108,86,.95,[255,200,130]]]; },
-  props(){ return [{y:146,draw(g){ shadowE(g,162,147,40,3,.3); R(g,124,122,76,5,'#3a281b'); R(g,124,127,76,1,'#1f150e'); R(g,126,128,20,18,'#2e2016'); R(g,178,128,20,18,'#2e2016'); R(g,132,134,8,1,'#7a6a40'); R(g,184,134,8,1,'#7a6a40');
-      R(g,160,116,16,6,'#c8c0a8'); R(g,166,118,6,1,'#5a5248'); R(g,142,119,6,3,'#2a2a28'); R(g,144,108,2,11,'#2a2a28'); R(g,138,102,14,7,'#2b4632'); R(g,138,108,14,1,'#f6dca0'); }}]; },
+/* ---------- OUTSIDE ---------- */
+SC.outside={ w:440, far:122, near:176, sFar:.62, outdoor:true, sun:[360,18], warm:.25,
+  bg(g,w){ const r=rng(12); skyHills(g,w,[255,214,168],[255,241,214]); for(let i=0;i<3;i++) cloud(g,30+i*140,16+r()*20,1.2);
+    for(let x=0;x<w;x++){ const h=18+6*Math.sin(x*.015+1.4); R(g,x,116-h,1,h+6,'#a8dc78'); }
+    R(g,220,50,140,70,'#fff3dd'); for(let y=56;y<120;y+=8) R(g,220,y,140,1,'#f0e0c4'); for(let i=0;i<30;i++) R(g,212+i*2.6,50-i*1.6,156-i*5.2,2,i%2?'#d8403a':'#e0574f'); R(g,320,10,14,30,'#b8b0a8'); R(g,318,8,18,4,'#8a5a36');
+    R(g,276,72,28,48,'#8a5a36'); R(g,278,74,24,46,'#a8703e'); disc(g,290,88,6,'#ffe066'); R(g,297,98,2,2,'#ffd34d');
+    for(const wx of [238,326]){ R(g,wx-2,68,22,22,'#8a5a36'); R(g,wx,70,18,18,'#9fdcff'); R(g,wx+8,70,2,18,'#8a5a36'); R(g,wx-2,90,22,4,'#a8703e'); for(let i=0;i<5;i++){ R(g,wx+i*4,86,2,4,'#3f9a3f'); disc(g,wx+1+i*4,85,1,i%2?'#ff8fb0':'#fff066'); } }
+    for(let x=0;x<200;x+=10){ R(g,x,98,3,22,'#fff3dd'); } R(g,0,104,200,2,'#fff3dd'); R(g,0,112,200,2,'#fff3dd');
+    grassFloor(g,w,120,30,290,()=>0); treeP(g,410,124,1.4); },
+  walk:[[8,124],[432,124],[432,177],[8,177]], block:[[80,126,50,14]],
+  anim(g){ for(let i=0;i<4;i++){ const p=(T*.4+i*.25)%1; g.globalAlpha=.7*(1-p); disc(g,327+Math.sin(T+i)*4,8-p*24,3+Math.round(p*4),'#ffffff'); } g.globalAlpha=1; },
+  props(){ const L=[];
+    L.push({y:138,draw(g){ shadowE(g,104,139,26,3,.2); for(let i=0;i<5;i++){ R(g,82,134-i*6,44,6,'#a8703e'); disc(g,126,137-i*6,3,'#e8c08a'); R(g,82,134-i*6,44,1,'#c88a52'); } }});
+    L.push({y:146,draw(g){ actor(g,gg=>person(gg,{skin:'#ffe3cf',hair:'#7a4a2a',hs:'cap',cap:'#a8703e',top:'#3f9a5a',stripe:'#2f7a46',bottom:'#4a5a8a',beard:'#7a4a2a',view:'front',bob:.8,seed:2}),150,146,scl(146)); }});
+    for(let i=0;i<2;i++) L.push({y:160+i*8,draw(g){ actor(g,chick,380+i*22+Math.sin(T*1.5+i)*6,160+i*8,scl(160)); }});
+    return L; },
   hs:[
-    {id:'door',n:'Προς το χολ',rect:[0,50,10,130],at:[22,160],face:'left',hand(){ sfx('door'); go('hall','study'); },exit(){ sfx('door'); go('hall','study'); }},
-    {id:'books',n:'Βιβλιοθήκη',rect:[6,30,58,130],at:[60,150],face:'left',look:['Δρομολόγια του σιδηροδρόμου, δεμένα σε τόμους. Από το 1958 ως το 1967.','Μετά το 1967, τίποτα.']},
-    {id:'photo',n:'Φωτογραφία',rect:[114,40,24,20],at:[126,128],face:'back',look:['Ένα ζευγάρι σε παραλία. Εκείνη γελάει. Εκείνος κοιτάζει το ρολόι του.','Από πίσω: «Ευτέρπη και Ανδρέας, Καβάλα 1966».']},
-    {id:'map',n:'Χάρτης',rect:[192,38,34,28],at:[208,128],face:'back',look:['Χάρτης του σιδηροδρομικού δικτύου. Μια διαδρομή είναι σημαδεμένη με κόκκινο μελάνι, ξανά και ξανά.','Θεσσαλονίκη – Αθήνα. Μόνο το πήγαινε.']},
-    {id:'desk',n:'Γραφείο',rect:[122,100,80,46],at:[162,154],face:'back',look:['Ένα γραφείο με πράσινη λάμπα. Το ρεύμα έχει κοπεί, κι όμως η λάμπα καίει.'],
-      hand(){ if(!F.diary){ F.diary=1; give('wind_key'); sfx('pick'); say(['Ένα ημερολόγιο, ανοιχτό στην τελευταία σελίδα:','«Το ρολόι σταμάτησε τη νύχτα που ο Ανδρέας πήρε το τρένο των 3:17.»','«Δεν θα το ξανακουρδίσω. Όσο ο χρόνος δεν προχωρά, δεν έχει φύγει.»','Στο συρτάρι, ένα κλειδί κουρδίσματος με μαύρη κορδέλα.','Πρέπει να ελέγξω αν το ρολόι λειτουργεί. Αλλάζει την εκτίμηση.']); } else say(['«Όσο ο χρόνος δεν προχωρά, δεν έχει φύγει.»']); }},
-    {id:'window',n:'Παράθυρο',rect:[264,30,40,90],at:[262,140],face:'right',look:['Τα τζάμια τρέμουν σε κάθε βροντή. Κι εγώ λίγο.']},
+    {id:'back',n:'Πίσω στο δάσος',rect:[0,60,10,120],at:[10,152],face:'left',act(){ go('forest','outside'); }},
+    {id:'wood',n:'Ξυλοκόπος',rect:()=>npcRect(150,146,scl(146)),at:[168,152],face:'left',act(){
+      if(F.whistle) return say(['Ξυλοκόπος: «Αν χρειαστείς βοήθεια, φύσα τη σφυρίχτρα. Θα είμαι εδώ!»']);
+      F.whistle=1; give('whistle'); star('whistle'); say(['Ξυλοκόπος: «Γεια σου, Κοκκινοσκουφίτσα! Πας στη γιαγιά σου;»','Ξυλοκόπος: «Είδα έναν λύκο να τρέχει προς τα εδώ. Πάρε αυτή τη σφυρίχτρα.»','Ξυλοκόπος: «Αν χρειαστείς βοήθεια, φύσα τη δυνατά και θα έρθω αμέσως!»']); }},
+    {id:'chicks',n:'Κοτούλες',rect:[370,146,46,24],at:[370,170],face:'right',act(){ sfx('cluck'); say(['Κοκοκό! Οι κοτούλες της γιαγιάς ψάχνουν σποράκια.']); }},
+    {id:'door',n:'Πόρτα της γιαγιάς',rect:[274,70,32,50],at:[290,130],face:'back',act(){
+      if(!F.whistle) return say(['Ας πούμε πρώτα καλημέρα στον ξυλοκόπο!']);
+      sfx('knock'); say(['Τοκ τοκ τοκ!','Λύκος με ψιλή φωνή: «Ποιος είναι;»','Κοκκινοσκουφίτσα: «Εγώ είμαι, γιαγιά! Σου έφερα μηλόπιτα!»','Λύκος με ψιλή φωνή: «Τράβα το κορδονάκι και μπες μέσα, χρυσό μου!»','Χμμ… Η φωνή της γιαγιάς ακούγεται λίγο παράξενη.'],()=>go('bedroom','outside')); }},
   ],
-  entries:{hall:[28,160,'side',1]},
-  onEnter(){ if(!F.sSeen){ F.sSeen=1; say(['Η λάμπα του γραφείου είναι αναμμένη.','Το ρεύμα έχει κοπεί από τον Οκτώβριο.']); } } };
-
-/* ---------- DREAM ---------- */
-SC.dream={ w:640, far:124, near:176, sFar:.66, dark:.9, dream:true,
-  bg(g,w){ const r=rng(77); R(g,0,0,w,24,'#090202'); R(g,0,24,w,92,'#2a0d0b'); for(let x=0;x<w;x+=8) R(g,x,24,1,92,'#210908'); for(let i=0;i<w/12;i++){ g.globalAlpha=.55; R(g,r()*w,24,1,20+r()*70,'#4a0c08'); g.globalAlpha=1; }
-    for(let x=40;x<w-80;x+=42){ const cy=40+((r()*40)|0), cr=3+((r()*6)|0); disc(g,x,cy,cr+1,'#2a2016'); disc(g,x,cy,cr,'#8a7a66'); const a=r()*6.28; line(g,x,cy,x+Math.sin(a)*cr*.8,cy-Math.cos(a)*cr*.8,'#120e0a'); }
-    for(const dx of [90,210,330,450]){ R(g,dx-12,62,24,54,'#2a0c0a'); R(g,dx-10,64,20,52,'#1a0807'); }
-    R(g,590,58,32,58,'#0a0303'); R(g,592,60,28,56,'#1a0807');
-    floorFill(g,[[0,116],[w,116],[w,180],[0,180]],40,320,44,6000,(X,Z,x,y)=>{ const f=Z/3; return (Math.floor(f)&1)?[20,6,6]:[16,4,4]; });
-  },
-  walk:[[16,124],[624,124],[624,177],[16,177]], block:[],
-  lights(){ const L=[[606,110,64,.85,[255,80,50]],[S.x,S.y-30,50,.5]]; if(!F.dwFig) L.push([480,110,44,.55,[200,40,30]]); return L; },
-  anim(g){ R(g,594,115,24,1,Math.sin(T*6)>0?'#ff5a3a':'#c83a28'); },
-  props(){ return []; },
-  hs:[{id:'door',n:'Πόρτα',rect:[588,56,36,64],at:[604,126],face:'back',hand(){ wake(); },exit(){ wake(); },look:['Μια πόρτα. Από κάτω, κόκκινο φως.']}],
-  entries:{hall:[40,150,'side',1]},
-  onEnter(){ S.heartT=0; } };
+  entries:{forest:[20,150,'side',1], bedroom:[290,134,'front']} };
 
 /* ---------- BEDROOM ---------- */
-SC.bedroom={ w:320, far:126, near:176, sFar:.72, dark:.8, storm:true,
-  bg(g,w){ const r=rng(52); const RM=room1(g,w,{bx0:80,bx1:240,by0:30,by1:114,vx:160,vy:48,ceil:'#141110',left:'#3b2f31',right:'#3b2f31',back:'#433638',S1:40,S2:7000,
-      floor:(X,Z)=>{ const fx=X/7; if(frac(fx)<.06) return [18,12,9]; return hash2(Math.floor(fx),Math.floor(Z/3+fx*5))<.5?[42,31,24]:[36,27,21]; }});
-    for(let x=82;x<240;x+=8) R(g,x,30,1,62,'#3b2f31'); R(g,80,92,160,22,'#2b1f19'); R(g,80,92,160,2,'#3a2a22');
-    const wl=RM.wallL; wallQuad(g,'L',30,52,.3,.36,wl,'#3a281b'); R(g,36,58,5,10,'#a08a4a'); R(g,37,59,3,8,'#5a3a2a'); R(g,43,58,5,10,'#a08a4a'); R(g,44,59,3,8,'#2a3a5a');
-    R(g,140,36,40,48,'#271c15'); R(g,142,38,36,44,'#0a0e16'); R(g,159,38,1,44,'#271c15'); R(g,142,58,36,1,'#271c15'); R(g,134,34,9,56,'#7d7466'); R(g,177,34,9,56,'#7d7466');
-    R(g,196,60,40,32,'#2e1f16'); R(g,194,58,44,3,'#3e2a1d'); for(const dy of [64,74,84]){ R(g,198,dy,36,7,'#24180f'); R(g,214,dy+3,4,1,'#8a7a46'); }
-    R(g,204,40,20,18,'#2a1c13'); R(g,206,42,16,14,'#141a1e');
-  },
-  walk:[[90,126],[230,126],[300,177],[20,177]], block:[[20,128,90,30],[246,138,52,16]],
-  beams:[[[142,38],[178,38],[196,170],[124,170]]],
-  lights(){ return [[272,118,66,.85,[255,190,120]],[42,60,30,.7*(.8+.2*Math.sin(T*9)),[255,60,40]]]; },
-  anim(g){ R(g,41,56,3,3,Math.sin(T*9)>-.4?'#ff6a3a':'#a8301c'); const f=S.flash; R(g,142,38,36,44,f>.05?'#8a96ac':'#0a0e16'); R(g,159,38,1,44,'#271c15'); R(g,142,58,36,1,'#271c15'); },
-  props(){ return [
-    {y:158,draw(g){ shadowE(g,66,159,46,4,.3); R(g,24,104,10,54,'#2a1a12'); poly(g,[[34,130],[104,126],[110,152],[30,158]],'#523634'); poly(g,[[34,126],[104,122],[104,128],[34,132]],'#8e887e'); R(g,36,122,18,6,'#b0aa9e'); R(g,58,121,18,5,'#a09a8e'); R(g,104,122,4,34,'#2a1a12'); }},
-    {y:150,draw(g){ shadowE(g,150,152,16,3,.3); g.save(); g.translate(150,150); g.rotate(Math.sin(T*1.5)*.13); R(g,-16,-1,32,2,'#2a1a10'); R(g,-13,-16,3,15,'#2a1a10'); R(g,10,-16,3,15,'#2a1a10'); R(g,-15,-19,26,4,'#4a2e22'); R(g,-16,-52,4,36,'#2a1a10'); R(g,-15,-50,3,32,'#4a2e22'); R(g,8,-32,3,16,'#2a1a10'); g.restore(); }},
-    {y:154,draw(g){ shadowE(g,272,155,26,3,.3); R(g,248,124,48,4,'#3a281b'); R(g,250,128,3,26,'#2a1c13'); R(g,292,128,3,26,'#2a1c13'); R(g,268,118,8,6,'#2a2a28'); R(g,271,106,2,12,'#2a2a28'); R(g,264,100,16,7,'#7a5a3a'); R(g,264,106,16,1,'#f6d8a0'); R(g,252,121,14,3,'#c8c0a8'); }},
-  ]; },
+SC.bedroom={ w:320, far:126, near:176, sFar:.72,
+  bg(g,w){ const RM=room1(g,w,{bx0:70,bx1:250,by0:24,by1:114,vx:160,vy:44,ceil:'#c98a4f',left:'#ffe8b8',right:'#ffe8b8',back:'#fff0c8',S1:40,S2:7000,
+      floor:(X,Z)=>{ const fz=Z/4; if(frac(X/14)<.05) return [168,112,62]; return (Math.floor(fz+Math.floor(X/14)*.5)&1)?[201,138,79]:[190,128,70]; }});
+    for(let y=30;y<106;y+=12) for(let x=74+((y/12)%2)*8;x<248;x+=16){ R(g,x,y,2,2,'#ffb8c8'); R(g,x+1,y+2,1,2,'#9ad46a'); } R(g,70,96,180,18,'#ffe3a8'); R(g,70,96,180,2,'#c98a4f');
+    R(g,150,38,36,30,'#8a5a36'); R(g,152,40,32,26,'#9fdcff'); R(g,152,56,32,10,'#8fd06a'); R(g,167,40,2,26,'#8a5a36'); R(g,146,36,8,34,'#ff8fa3'); R(g,182,36,8,34,'#ff8fa3');
+    const wl=RM.wallL; wallQuad(g,'L',8,40,.3,1,wl,'#8a5a36'); wallQuad(g,'L',11,37,.33,1,wl,'#a8703e');
+    R(g,252,90,24,24,'#a8703e'); R(g,256,80,16,10,'#c98a4f'); R(g,258,74,12,4,'#fff3a0'); disc(g,264,72,4,'#fff6c0'); },
+  walk:[[80,126],[240,126],[300,177],[20,177]], block:[[178,118,80,26],[60,128,50,20]],
+  anim(g){},
+  props(){ const L=[], sh=!F.granOut?Math.round(Math.sin(T*20)*(Math.sin(T*1.3)>.6?1:0)):0;
+    L.push({y:150,draw(g){ shadowE(g,84,151,30,3,.2); if(!F.granOut){ R(g,58+sh,62,54,88,'#8a5a36'); R(g,60+sh,64,50,84,'#b07a4a'); R(g,84+sh,64,2,84,'#8a5a36'); disc(g,80+sh,104,2,'#ffd34d'); disc(g,90+sh,104,2,'#ffd34d'); }
+      else { R(g,58,62,54,88,'#8a5a36'); R(g,60,64,24,84,'#4a3020'); R(g,86,64,24,84,'#b07a4a'); R(g,36,64,24,84,'#b07a4a'); } }});
+    L.push({y:144,draw(g){ shadowE(g,218,145,44,3,.2); R(g,176,96,8,48,'#8a5a36'); R(g,250,108,6,36,'#8a5a36'); poly(g,[[182,124],[252,120],[256,140],[178,144]],'#ffffff'); for(let i=0;i<8;i++) for(let j=0;j<2;j++) R(g,184+i*9,126+j*8,9,8,['#ff8fb0','#9fd0ff','#ffe066','#9ad46a','#c8a0ff'][(i+j*2)%5]);
+      if(!F.revealed){ R(g,198,108,18,16,'#8a94a3'); R(g,214,114,12,7,'#8a94a3'); R(g,224,113,3,3,'#2a2a33'); R(g,196,102,22,8,'#ffd6e6'); disc(g,193,104,3,'#ff9fc0'); R(g,208,111,7,4,'#5a3a2a'); R(g,209,112,5,2,'#dff4ff'); R(g,183,118,30,4,'#ffffff'); } }});
+    if(F.revealed) L.push({y:S.party?152:150,draw(g){ actor(g,gg=>wolfPaint(gg,F.friend?'happy':F.woodIn?'sad':'sly'),S.party?200:238,S.party?152:150,scl(150),true); }});
+    if(F.woodIn) L.push({y:156,draw(g){ actor(g,gg=>person(gg,{skin:'#ffe3cf',hair:'#7a4a2a',hs:'cap',cap:'#a8703e',top:'#3f9a5a',stripe:'#2f7a46',bottom:'#4a5a8a',beard:'#7a4a2a',view:S.party?'front':'side',seed:2}),S.party?262:40,156,scl(156)); }});
+    if(F.granOut) L.push({y:158,draw(g){ actor(g,gg=>person(gg,{h:50,skin:'#ffe3cf',hair:'#f4f4f4',hs:'bun',top:'#c8a0ff',bottom:'#7a5aa8',dress:true,glasses:true,blush:true,view:'front',bob:S.party?3:0,seed:3}),S.party?140:110,158,scl(158)); }});
+    if(S.party) L.push({y:170,draw(g){ R(g,150,150,40,4,'#a8703e'); disc(g,170,146,6,'#e8a868'); for(let i=0;i<14;i++){ const cx=(i*41+T*30)%320, cy=(i*23+T*50)%150; R(g,cx,cy,2,3,['#ff5a8a','#ffd34d','#5ab0f0','#8fd06a'][i%4]); } }});
+    return L; },
   hs:[
-    {id:'stairs',n:'Σκάλα',rect:[0,60,14,120],at:[24,166],face:'left',hand(){ sfx('door'); go('hall','bedroom'); },exit(){ sfx('door'); go('hall','bedroom'); }},
-    {id:'icon',n:'Εικονοστάσι',rect:[28,50,26,22],at:[60,140],face:'left',look:['Το εικονοστάσι. Το καντήλι είναι αναμμένο.','Η Ευτέρπη πέθανε πριν από τρεις εβδομάδες.','Ποιος το άναψε;']},
-    {id:'bed',n:'Κρεβάτι',rect:[22,100,90,58],at:[110,164],face:'left',look:['Το κρεβάτι είναι στρωμένο για δύο. Το ένα μαξιλάρι είναι ακόμα βαθουλωμένο.']},
-    {id:'chair',n:'Κουνιστή πολυθρόνα',rect:[130,96,40,56],at:[150,162],face:'back',look:['Κουνιέται. Δεν την αγγίζει κανείς.'],
-      hand(){ if(!F.letter){ F.letter=1; give('letter'); sfx('pick'); say(['Κουνιέται. Δεν την αγγίζει κανείς.','Τη σταματάω με το χέρι. Είναι ζεστή.','Κάτω από το μαξιλάρι, ένας φάκελος: «Σε όποιον έρθει να με μετρήσει».']); } else say(['Ξανακουνιέται. Την αφήνω.']); }},
-    {id:'window',n:'Παράθυρο',rect:[134,34,52,56],at:[160,130],face:'back',look:['Από εδώ φαίνεται η στάση του τρένου. Το φως της είναι ακόμα αναμμένο.']},
-    {id:'dresser',n:'Συρταριέρα',rect:[194,38,44,54],at:[216,130],face:'back',look:['Μια συρταριέρα με ένα μουσικό κουτί από πάνω.'],hand(){ sfx('musicbox'); say(['Ένα μουσικό κουτί. Παίζει έναν σκοπό που δεν ξέρω.','Κι όμως, τον θυμάμαι.']); }},
-    {id:'desk',n:'Γραφειάκι',rect:[246,98,52,56],at:[262,162],face:'right',look(){ say(F.letter?['Εδώ θα συμπληρώσω την απογραφή. Χρειάζομαι το έντυπο.']:['Ένα μικρό γραφείο με λάμπα. Εδώ θα συμπληρώσω την απογραφή.','Πρώτα να ελέγξω όλο το δωμάτιο.']); }, hand(){ this.look(); },
-      item(i){ if(i==='form'){ if(!F.letter){ say(['Πρώτα να ελέγξω όλο το δωμάτιο.']); return true; } finalChoice(); return true; } if(i==='letter'){ say(['Το διαβάζω ξανά. Τα γράμματα τρέμουν προς το τέλος.']); return true; } }},
+    {id:'out',n:'Έξω',rect:[6,60,34,116],at:[30,160],face:'left',act(){ if(F.revealed&&!F.friend) return say(['Όχι τώρα! Πρέπει να βοηθήσουμε τη γιαγιά!']); go('outside','bedroom'); }},
+    {id:'wardrobe',n:'Ντουλάπα',rect:[56,60,58,90],at:[100,156],face:'back',act(){
+      if(F.granOut) return say(['Γιαγιά: «Τι καλά που ήρθες, κοριτσάκι μου!»']);
+      if(!F.woodIn) return say(['Η ντουλάπα τρέμει λίγο… και ακούγεται ένα σιγανό «σσσς!»','Ποιος να είναι μέσα;']);
+      F.granOut=1; star('gran'); sfx('yay'); say(['Η Κοκκινοσκουφίτσα ανοίγει τη ντουλάπα…','Γιαγιά: «Εδώ είμαι! Κρύφτηκα από τον λύκο!»','Κοκκινοσκουφίτσα: «Γιαγιά μου!»','Γιαγιά και εγγονούλα αγκαλιάζονται σφιχτά.']); },
+      item(i){ if(i==='flowers'&&F.granOut){ take('flowers'); sfx('yay'); say(['Γιαγιά: «Λουλούδια για μένα; Τι όμορφα! Σ’ ευχαριστώ, χρυσό μου!»']); return true; } }},
+    {id:'bed',n:'Γιαγιά;',rect:()=>F.revealed?npcRect(S.party?200:238,150,scl(150)):[180,96,76,48],at:[196,154],face:'right',act(){
+      if(!F.revealed) return askWolf();
+      if(F.friend) return say(['Λύκος: «Ευχαριστώ για τα κουλουράκια! Είναι τα καλύτερα του κόσμου!»']);
+      if(!F.woodIn) return say(['Ο λύκος γλείφεται και κοιτάζει το καλάθι.','Ποιος μπορεί να μας βοηθήσει; Τι μας έδωσε ο ξυλοκόπος;']);
+      if(!F.granOut) return say(['Λύκος: «Συγγνώμη… Δεν θα κάνω πια σκανταλιές.»','Πού να είναι άραγε η γιαγιά; Ακούω κάτι μέσα στη ντουλάπα!']);
+      say(['Λύκος: «Πεινάω τόσο πολύ… Από χθες δεν έχω φάει τίποτα.»','Μήπως έχουμε κάτι νόστιμο στο καλάθι για τον λύκο;']); },
+      item(i){ if(!F.revealed) return false;
+        if(i==='cookies'||i==='berries'){ if(!F.woodIn||!F.granOut){ say(['Πρώτα ας βρούμε τη γιαγιά!']); return true; }
+          if(i==='berries'){ take('berries'); say(['Λύκος: «Μμμ, φραουλίτσες! Νόστιμες! Αλλά… μήπως έχεις και κουλουράκια;»']); return true; }
+          take('cookies'); F.friend=1; star('friend'); finale(); return true; }
+        if(i==='basket'){ say(['Η μηλόπιτα είναι για τη γιαγιά! Μήπως έχουμε κάτι άλλο για τον λύκο;']); return true; } }},
+    {id:'window',n:'Παράθυρο',rect:[146,36,44,34],at:[168,134],face:'back',act(){ say(['Από το παράθυρο φαίνεται το δάσος και ο ήλιος που λάμπει.']); }},
+    {id:'lamp',n:'Λαμπίτσα',rect:[250,68,28,46],at:[262,146],face:'right',act(){ say(['Μια μικρή λάμπα σκορπάει ζεστό φως στο δωμάτιο.']); }},
   ],
-  entries:{hall:[30,166,'side',1]},
-  onEnter(){ if(!F.bdSeen){ F.bdSeen=1; say(['Η πολυθρόνα κουνιέται.','Το παράθυρο είναι κλειστό.']); } } };
-function finalChoice(){
-  say(['Γράφω. Καναπές. Δύο πολυθρόνες. Σερβίτσιο πορσελάνης. Βάζα με γλυκό: πενήντα δύο.','Εκκρεμές ρολόι, σε λειτουργία. Μόνο αυτό αξίζει όσο το μισό σπίτι.','Από κάτω ακούγεται το τικ-τακ. Σαν να περιμένει τι θα γράψω.'],()=>
-    choose('Τι γράφω για το ρολόι;',[{t:'«Σε λειτουργία». Υπογράφω.',f:()=>ending('a')},{t:'Κατεβαίνω να το σταματήσω στις 3:17.',f:()=>ending('b')}])); }
-const ENDINGS={ a:{h:'Πρώτο τέλος · Η απογραφή',p:['Το ρολόι φορτώθηκε σε ένα φορτηγάκι του Δημοσίου μαζί με άλλα διακόσια δεκατρία αντικείμενα. Χτυπούσε σε όλη τη διαδρομή.','Τον Μάρτιο πήρα προαγωγή.','Ξυπνάω κάθε βράδυ στις 3:17 και ακούω ένα τικ-τακ στο χολ μου.','Δεν έχω ρολόι στο χολ μου.']},
-  b:{h:'Δεύτερο τέλος · Τρεις και δεκαεφτά',p:['Άνοιξα το γυάλινο πορτάκι και σταμάτησα το εκκρεμές με δύο δάχτυλα. Γύρισα τους δείκτες πίσω: τρεις και δεκαεφτά.','Η βροχή σταμάτησε. Από πάνω, η πολυθρόνα έτριξε μια τελευταία φορά, και ησύχασε.','Στο έντυπο έγραψα: «Εκκρεμές ρολόι, μη λειτουργικό. Άνευ αξίας.»','Ήταν το μόνο ψέμα που έγραψα ποτέ σε απογραφή.']} };
-function ending(k){ S.lock=1; if(k==='b'){ S.clockRun=0; sfx('creak'); }
-  fadeTo(1,1.6,()=>{ S.mode='end'; const e=ENDINGS[k]; $('endH').textContent=tr(e.h); const box=$('endT'); box.innerHTML='';
-    e.p.forEach((t,i)=>{ const p=document.createElement('p'); p.textContent=tr(t); p.style.animationDelay=(.6+i*1.8)+'s'; box.appendChild(p); });
-    $('endB').style.animationDelay=(1+e.p.length*1.8)+'s'; $('end').hidden=false; setUI(false); clearSave(); }); }
-/* ---------- audio (all synthesised) ---------- */
-const A = { c:null, m:null, on:true,
+  entries:{outside:[34,160,'side',1]},
+  onEnter(){ if(!F.bSeen){ F.bSeen=1; say(['Το δωμάτιο της γιαγιάς. Η «γιαγιά» είναι ξαπλωμένη στο κρεβάτι, με το σκουφάκι της.','Κάτι δεν πάει καλά… Ας πλησιάσουμε!']); } } };
+function askWolf(){
+  const left=[['eyes','«Γιαγιά, τι μεγάλα μάτια που έχεις!»','Λύκος με ψιλή φωνή: «Για να σε βλέπω καλύτερα, παιδί μου!»'],['ears','«Γιαγιά, τι μεγάλα αυτιά που έχεις!»','Λύκος με ψιλή φωνή: «Για να σε ακούω καλύτερα, παιδί μου!»'],['nose','«Γιαγιά, τι μεγάλη μύτη που έχεις!»','Λύκος με ψιλή φωνή: «Για να μυρίζω καλύτερα τη μηλόπιτα, παιδί μου!»']].filter(q=>!F['q_'+q[0]]);
+  if(!left.length) return reveal();
+  choose('Τι λέει η Κοκκινοσκουφίτσα;',left.map(q=>({t:q[1],f:()=>{ F['q_'+q[0]]=1; sfx('boing'); say([(LANG==='en'?'Little Red: ':'Κοκκινοσκουφίτσα: ')+tr(q[1]),q[2]],()=>{ if(['eyes','ears','nose'].every(k=>F['q_'+k])) reveal(); else after(.3,askWolf); }); }}))); }
+function reveal(){ F.revealed=1; star('ask'); sfx('wolf'); say(['Κοκκινοσκουφίτσα: «Γιαγιά, και τι μεγάλο στόμα που έχεις!»','Λύκος: «Για να φάω… ΤΗ ΜΗΛΟΠΙΤΑ ΣΟΥ!»','Ο λύκος πετάγεται από το κρεβάτι! Δεν είναι η γιαγιά, είναι ο λύκος!','Γρήγορα! Τι μας έδωσε ο ξυλοκόπος; Διάλεξε τη σφυρίχτρα από το καλάθι!']); }
+function blowWhistle(){ sfx('whistle'); if(S.scene!=='bedroom'||!F.revealed||F.woodIn) return say(['Φιιιιιιιτ! Τι δυνατή σφυρίχτρα!']);
+  F.woodIn=1; star('wood'); say(['Φιιιιιιιτ!','Μπαμ! Η πόρτα ανοίγει και μπαίνει ο ξυλοκόπος!','Ξυλοκόπος: «Τι γίνεται εδώ, κύριε Λύκε;»','Λύκος: «Ωχ… Συγγνώμη… Απλώς πεινούσα πολύ…»','Ο λύκος μαζεύεται ντροπαλός σε μια γωνίτσα.']); }
+function finale(){ sfx('yay'); say(['Η Κοκκινοσκουφίτσα δίνει στον λύκο τα κουλουράκια.','Λύκος: «Για μένα; Κανείς δεν μου έχει φερθεί ποτέ τόσο καλά!»','Λύκος: «Συγγνώμη που σας τρόμαξα. Υπόσχομαι να είμαι καλός λύκος!»','Γιαγιά: «Ελάτε όλοι! Η μηλόπιτα είναι ζεστή. Ας φάμε όλοι μαζί!»'],()=>{
+    S.party=1; S.lock=1; S.x=176; S.y=160; S.dir='front'; music('party'); say(['Και έτσι, η γιαγιά, η Κοκκινοσκουφίτσα, ο ξυλοκόπος και ο λύκος έφαγαν μηλόπιτα και τραγούδησαν όλο το απόγευμα.'],()=>after(1.5,ending)); }); }
+function ending(){ fadeTo(1,1,()=>{ S.mode='end'; $('endStars').textContent='★'.repeat(F.stars||0)+'☆'.repeat(Math.max(0,G.maxPts-(F.stars||0))); $('end').hidden=false; setUI(false); clearSave(); S.lock=0; S.party=0; VOICE.speak(tr('Κι έζησαν αυτοί καλά κι εμείς καλύτερα!'),'narrator'); }); }
+function goal(){ const s=S.scene;
+  if(s==='home') return !F.cape?'hook':!F.basket?'mom':!F.cookies?'table':'door';
+  if(s==='meadow'){ for(let i=0;i<3;i++) if(!F['fl'+i]) return 'f'+i; if(!F.bunnyMet) return 'bunny'; if(!F.bunny) return F.carrot?'bunny':'carrot'; return 'bush'; }
+  if(s==='forest') return !F.wolfMet?'wolf':'next';
+  if(s==='outside') return !F.whistle?'wood':'door';
+  if(s==='bedroom'){ if(!F.revealed||!F.woodIn) return 'bed'; if(!F.granOut) return 'wardrobe'; return F.friend?null:'bed'; } return null; }
+const HINTS={ hook:'Ας φορέσουμε την κόκκινη κάπα! Πάτα την κρεμάστρα.', mom:'Ας μιλήσουμε με τη μαμά!', table:'Ας βάλουμε κουλουράκια στο καλάθι! Πάτα το τραπέζι.', door:'Πάμε στη γιαγιά! Πάτα την πόρτα.',
+  f0:'Ας μαζέψουμε λουλουδάκια για τη γιαγιά!', f1:'Ας μαζέψουμε λουλουδάκια για τη γιαγιά!', f2:'Ας μαζέψουμε λουλουδάκια για τη γιαγιά!', bunny:'Το λαγουδάκι είναι λυπημένο. Ας το βοηθήσουμε!', carrot:'Βλέπεις κάτι πορτοκαλί στο χώμα;', bush:'Το λαγουδάκι μάς άνοιξε δρόμο! Πάμε δεξιά!',
+  wolf:'Ας συνεχίσουμε στο μονοπάτι.', next:'Πάμε δεξιά, στο σπίτι της γιαγιάς!', wood:'Ας πούμε καλημέρα στον ξυλοκόπο!', wardrobe:'Κάτι κουνιέται μέσα στη ντουλάπα!' };
+function hintText(){ const gl=goal(); if(S.scene==='bedroom'){ if(!F.revealed) return 'Ας πλησιάσουμε τη «γιαγιά» στο κρεβάτι.'; if(!F.woodIn) return has('whistle')?'Διάλεξε τη σφυρίχτρα από το καλάθι και πάτα τον λύκο!':'Ας ζητήσουμε βοήθεια!'; if(F.granOut&&!F.friend) return 'Ο λύκος πεινάει. Δώσ’ του τα κουλουράκια από το καλάθι!'; }
+  return HINTS[gl]||'Πάτα όπου θέλεις να πάει η Κοκκινοσκουφίτσα!'; }
+/* ---------- speech (device text-to-speech) ---------- */
+const VOICE={ on:true, voice:null, speaking:false, list:[],
+  supported:()=>'speechSynthesis' in window && 'SpeechSynthesisUtterance' in window,
+  pick(){ if(!this.supported()) return; const vs=speechSynthesis.getVoices(); this.list=vs; const want=LANG==='en'?'en':'el';
+    const score=v=>{ const n=(v.name||'').toLowerCase(); let s=0; if(/natural|neural|premium|enhanced|wavenet/.test(n)) s+=6; if(/google/.test(n)) s+=4; if(/melina|nikos|athina|stefanos|siri/.test(n)) s+=3; if(v.localService) s+=1; if(LANG==='en'&&/en-gb/i.test(v.lang)) s+=1; return s; };
+    const c=vs.filter(v=>(v.lang||'').toLowerCase().replace('_','-').startsWith(want)).sort((a,b)=>score(b)-score(a));
+    this.voice=c[0]||null; updateVoiceNote(); },
+  speak(text,who,onend){
+    if(!this.on||!this.supported()){ onend&&onend(false); return; }
+    try{ if(speechSynthesis.speaking||speechSynthesis.pending) speechSynthesis.cancel(); }catch(e){}
+    const clean=text.replace(/[«»"“”]/g,'').replace(/…/g,', ').replace(/\s+/g,' ').trim();
+    if(!clean){ onend&&onend(false); return; }
+    const u=new SpeechSynthesisUtterance(clean);
+    u.lang=LANG==='en'?'en-GB':'el-GR'; if(this.voice) u.voice=this.voice;
+    const p=PITCH[who]||PITCH.narrator; u.pitch=p[0]; u.rate=p[1]; u.volume=1;
+    const id=++this.seq; this.speaking=true; duck(true); $('speak').classList.add('on');
+    let done=false; const t0=performance.now();
+    const fin=(ok)=>{ if(done||id!==this.seq) return; done=true; this.speaking=false; duck(false); $('speak').classList.remove('on'); onend&&onend(ok); };
+    u.onend=()=>fin(performance.now()-t0>clean.length*25); u.onerror=()=>fin(false); setTimeout(()=>fin(false),(clean.length*110)/p[1]+4000);
+    speechSynthesis.speak(u);
+    if(speechSynthesis.paused) speechSynthesis.resume(); },
+  stop(){ this.seq++; this.speaking=false; duck(false); $('speak').classList.remove('on'); try{ if(this.supported()) speechSynthesis.cancel(); }catch(e){} },
+  seq:0 };
+const PITCH={ narrator:[1.05,.9], girl:[1.45,.98], mom:[1.15,.92], wolf:[.55,.86], wolfgran:[1.35,.82], gran:[1.2,.82], bunny:[1.9,1.05], wood:[.75,.88] };
+const SPEAKERS=[
+  {re:/^(Κοκκινοσκουφίτσα|Little Red):\s*/,who:'girl',el:'Κοκκινοσκουφίτσα',en:'Little Red',c:'#e0262f'},
+  {re:/^(Μαμά|Mum):\s*/,who:'mom',el:'Μαμά',en:'Mum',c:'#3fae6e'},
+  {re:/^(Λύκος με ψιλή φωνή|Wolf, in a squeaky voice):\s*/,who:'wolfgran',el:'Λύκος',en:'Wolf',c:'#6d7787'},
+  {re:/^(Λύκος|Wolf):\s*/,who:'wolf',el:'Λύκος',en:'Wolf',c:'#6d7787'},
+  {re:/^(Γιαγιά|Grandma):\s*/,who:'gran',el:'Γιαγιά',en:'Grandma',c:'#9a5ab8'},
+  {re:/^(Λαγουδάκι|Bunny):\s*/,who:'bunny',el:'Λαγουδάκι',en:'Bunny',c:'#e07aa0'},
+  {re:/^(Ξυλοκόπος|Woodcutter):\s*/,who:'wood',el:'Ξυλοκόπος',en:'Woodcutter',c:'#7a5a2a'},
+];
+function parseLine(t){ for(const s of SPEAKERS){ const m=t.match(s.re); if(m) return {who:s.who,name:LANG==='en'?s.en:s.el,col:s.c,text:t.slice(m[0].length)}; } return {who:'narrator',name:'',col:'',text:t}; }
+function updateVoiceNote(){ const el=$('voiceNote'); if(!el) return;
+  if(!VOICE.supported()){ el.textContent=tr('Αυτή η συσκευή δεν υποστηρίζει ανάγνωση φωνής. Η ιστορία συνεχίζει με άγγιγμα.'); return; }
+  if(VOICE.voice) el.textContent=tr('Φωνή:')+' '+VOICE.voice.name+(LANG==='el'?' · '+tr('για πιο φυσική φωνή, κατέβασε τη «βελτιωμένη» ελληνική φωνή από τις ρυθμίσεις του κινητού.'):'');
+  else el.textContent=tr('Δεν βρέθηκε ελληνική φωνή. Πρόσθεσε ελληνική φωνή από τις ρυθμίσεις του κινητού (Προσβασιμότητα → Εκφώνηση).'); }
+if(VOICE.supported()){ VOICE.pick(); speechSynthesis.onvoiceschanged=()=>VOICE.pick(); }
+
+/* ---------- audio + music ---------- */
+const A={ c:null, m:null, mg:null, on:true,
   init(){ if(this.c){ if(this.c.state==='suspended') this.c.resume(); return; }
-    try{ this.c = new (window.AudioContext||window.webkitAudioContext)(); }catch(e){ return; }
-    const c=this.c; this.m=c.createGain(); this.m.gain.value=this.on?.9:0; this.m.connect(c.destination);
-    const b=c.createBuffer(1,c.sampleRate*3,c.sampleRate), d=b.getChannelData(0); for(let i=0;i<d.length;i++) d[i]=Math.random()*2-1; this.nb=b;
-    const s=c.createBufferSource(); s.buffer=b; s.loop=true; this.rf=c.createBiquadFilter(); this.rf.type='lowpass'; this.rf.frequency.value=1800; this.rg=c.createGain(); this.rg.gain.value=0;
-    s.connect(this.rf); this.rf.connect(this.rg); this.rg.connect(this.m); s.start();
-    this.dl=c.createBiquadFilter(); this.dl.type='lowpass'; this.dl.frequency.value=170; this.dl.Q.value=5; this.dg=c.createGain(); this.dg.gain.value=0;
-    [55,55.5,82.6].forEach(f=>{ const o=c.createOscillator(); o.type='sawtooth'; o.frequency.value=f; o.connect(this.dl); o.start(); });
-    const lfo=c.createOscillator(), lgn=c.createGain(); lfo.frequency.value=.06; lgn.gain.value=80; lfo.connect(lgn); lgn.connect(this.dl.frequency); lfo.start();
-    this.dl.connect(this.dg); this.dg.connect(this.m); this.amb(); },
-  amb(){ if(!this.c) return; const s=SC[S.scene], t=this.c.currentTime;
-    const rain = S.mode==='title'||s.outdoor ? .085 : s.storm ? .03 : .004, cut = s.outdoor||S.mode==='title' ? 2400 : 480;
-    this.rg.gain.setTargetAtTime(s.dream?0:rain,t,.6); this.rf.frequency.setTargetAtTime(cut,t,.6);
-    this.dg.gain.setTargetAtTime(s.dream?.11:s.id==='basement'?.08:.045,t,1); this.dl.frequency.setTargetAtTime(s.dream?110:170,t,1); },
-  setOn(v){ this.on=v; if(this.m) this.m.gain.setTargetAtTime(v?.9:0,this.c.currentTime,.05); },
+    try{ this.c=new (window.AudioContext||window.webkitAudioContext)(); }catch(e){ return; }
+    const c=this.c; this.m=c.createGain(); this.m.gain.value=this.on?.8:0; this.m.connect(c.destination);
+    this.mg=c.createGain(); this.mg.gain.value=1; this.mg.connect(this.m);
+    const b=c.createBuffer(1,c.sampleRate*2,c.sampleRate), d=b.getChannelData(0); for(let i=0;i<d.length;i++) d[i]=Math.random()*2-1; this.nb=b; },
+  amb(){},
+  setOn(v){ this.on=v; if(this.m) this.m.gain.setTargetAtTime(v?.8:0,this.c.currentTime,.05); },
   tone(f,dur,o={}){ const c=this.c; if(!c) return; const t=c.currentTime+(o.at||0), osc=c.createOscillator(), g=c.createGain();
-    osc.type=o.type||'sine'; osc.frequency.setValueAtTime(f,t); if(o.f2) osc.frequency.exponentialRampToValueAtTime(o.f2,t+dur);
-    g.gain.setValueAtTime(.0001,t); g.gain.exponentialRampToValueAtTime(o.vol||.1,t+(o.att||.005)); g.gain.exponentialRampToValueAtTime(.0001,t+dur);
-    osc.connect(g); g.connect(this.m); osc.start(t); osc.stop(t+dur+.05); },
+    osc.type=o.type||'triangle'; osc.frequency.setValueAtTime(f,t); if(o.f2) osc.frequency.exponentialRampToValueAtTime(o.f2,t+dur);
+    g.gain.setValueAtTime(.0001,t); g.gain.exponentialRampToValueAtTime(o.vol||.05,t+(o.att||.01)); g.gain.exponentialRampToValueAtTime(.0001,t+dur);
+    osc.connect(g); g.connect(o.mus?this.mg:this.m); osc.start(t); osc.stop(t+dur+.05); },
   noise(dur,o={}){ const c=this.c; if(!c) return; const t=c.currentTime+(o.at||0), s=c.createBufferSource(), f=c.createBiquadFilter(), g=c.createGain();
     s.buffer=this.nb; f.type=o.ft||'lowpass'; f.frequency.setValueAtTime(o.ff||1000,t); if(o.ff2) f.frequency.exponentialRampToValueAtTime(o.ff2,t+dur); f.Q.value=o.q||1;
     g.gain.setValueAtTime(.0001,t); g.gain.exponentialRampToValueAtTime(o.vol||.1,t+(o.att||.003)); g.gain.exponentialRampToValueAtTime(.0001,t+dur);
-    s.connect(f); f.connect(g); g.connect(this.m); s.start(t, Math.random()*Math.max(0,2.8-dur)); s.stop(t+dur+.05); }
+    s.connect(f); f.connect(g); g.connect(this.m); s.start(t,Math.random()*Math.max(0,1.8-dur)); s.stop(t+dur+.05); } };
+function duck(on){ if(A.mg) A.mg.gain.setTargetAtTime(on?.3:1,A.c.currentTime,.15); }
+const mf=m=>440*Math.pow(2,(m-69)/12);
+const SONGS={
+  walk:{ step:.26, mel:[72,0,74,76,79,0,76,0,74,0,72,74,76,0,0,0,72,0,74,76,79,0,81,79,77,76,74,0,72,0,0,0], bass:[48,0,0,0,55,0,0,0,53,0,0,0,55,0,0,0,48,0,0,0,57,0,0,0,53,0,55,0,48,0,0,0] },
+  house:{ step:.3, mel:[67,0,72,0,71,0,69,0,67,0,0,0,64,0,0,0,65,0,69,0,67,0,65,0,64,0,0,0,62,0,0,0], bass:[48,0,0,0,52,0,0,0,53,0,0,0,48,0,0,0,50,0,0,0,53,0,0,0,48,0,0,0,43,0,0,0] },
+  party:{ step:.16, mel:[72,76,79,76,72,76,79,84,81,77,74,77,81,77,74,71,72,76,79,76,72,76,79,84,79,77,76,74,72,0,72,0], bass:[48,0,55,0,48,0,55,0,53,0,57,0,50,0,55,0,48,0,55,0,48,0,55,0,55,0,53,0,48,0,48,0] },
 };
+const MU={ song:null, i:0, next:0 };
+function music(name){ if(MU.name===name) return; MU.name=name; MU.song=name?SONGS[name]:null; MU.i=0; MU.next=0; }
+function musicTick(dt){ if(!MU.song||!A.c||!A.on) return; MU.next-=dt; if(MU.next>0) return; const s=MU.song; MU.next+=s.step; if(MU.next<-.3) MU.next=0;
+  const i=MU.i%s.mel.length, m=s.mel[i], b=s.bass[i];
+  if(m) A.tone(mf(m),s.step*2.2,{type:'triangle',vol:.035,mus:1}); if(m&&i%4===0) A.tone(mf(m+12),.25,{type:'sine',vol:.012,mus:1});
+  if(b) A.tone(mf(b),s.step*3,{type:'sine',vol:.06,mus:1}); MU.i++; }
 function sfx(n){ if(!A.c||!A.on) return;
   switch(n){
-    case 'step': SC[S.scene].outdoor ? A.noise(.09,{ff:1400,vol:.07,ft:'bandpass',q:.8}) : A.noise(.07,{ff:420,vol:.11,ft:'bandpass',q:1.2}); break;
-    case 'pick': A.tone(523,.35,{vol:.05,type:'triangle'}); A.tone(784,.6,{vol:.04,type:'triangle',at:.09}); break;
-    case 'unlock': A.noise(.05,{ff:3000,ft:'highpass',vol:.2}); A.tone(90,.25,{vol:.15,at:.06}); A.noise(.06,{ff:2400,ft:'highpass',vol:.15,at:.18}); break;
-    case 'door': A.tone(140,.7,{type:'sawtooth',f2:70,vol:.025,att:.1}); A.noise(.6,{ft:'bandpass',ff:700,ff2:300,q:6,vol:.06,att:.1}); break;
-    case 'tick': A.noise(.03,{ft:'highpass',ff:3500,vol:.06}); A.tone(1900,.04,{vol:.025}); break;
-    case 'tickLoud': A.noise(.04,{ft:'highpass',ff:2500,vol:.14}); A.tone(1500,.06,{vol:.05}); break;
-    case 'heart': A.tone(58,.18,{vol:.35,f2:40}); A.tone(52,.2,{vol:.28,f2:38,at:.22}); break;
-    case 'sting': [61,65,92,98].forEach((f,i)=>A.tone(f*4,1.6,{type:'sawtooth',vol:.025,att:.01,f2:f*3.6})); A.noise(1.2,{ff:3000,ff2:200,vol:.12}); A.tone(45,1.4,{vol:.3,f2:30}); break;
-    case 'thunder': A.noise(2.6,{ff:380,ff2:60,vol:.35,att:.08}); A.noise(.4,{ff:1200,vol:.08}); break;
-    case 'creak': A.tone(210,.5,{type:'sawtooth',f2:160,vol:.012,att:.15}); A.noise(.4,{ft:'bandpass',ff:900,q:9,vol:.03,att:.15}); break;
-    case 'musicbox': [76,79,83,81,79,76,74,76,71].forEach((m,i)=>A.tone(440*Math.pow(2,(m-69)/12),.9,{type:'triangle',vol:.05,at:i*.36})); break;
+    case 'step': A.tone(rand(200,260),.05,{type:'sine',vol:.03}); break;
+    case 'star': [79,84,88,91].forEach((m,i)=>A.tone(mf(m),.25,{type:'sine',vol:.06,at:i*.07})); break;
+    case 'pop': A.tone(500,.12,{type:'sine',f2:1100,vol:.08}); break;
+    case 'yay': [72,76,79,84].forEach((m,i)=>A.tone(mf(m),.3,{type:'triangle',vol:.06,at:i*.1})); break;
+    case 'meow': A.tone(700,.4,{type:'sine',f2:500,vol:.05,att:.08}); break;
+    case 'wolf': A.tone(220,.9,{type:'sawtooth',f2:420,vol:.025,att:.2}); A.tone(420,.5,{type:'sine',f2:300,vol:.04,at:.7}); break;
+    case 'knock': for(let i=0;i<3;i++) A.noise(.08,{ff:300,vol:.3,at:i*.22}); break;
+    case 'whistle': A.tone(2000,.9,{type:'sine',f2:2300,vol:.06,att:.03}); break;
+    case 'splash': A.noise(.5,{ft:'bandpass',ff:1500,q:.7,vol:.12}); break;
+    case 'cluck': for(let i=0;i<3;i++) A.tone(800,.06,{type:'square',f2:500,vol:.03,at:i*.15}); break;
+    case 'boing': A.tone(180,.35,{type:'sine',f2:520,vol:.07}); break;
+    case 'door': A.tone(300,.2,{type:'triangle',f2:200,vol:.05}); break;
+    case 'tap': A.tone(880,.05,{type:'sine',vol:.03}); break;
   } }
 
+/* ---------- basket ---------- */
+const basketEl=$('basket');
+function renderBasket(){ basketEl.innerHTML='';
+  S.inv.forEach(id=>{ const b=document.createElement('button'); b.className='it'+(S.sel===id?' on':''); b.setAttribute('aria-label',tr(ITEMS[id].n)); b.appendChild(iconCanvas(id));
+    b.addEventListener('pointerdown',e=>{ e.stopPropagation(); e.preventDefault(); A.init(); if(D.active) return;
+      if(S.sel===id){ S.sel=null; renderBasket(); return; }
+      S.sel=id; sfx('tap'); renderBasket();
+      if(id==='whistle'&&!(S.scene==='bedroom'&&F.revealed&&!F.woodIn)) { VOICE.speak(tr(ITEMS[id].n),'narrator'); return; }
+      if(id==='whistle'){ S.sel=null; renderBasket(); blowWhistle(); return; }
+      VOICE.speak(tr(ITEMS[id].n)+'. '+tr(ITEMS[id].d),'narrator'); });
+    basketEl.appendChild(b); }); }
+
+
+function setVoice(on){ VOICE.on=on; if(!on) VOICE.stop(); document.querySelectorAll('#vRow button[data-v]').forEach(b=>b.setAttribute('aria-pressed',String((b.dataset.v==='1')===on))); savePrefs(); }
+document.querySelectorAll('#vRow button[data-v]').forEach(b=>b.addEventListener('click',e=>{ e.stopPropagation(); setVoice(b.dataset.v==='1'); }));
+$('vTest').addEventListener('click',e=>{ e.stopPropagation(); VOICE.pick(); if(!VOICE.on) setVoice(true); VOICE.speak(tr('Γεια σου! Εγώ είμαι η φωνή που θα σου διαβάζει το παραμύθι.'),'narrator'); });
+$('bSay').addEventListener('click',e=>{ e.stopPropagation(); A.init(); if(D.active&&D.line){ VOICE.speak(D.opts?D.text:D.line.text,D.opts?'narrator':D.line.who); return; } if(S.mode==='play') say([hintText()]); });
+$('bSet').addEventListener('click',e=>{ e.stopPropagation(); A.init(); VOICE.stop(); updateVoiceNote(); openSettings(); });
 /* ---------- walk grid + A* pathfinding ---------- */
 const CELL=4;
 function buildGrid(s){ const gw=Math.ceil(s.w/CELL), gh=Math.ceil(H/CELL), m=new Uint8Array(gw*gh);
@@ -876,6 +932,7 @@ function doVerb(h,v){
   if(v==='hand'&&h.exit) return h.exit();
   say(DEF[v]||DEF.look); }
 function clickAt(sx,sy,touch){
+  if(G.smart) return G.smart(sx,sy,touch);
   if(!$('settings').hidden) return;
   if(D.active){ if(!D.opts) advance(); return; }
   if(S.mode!=='play'||S.lock||S.trans) return;
@@ -914,8 +971,8 @@ function drawCursor(g,x,y){ const c=CUR.getContext('2d'); c.clearRect(0,0,16,16)
 const invEl=$('inv'), slotsEl=$('slots'), capEl=$('invCap');
 function renderInv(){ slotsEl.innerHTML='';
   S.inv.forEach(id=>{ const b=document.createElement('button'); b.className='slot'+(S.sel===id?' on':''); b.setAttribute('aria-label',tr(ITEMS[id].n)); b.appendChild(iconCanvas(id)); b.addEventListener('click',e=>{ e.stopPropagation(); invTap(id); }); slotsEl.appendChild(b); });
-  $('bExam').disabled=!S.sel; updItemBtn(); }
-function updItemBtn(){ const c=$('vItem'); const g=c.getContext('2d'); g.clearRect(0,0,16,16); if(S.sel){ g.save(); g.translate(2,2); ICON[S.sel](g); g.restore(); } $('vItemB').disabled=!S.sel; }
+  $('bExam').disabled=!S.sel; updItemBtn(); if(G.onInv) G.onInv(); }
+function updItemBtn(){ const c=$('vItem'); if(!c) return; const g=c.getContext('2d'); g.clearRect(0,0,16,16); if(S.sel){ g.save(); g.translate(2,2); ICON[S.sel](g); g.restore(); } $('vItemB').disabled=!S.sel; }
 function setSel(id){ S.sel=id; updItemBtn(); if(id) setVerb('item'); else if(S.verb==='item') setVerb('walk'); }
 function invTap(id){ A.init();
   if(S.sel&&S.sel!==id){ const r=RECIPES[rkey(S.sel,id)];
@@ -964,13 +1021,20 @@ function composite(dt,cam,lights,dark){
 /* ---------- dialogue ---------- */
 const D={ q:[], cb:null, text:'', shown:0, active:false, opts:null };
 const dlgEl=$('dlg'), dlgText=$('dlgText'), dlgOpts=$('dlgOpts'), moreEl=$('more');
+function ptSet(l){ return l; }
+const whoEl=$('who'); Object.assign(D,{line:null,auto:0});
+function say(lines,cb){ if(typeof lines==='string') lines=[lines]; D.q=lines.map(tr); D.cb=cb||null; D.active=true; D.opts=null; S.idle=0; nextLine(); }
+function nextLine(){ D.auto=0;
+  if(!D.q.length){ D.active=false; dlgEl.hidden=true; VOICE.stop(); const cb=D.cb; D.cb=null; if(cb) cb(); return; }
+  const p=parseLine(D.q.shift()); D.line=p; D.text=p.text; D.shown=0; dlgText.textContent=''; dlgOpts.innerHTML=''; dlgEl.hidden=false;
+  whoEl.textContent=p.name; whoEl.style.background=p.col; moreEl.style.visibility='hidden';
+  const my=D.text; VOICE.speak(p.text,p.who,(ok)=>{ if(ok&&D.active&&!D.opts&&D.text===my) D.auto=.7; }); }
+function advance(){ if(!D.active||D.opts) return; if(D.shown<D.text.length){ D.shown=D.text.length; dlgText.textContent=D.text; return; } VOICE.stop(); nextLine(); }
+function choose(prompt,opts){ prompt=tr(prompt); D.active=true; D.text=prompt; D.shown=prompt.length; D.opts=opts; D.q=[]; D.auto=0; whoEl.textContent=''; dlgText.textContent=prompt; dlgOpts.innerHTML=''; dlgEl.hidden=false; moreEl.style.visibility='hidden';
+  VOICE.speak(prompt,'narrator');
+  opts.forEach(o=>{ const b=document.createElement('button'); b.textContent=tr(o.t); b.addEventListener('click',e=>{ e.stopPropagation(); VOICE.stop(); D.opts=null; D.active=false; dlgEl.hidden=true; dlgOpts.innerHTML=''; o.f(); }); dlgOpts.appendChild(b); }); }
+let spT=0; function sparkle(t){ const el=$('sparkle'); el.textContent=t; el.classList.add('show'); clearTimeout(spT); spT=setTimeout(()=>el.classList.remove('show'),900); }
 
-function say(lines,cb){ if(typeof lines==='string') lines=[lines]; D.q=lines.map(tr); D.cb=cb||null; D.active=true; D.opts=null; nextLine(); }
-function nextLine(){ if(!D.q.length){ D.active=false; dlgEl.hidden=true; const cb=D.cb; D.cb=null; if(cb) cb(); return; }
-  D.text=ptSet(D.q.shift()); D.shown=0; dlgText.textContent=''; dlgOpts.innerHTML=''; dlgEl.hidden=false; moreEl.style.visibility='hidden'; }
-function advance(){ if(!D.active||D.opts) return; if(D.shown<D.text.length){ D.shown=D.text.length; dlgText.textContent=D.text; } else nextLine(); }
-function choose(prompt,opts){ prompt=tr(prompt); ptSet(null); D.active=true; D.text=prompt; D.shown=prompt.length; D.opts=opts; D.q=[]; dlgText.textContent=prompt; dlgOpts.innerHTML=''; dlgEl.hidden=false; moreEl.style.visibility='hidden';
-  opts.forEach(o=>{ const b=document.createElement('button'); b.textContent=tr(o.t); b.addEventListener('click',e=>{ e.stopPropagation(); D.opts=null; D.active=false; dlgEl.hidden=true; dlgOpts.innerHTML=''; o.f(); }); dlgOpts.appendChild(b); }); }
 let whT=0; function whisper(t){ const el=$('whisper'); el.textContent=tr(t); el.classList.add('show'); clearTimeout(whT); whT=setTimeout(()=>el.classList.remove('show'),1700); }
 let tipT=0; function tip(t,ms){ const el=$('tip'); el.textContent=tr(t); el.classList.add('show'); clearTimeout(tipT); tipT=setTimeout(()=>el.classList.remove('show'),ms||6000); }
 
@@ -1105,6 +1169,7 @@ fit(); toTitle(); requestAnimationFrame(loop);
 
 
 
+
 <script id="gfx">
 /* ===== GFX+ — engine-independent graphics pack =====
    Works on any of our builds (needs: render(), a composite*() HD pass, SC[*].img backgrounds, S.cam, cv, octx, OW/OH).
@@ -1121,7 +1186,7 @@ fit(); toTitle(); requestAnimationFrame(loop);
   const FULL=()=>typeof FXFULL==='undefined'?true:FXFULL;
   const blue=(r,g,b)=>b>165&&b-r>55&&g-r>18;
   function build(s,id){ const src=s.img; if(!src||!src.getContext) return {none:true,src}; const w=src.width, h=src.height, d=src.getContext('2d').getImageData(0,0,w,h).data;
-    const lim=typeof s.gy==='number'?s.gy:typeof s.far==='number'?s.far-2:140, band=Math.max(0,Math.min(h,140,lim));
+    const lim=typeof s.skyMax==='number'?s.skyMax:typeof s.gy==='number'?s.gy:typeof s.far==='number'?s.far-2:140, band=Math.max(0,Math.min(h,140,lim));
     const reg=new Uint8Array(w*h), dist=(i,c)=>Math.abs(d[i]-c[0])+Math.abs(d[i+1]-c[1])+Math.abs(d[i+2]-c[2]);
     const rowTop=y=>{ const m={}; for(let x=0;x<w;x++){ const i=(y*w+x)*4, k=d[i]<<16|d[i+1]<<8|d[i+2]; m[k]=(m[k]||0)+1; } return Object.entries(m).sort((a,b)=>b[1]-a[1]).slice(0,2).map(([k,n])=>[[k>>16&255,k>>8&255,k&255],n/w]); };
     let skyBot=-1, lum=0, ln=0;
@@ -1158,7 +1223,8 @@ fit(); toTitle(); requestAnimationFrame(loop);
       let r=b[i]*k, g=b[i+1]*k, bl=b[i+2]*k; if(w>.86&&((x*7+y*13)&3)===0){ r=g=bl=255; } fd[i]=r; fd[i+1]=g; fd[i+2]=bl; }
     L2.fg.putImageData(L2.fid,0,0,0,L2.seaTop,L2.w,span); }
   function idOf(s){ if(s.id) return s.id; for(const k in SC) if(SC[k]===s) return s.id=k; return 'x'; }
-  function compose(s,dt){ const id=idOf(s); let L2=GX.st[id];
+  const usesFlags=()=>{ if(GX._uf===undefined){ GX._uf=false; for(const k in SC) if(SC[k].outdoor!==undefined) GX._uf=true; } return GX._uf; };
+  function compose(s,dt){ const id=idOf(s); if(s.gfx===false||(usesFlags()&&!s.outdoor)) return; let L2=GX.st[id];
     if(!L2||(s.img!==L2.out&&s.img!==L2.src)) L2=GX.st[id]=build(s,id);
     if(L2.none){ return; } if(!GX.on){ if(s.img===L2.out) s.img=L2.src; return; }
     const g=L2.out.getContext('2d'), cam=S.cam, w=L2.w; g.imageSmoothingEnabled=false;
@@ -1176,7 +1242,9 @@ fit(); toTitle(); requestAnimationFrame(loop);
   function post(){ if(typeof octx==='undefined') return; const s=SC[S.scene]||{}, L2=GX.st[idOf(s)]||{};
     if(GX.on){ octx.save(); octx.setTransform(1,0,0,1,0,0);
       if(GX.lvl>1){ bg.globalCompositeOperation='source-over'; bg.globalAlpha=1; bg.imageSmoothingEnabled=true; bg.drawImage(cv,0,0,80,45); bg.globalCompositeOperation='multiply'; bg.drawImage(bl,0,0); bg.drawImage(bl,0,0); bg.drawImage(bl,0,0);
-        const str=/disco/.test(S.scene)?.65:(s.night||s.dark||(L2.none&&L2.lum<70&&!L2.indoor))?.45:s.underwater?.35:L2.none?.28:.2; octx.globalCompositeOperation='lighter'; octx.globalAlpha=str; octx.imageSmoothingEnabled=true; octx.drawImage(bl,0,0,OW,OH); octx.globalAlpha=1; }
+        let avg=GX.avg||.5; if(!GX._ac||T-GX._ac>.5){ GX._ac=T; try{ const d=bg.getImageData(0,0,80,45).data; let sum=0; for(let i=0;i<d.length;i+=16) sum+=d[i]+d[i+1]+d[i+2]; avg=GX.avg=sum/(d.length/16)/765; }catch(e){} }
+        const damp=Math.max(.2,Math.min(1,(1-Math.cbrt(avg))*2.2));
+        const str=damp*(/disco/.test(S.scene)?.65:(s.night||s.dark||(L2.none&&L2.lum<70&&!L2.indoor))?.45:s.underwater?.35:L2.none?.28:.2); octx.globalCompositeOperation='lighter'; octx.globalAlpha=str; octx.imageSmoothingEnabled=true; octx.drawImage(bl,0,0,OW,OH); octx.globalAlpha=1; }
       const k=OW/320; octx.setTransform(k,0,0,k,0,0); octx.globalCompositeOperation='source-over';
       if(!L2.none&&L2.seaTop>0){ const y=L2.seaTop, gr=octx.createLinearGradient(0,y-14,0,y+8); gr.addColorStop(0,'rgba(255,255,255,0)'); gr.addColorStop(.6,'rgba(255,250,240,.2)'); gr.addColorStop(1,'rgba(255,255,255,0)'); octx.fillStyle=gr; octx.fillRect(0,y-14,320,22); }
       if(GX.lvl>0&&L2.none&&L2.indoor&&!s.underwater){ octx.globalCompositeOperation='lighter'; for(let i=0;i<24;i++){ const x=(i*47+T*(3+i%4))%320, y=(i*29+Math.sin(T*.6+i)*12+T*2)%150+10, a=.2+.2*Math.sin(T*2+i); octx.fillStyle='rgba(255,240,200,'+a+')'; octx.beginPath(); octx.arc(x,y,.5+(i%3)*.25,0,7); octx.fill(); } }
@@ -1448,7 +1516,7 @@ function CS_kokkino(){ return { introMood:'tale', midMood:'tale', endMood:'tale'
     {d:5,cap:['Και ο λύκος; Έμαθε να ζητάει συγγνώμη. Και να τρώει κουλουράκια.','And the wolf? He learned to say sorry. And to eat cookies.'],low(g,t,p){ C.R(g,0,0,320,180,'#8a5a3a'); const w=Math.max(4,140*Math.min(1,p*1.6)); C.R(g,160-w/2-4,26,w+8,130,'#5a1a1a'); C.R(g,160-w/2,30,w,122,'#c8302a'); },hd(o,t,p){ if(p>.5) C.title(o,CINE.L(['Τέλος','The End']),96,18,'#ffe8b0',Math.min(1,(p-.5)*3)); }},
   ]}; }
 
-cineInstall(CS_apografi());
+cineInstall(CS_kokkino());
 })();
 </script>
 </body>

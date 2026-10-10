@@ -6,7 +6,7 @@
 <meta name="theme-color" content="#2b1d3a">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
-<title>Ο Λουκουμάς στο Αλμυρίκι v2</title>
+<title>Ο Λουκουμάς στο Αλμυρίκι · v2 (πλάγια κύλιση)</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@500;700&display=swap" rel="stylesheet">
@@ -149,6 +149,7 @@ button:focus-visible{outline:2px solid var(--pink);outline-offset:2px;}
 
 [hidden]{display:none!important;}
 </style>
+
 
 
 
@@ -1218,6 +1219,7 @@ fit(); toTitle(); requestAnimationFrame(loop);
 
 
 
+
 <script id="gfx">
 /* ===== GFX+ — engine-independent graphics pack =====
    Works on any of our builds (needs: render(), a composite*() HD pass, SC[*].img backgrounds, S.cam, cv, octx, OW/OH).
@@ -1234,7 +1236,7 @@ fit(); toTitle(); requestAnimationFrame(loop);
   const FULL=()=>typeof FXFULL==='undefined'?true:FXFULL;
   const blue=(r,g,b)=>b>165&&b-r>55&&g-r>18;
   function build(s,id){ const src=s.img; if(!src||!src.getContext) return {none:true,src}; const w=src.width, h=src.height, d=src.getContext('2d').getImageData(0,0,w,h).data;
-    const lim=typeof s.gy==='number'?s.gy:typeof s.far==='number'?s.far-2:140, band=Math.max(0,Math.min(h,140,lim));
+    const lim=typeof s.skyMax==='number'?s.skyMax:typeof s.gy==='number'?s.gy:typeof s.far==='number'?s.far-2:140, band=Math.max(0,Math.min(h,140,lim));
     const reg=new Uint8Array(w*h), dist=(i,c)=>Math.abs(d[i]-c[0])+Math.abs(d[i+1]-c[1])+Math.abs(d[i+2]-c[2]);
     const rowTop=y=>{ const m={}; for(let x=0;x<w;x++){ const i=(y*w+x)*4, k=d[i]<<16|d[i+1]<<8|d[i+2]; m[k]=(m[k]||0)+1; } return Object.entries(m).sort((a,b)=>b[1]-a[1]).slice(0,2).map(([k,n])=>[[k>>16&255,k>>8&255,k&255],n/w]); };
     let skyBot=-1, lum=0, ln=0;
@@ -1271,7 +1273,8 @@ fit(); toTitle(); requestAnimationFrame(loop);
       let r=b[i]*k, g=b[i+1]*k, bl=b[i+2]*k; if(w>.86&&((x*7+y*13)&3)===0){ r=g=bl=255; } fd[i]=r; fd[i+1]=g; fd[i+2]=bl; }
     L2.fg.putImageData(L2.fid,0,0,0,L2.seaTop,L2.w,span); }
   function idOf(s){ if(s.id) return s.id; for(const k in SC) if(SC[k]===s) return s.id=k; return 'x'; }
-  function compose(s,dt){ const id=idOf(s); let L2=GX.st[id];
+  const usesFlags=()=>{ if(GX._uf===undefined){ GX._uf=false; for(const k in SC) if(SC[k].outdoor!==undefined) GX._uf=true; } return GX._uf; };
+  function compose(s,dt){ const id=idOf(s); if(s.gfx===false||(usesFlags()&&!s.outdoor)) return; let L2=GX.st[id];
     if(!L2||(s.img!==L2.out&&s.img!==L2.src)) L2=GX.st[id]=build(s,id);
     if(L2.none){ return; } if(!GX.on){ if(s.img===L2.out) s.img=L2.src; return; }
     const g=L2.out.getContext('2d'), cam=S.cam, w=L2.w; g.imageSmoothingEnabled=false;
@@ -1289,7 +1292,9 @@ fit(); toTitle(); requestAnimationFrame(loop);
   function post(){ if(typeof octx==='undefined') return; const s=SC[S.scene]||{}, L2=GX.st[idOf(s)]||{};
     if(GX.on){ octx.save(); octx.setTransform(1,0,0,1,0,0);
       if(GX.lvl>1){ bg.globalCompositeOperation='source-over'; bg.globalAlpha=1; bg.imageSmoothingEnabled=true; bg.drawImage(cv,0,0,80,45); bg.globalCompositeOperation='multiply'; bg.drawImage(bl,0,0); bg.drawImage(bl,0,0); bg.drawImage(bl,0,0);
-        const str=/disco/.test(S.scene)?.65:(s.night||s.dark||(L2.none&&L2.lum<70&&!L2.indoor))?.45:s.underwater?.35:L2.none?.28:.2; octx.globalCompositeOperation='lighter'; octx.globalAlpha=str; octx.imageSmoothingEnabled=true; octx.drawImage(bl,0,0,OW,OH); octx.globalAlpha=1; }
+        let avg=GX.avg||.5; if(!GX._ac||T-GX._ac>.5){ GX._ac=T; try{ const d=bg.getImageData(0,0,80,45).data; let sum=0; for(let i=0;i<d.length;i+=16) sum+=d[i]+d[i+1]+d[i+2]; avg=GX.avg=sum/(d.length/16)/765; }catch(e){} }
+        const damp=Math.max(.2,Math.min(1,(1-Math.cbrt(avg))*2.2));
+        const str=damp*(/disco/.test(S.scene)?.65:(s.night||s.dark||(L2.none&&L2.lum<70&&!L2.indoor))?.45:s.underwater?.35:L2.none?.28:.2); octx.globalCompositeOperation='lighter'; octx.globalAlpha=str; octx.imageSmoothingEnabled=true; octx.drawImage(bl,0,0,OW,OH); octx.globalAlpha=1; }
       const k=OW/320; octx.setTransform(k,0,0,k,0,0); octx.globalCompositeOperation='source-over';
       if(!L2.none&&L2.seaTop>0){ const y=L2.seaTop, gr=octx.createLinearGradient(0,y-14,0,y+8); gr.addColorStop(0,'rgba(255,255,255,0)'); gr.addColorStop(.6,'rgba(255,250,240,.2)'); gr.addColorStop(1,'rgba(255,255,255,0)'); octx.fillStyle=gr; octx.fillRect(0,y-14,320,22); }
       if(GX.lvl>0&&L2.none&&L2.indoor&&!s.underwater){ octx.globalCompositeOperation='lighter'; for(let i=0;i<24;i++){ const x=(i*47+T*(3+i%4))%320, y=(i*29+Math.sin(T*.6+i)*12+T*2)%150+10, a=.2+.2*Math.sin(T*2+i); octx.fillStyle='rgba(255,240,200,'+a+')'; octx.beginPath(); octx.arc(x,y,.5+(i%3)*.25,0,7); octx.fill(); } }
