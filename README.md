@@ -30,6 +30,7 @@
 | `games/apografi_v2.html` |
 | `games/apografi_25d.html` |
 | `games/apografi_hd.html` |
+| `painted/apografi/index.html` (Painted · εικόνες στο `painted/apografi/assets/`) |
 | `games/loukoumas_almyriki_v2.html` |
 | `games/loukoumas_almyriki_25d.html` |
 | `games/loukoumas_almyriki_hd.html` |
