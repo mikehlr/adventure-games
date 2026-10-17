@@ -1,0 +1,26 @@
+{
+  "gameId": "loukoumas-almyriki-painted-v1",
+  "version": 2,
+  "payload": {
+    "state": {
+      "scene": "port",
+      "x": 230,
+      "y": 152,
+      "dir": "front",
+      "face": 1,
+      "heading": "S",
+      "cam": 70,
+      "inv": [
+        "wallet",
+        "voucher"
+      ],
+      "F": {
+        "money": 500,
+        "score": 0
+      }
+    },
+    "label": "Λιμάνι · αρχή",
+    "when": 1792005282093
+  },
+  "checksum": "330f0489"
+}

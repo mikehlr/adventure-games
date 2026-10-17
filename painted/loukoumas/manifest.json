@@ -1,0 +1,33 @@
+{
+  "title": "Ο Λουκουμάς στο Αλμυρίκι · HD Remake v6 · Island promenade",
+  "buildId": "1e5b1ca69f5ae409",
+  "source_sha256": "fec62645231d323a0141fdb1f65987533737934483678a5a39c111f106a8c102",
+  "quality_profile": "hd-25d",
+  "platform": "desktop",
+  "scenes": [
+    "port",
+    "square",
+    "beach",
+    "lobby",
+    "room",
+    "disco"
+  ],
+  "story": "unchanged source functions, dialogue, recipes and story callbacks",
+  "saveSchema": 2,
+  "manualSlots": 4,
+  "readyLocationSaves": 6,
+  "wholeBodyWalkFrames": {
+    "E": 8,
+    "SE": 8,
+    "S": 6,
+    "N": 8,
+    "NE": 8,
+    "idleE": 1,
+    "idleSE": 1,
+    "idleS": 1,
+    "idleN": 1,
+    "idleNE": 1,
+    "dance": 4
+  },
+  "renderer": "82ad48030aa6937a68ae18ac577255cc8ffd3410a1cff422381fdde80c066f9b"
+}

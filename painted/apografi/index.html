@@ -3099,7 +3099,6 @@ function pProp(g,id,x,y,w,h){const b=PBOX[id],im=pImage('props');if(!im)return;g
 function pStreet(){
  const A=HDA.street,oldBg=A.bg,oldDyn=A.dyn,oldLight=A.light;
  A.bg=function(g,w){
-  pDraw(g,'street-master',0,0,480,180);
   for(let i=0;i<4;i++){
    const im=pImage('street-'+i);if(!im)continue;
    const c=document.createElement('canvas');c.width=im.width;c.height=im.height;const q=c.getContext('2d');q.drawImage(im,0,0);

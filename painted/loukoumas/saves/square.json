@@ -1,0 +1,29 @@
+{
+  "gameId": "loukoumas-almyriki-painted-v1",
+  "version": 2,
+  "payload": {
+    "state": {
+      "scene": "square",
+      "x": 18,
+      "y": 152,
+      "dir": "side",
+      "face": 1,
+      "heading": "E",
+      "cam": 0,
+      "inv": [
+        "wallet",
+        "voucher",
+        "frappe"
+      ],
+      "F": {
+        "money": 150,
+        "score": 5,
+        "frappe": 1,
+        "p_frappe": 1
+      }
+    },
+    "label": "Πλατεία · με φραπέ",
+    "when": 1792005282098
+  },
+  "checksum": "d4a5e84e"
+}

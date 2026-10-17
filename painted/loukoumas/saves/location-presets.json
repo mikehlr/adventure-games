@@ -1,0 +1,221 @@
+[
+  {
+    "id": "port",
+    "label": [
+      "Λιμάνι · αρχή",
+      "Harbour · beginning"
+    ],
+    "state": {
+      "scene": "port",
+      "x": 230,
+      "y": 152,
+      "dir": "front",
+      "face": 1,
+      "heading": "S",
+      "cam": 70,
+      "inv": [
+        "wallet",
+        "voucher"
+      ],
+      "F": {
+        "money": 500,
+        "score": 0
+      }
+    }
+  },
+  {
+    "id": "square",
+    "label": [
+      "Πλατεία · με φραπέ",
+      "Square · with frappé"
+    ],
+    "state": {
+      "scene": "square",
+      "x": 18,
+      "y": 152,
+      "dir": "side",
+      "face": 1,
+      "heading": "E",
+      "cam": 0,
+      "inv": [
+        "wallet",
+        "voucher",
+        "frappe"
+      ],
+      "F": {
+        "money": 150,
+        "score": 5,
+        "frappe": 1,
+        "p_frappe": 1
+      }
+    }
+  },
+  {
+    "id": "beach",
+    "label": [
+      "Παραλία · πρώτη επίσκεψη",
+      "Beach · first visit"
+    ],
+    "state": {
+      "scene": "beach",
+      "x": 16,
+      "y": 152,
+      "dir": "side",
+      "face": 1,
+      "heading": "E",
+      "cam": 0,
+      "inv": [
+        "wallet",
+        "voucher",
+        "frappe",
+        "hairspray",
+        "chain"
+      ],
+      "F": {
+        "money": 0,
+        "score": 15,
+        "frappe": 1,
+        "p_frappe": 1,
+        "spray": 1,
+        "p_spray": 1,
+        "p_chain": 1
+      }
+    }
+  },
+  {
+    "id": "lobby",
+    "label": [
+      "Ρεσεψιόν · φραπές για τη Ζωζώ",
+      "Reception · coffee for Zozo"
+    ],
+    "state": {
+      "scene": "lobby",
+      "x": 58,
+      "y": 152,
+      "dir": "side",
+      "face": 1,
+      "heading": "E",
+      "cam": 0,
+      "inv": [
+        "wallet",
+        "voucher",
+        "frappe",
+        "hairspray",
+        "chain",
+        "invitation"
+      ],
+      "F": {
+        "money": 0,
+        "score": 35,
+        "frappe": 1,
+        "p_frappe": 1,
+        "spray": 1,
+        "p_spray": 1,
+        "p_chain": 1,
+        "goal": 1,
+        "p_goal": 1,
+        "knowsBurn": 1,
+        "yogurt": 1,
+        "p_yogurt": 1,
+        "inv": 1,
+        "p_inv": 1,
+        "lSeen": 1
+      }
+    }
+  },
+  {
+    "id": "room",
+    "label": [
+      "Δωμάτιο 23 · ετοιμασία",
+      "Room 23 · getting ready"
+    ],
+    "state": {
+      "scene": "room",
+      "x": 54,
+      "y": 166,
+      "dir": "side",
+      "face": 1,
+      "heading": "E",
+      "cam": 0,
+      "inv": [
+        "wallet",
+        "hairspray",
+        "chain",
+        "invitation",
+        "key",
+        "pencil"
+      ],
+      "F": {
+        "money": 0,
+        "score": 50,
+        "frappe": 1,
+        "p_frappe": 1,
+        "spray": 1,
+        "p_spray": 1,
+        "p_chain": 1,
+        "goal": 1,
+        "p_goal": 1,
+        "knowsBurn": 1,
+        "yogurt": 1,
+        "p_yogurt": 1,
+        "inv": 1,
+        "p_inv": 1,
+        "lSeen": 1,
+        "awake": 1,
+        "p_awake": 1,
+        "pencil": 1,
+        "p_pencil": 1,
+        "rSeen": 1
+      }
+    }
+  },
+  {
+    "id": "disco",
+    "label": [
+      "Ζεφύρ · η κασέτα χάλασε",
+      "Zefyr · jammed tape"
+    ],
+    "state": {
+      "scene": "disco",
+      "x": 60,
+      "y": 166,
+      "dir": "side",
+      "face": 1,
+      "heading": "E",
+      "cam": 0,
+      "inv": [
+        "wallet",
+        "chain",
+        "key",
+        "pencil"
+      ],
+      "F": {
+        "money": 0,
+        "score": 75,
+        "frappe": 1,
+        "p_frappe": 1,
+        "spray": 1,
+        "p_spray": 1,
+        "p_chain": 1,
+        "goal": 1,
+        "p_goal": 1,
+        "knowsBurn": 1,
+        "yogurt": 1,
+        "p_yogurt": 1,
+        "inv": 1,
+        "p_inv": 1,
+        "lSeen": 1,
+        "awake": 1,
+        "p_awake": 1,
+        "pencil": 1,
+        "p_pencil": 1,
+        "rSeen": 1,
+        "hair": 1,
+        "p_hair": 1,
+        "p_in": 1,
+        "__cm": 1,
+        "jam": 1
+      }
+    }
+  }
+]

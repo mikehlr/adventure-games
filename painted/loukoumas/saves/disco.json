@@ -1,0 +1,51 @@
+{
+  "gameId": "loukoumas-almyriki-painted-v1",
+  "version": 2,
+  "payload": {
+    "state": {
+      "scene": "disco",
+      "x": 60,
+      "y": 166,
+      "dir": "side",
+      "face": 1,
+      "heading": "E",
+      "cam": 0,
+      "inv": [
+        "wallet",
+        "chain",
+        "key",
+        "pencil"
+      ],
+      "F": {
+        "money": 0,
+        "score": 75,
+        "frappe": 1,
+        "p_frappe": 1,
+        "spray": 1,
+        "p_spray": 1,
+        "p_chain": 1,
+        "goal": 1,
+        "p_goal": 1,
+        "knowsBurn": 1,
+        "yogurt": 1,
+        "p_yogurt": 1,
+        "inv": 1,
+        "p_inv": 1,
+        "lSeen": 1,
+        "awake": 1,
+        "p_awake": 1,
+        "pencil": 1,
+        "p_pencil": 1,
+        "rSeen": 1,
+        "hair": 1,
+        "p_hair": 1,
+        "p_in": 1,
+        "__cm": 1,
+        "jam": 1
+      }
+    },
+    "label": "Ζεφύρ · η κασέτα χάλασε",
+    "when": 1792005282109
+  },
+  "checksum": "15b5e3b3"
+}

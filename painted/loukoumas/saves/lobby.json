@@ -1,0 +1,43 @@
+{
+  "gameId": "loukoumas-almyriki-painted-v1",
+  "version": 2,
+  "payload": {
+    "state": {
+      "scene": "lobby",
+      "x": 58,
+      "y": 152,
+      "dir": "side",
+      "face": 1,
+      "heading": "E",
+      "cam": 0,
+      "inv": [
+        "wallet",
+        "voucher",
+        "frappe",
+        "hairspray",
+        "chain",
+        "invitation"
+      ],
+      "F": {
+        "money": 0,
+        "score": 35,
+        "frappe": 1,
+        "p_frappe": 1,
+        "spray": 1,
+        "p_spray": 1,
+        "p_chain": 1,
+        "goal": 1,
+        "p_goal": 1,
+        "knowsBurn": 1,
+        "yogurt": 1,
+        "p_yogurt": 1,
+        "inv": 1,
+        "p_inv": 1,
+        "lSeen": 1
+      }
+    },
+    "label": "Ρεσεψιόν · φραπές για τη Ζωζώ",
+    "when": 1792005282103
+  },
+  "checksum": "d2de5d64"
+}

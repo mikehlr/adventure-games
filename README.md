@@ -34,6 +34,7 @@
 | `games/loukoumas_almyriki_v2.html` |
 | `games/loukoumas_almyriki_25d.html` |
 | `games/loukoumas_almyriki_hd.html` |
+| `painted/loukoumas/index.html` (Painted · εικόνες στο `painted/loukoumas/assets/`) |
 | `games/peripoliko7_v2.html` |
 | `games/peripoliko7_25d.html` |
 | `games/kokkinoskoufitsa_v2.html` |

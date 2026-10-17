@@ -1,0 +1,34 @@
+{
+  "gameId": "loukoumas-almyriki-painted-v1",
+  "version": 2,
+  "payload": {
+    "state": {
+      "scene": "beach",
+      "x": 16,
+      "y": 152,
+      "dir": "side",
+      "face": 1,
+      "heading": "E",
+      "cam": 0,
+      "inv": [
+        "wallet",
+        "voucher",
+        "frappe",
+        "hairspray",
+        "chain"
+      ],
+      "F": {
+        "money": 0,
+        "score": 15,
+        "frappe": 1,
+        "p_frappe": 1,
+        "spray": 1,
+        "p_spray": 1,
+        "p_chain": 1
+      }
+    },
+    "label": "Παραλία · πρώτη επίσκεψη",
+    "when": 1792005282101
+  },
+  "checksum": "f952f7a6"
+}

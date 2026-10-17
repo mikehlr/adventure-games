@@ -1,0 +1,152 @@
+{
+  "title": "Ο Λουκουμάς στο Αλμυρίκι · Μουσική για ένα καλοκαίρι του 1988",
+  "version": 1,
+  "direction": "Τέσσερα ορχηστρικά θέματα, με ζεστή αναλογική χροιά, μικρό σύνολο και διακριτικό χιούμορ. Η μουσική αφήνει χώρο στους διαλόγους. Οι ήχοι θάλασσας, γλάρων και συντριβανιού ανήκουν στο περιβάλλον του παιχνιδιού, όχι στη μουσική.",
+  "production": [
+    "Ξεκίνα με το θέμα του χωριού. Διάλεξε μια εκδοχή με απλό, αναγνωρίσιμο μοτίβο και χρησιμοποίησέ την ως αισθητική αναφορά για τις υπόλοιπες παραγωγές. Τα ανεξάρτητα prompts δεν εγγυώνται ίδια μελωδία.",
+    "Στόχος ανά θέμα: περίπου 90–120 δευτερόλεπτα χρήσιμης μουσικής, χωρίς φωνές. Απόφυγε τραγουδιστική δομή με έντονο ρεφρέν· προτίμησε μικρές εναλλαγές που αντέχουν στην επανάληψη.",
+    "Ζήτησε loop-friendly παραγωγή. Μετά την εξαγωγή χρειάζεται ακρόαση και επιλογή σημείων βρόχου ή μικρό crossfade· το prompt μόνο του δεν εγγυάται αόρατη ένωση.",
+    "Όταν δύο οθόνες μοιράζονται θέμα, συνέχισε το ίδιο κομμάτι χωρίς επανεκκίνηση. Σε αλλαγή θέματος προτίμησε ήπια μετάβαση 2–3 δευτερολέπτων και χαμηλότερη ένταση κάτω από τους διαλόγους.",
+    "Το παιχνίδι αναζητά τα track1.mp3 έως track4.mp3 στον φάκελο assets/music/. Όσα λείπουν αφήνουν ενεργή την αρχική συνθετική μουσική. Μετά την προσθήκη αρχείων, επίστρεψε στο παράθυρο του παιχνιδιού ή ανανέωσέ το."
+  ],
+  "tracks": [
+    {
+      "id": "village-day",
+      "title": "Αλμυρίκι, μεσημέρι",
+      "tempo": "94 BPM · D major",
+      "mood": "Φωτεινό, φιλικό, λίγο πονηρό — καλοκαιρινή βόλτα χωρίς βιασύνη.",
+      "prompt": "Instrumental exploration loop for a hand-painted point-and-click adventure on a small Greek island in summer 1988. Warm Mediterranean acoustic pop with a gentle vintage groove, 94 BPM, D major. Fingerpicked nylon-string guitar, restrained bouzouki replies, soft electric piano, rounded electric bass, brushed drums and a light shaker. A short, memorable four-note motif, playful and affectionate rather than slapstick. Sunlit harbour, whitewashed village shops, iced coffee and everyday island life. Small ensemble, warm tape colour, natural dynamics, sparse midrange and plenty of space for spoken dialogue. Gentle A/B variation, steady energy, loop-friendly open beginning and ending, no dramatic intro, no final flourish or fade-out. No vocals, choir, vocal chops, sound effects, sea recordings, seagulls, epic orchestra or exaggerated tourist folk clichés.",
+      "notes": "Το βασικό θέμα του παιχνιδιού. Το μπουζούκι κάνει μικρές απαντήσεις, δεν παίζει αδιάκοπο σόλο. Η μελωδία πρέπει να μένει ευχάριστη ακόμη και όταν ο παίκτης ψάχνει πολλή ώρα έναν γρίφο.",
+      "file": "track1.mp3"
+    },
+    {
+      "id": "beach-breeze",
+      "title": "Αρμύρα και φραπές",
+      "tempo": "82 BPM · D major",
+      "mood": "Ανάλαφρο, ονειροπόλο και χαλαρό, με μια μικρή ρομαντική νότα.",
+      "prompt": "Instrumental seaside exploration loop for a hand-painted Greek island adventure set in 1988. Relaxed Mediterranean soft pop, 82 BPM, D major. Delicate nylon-string guitar, mellow Rhodes-style electric piano, warm melodic bass, tiny hand-percussion accents and very occasional bouzouki harmonics. An understated four-note melodic idea, hummable but never insistent. Long sunny beach, striped parasols, a shy summer crush and an unhurried afternoon. Intimate small ensemble, soft analogue warmth, airy arrangement, restrained high frequencies, no huge reverb. Keep a gentle pulse and room for dialogue; no big emotional climax. Subtle A/B variation with a loop-friendly open ending, no long intro or fade-out. No vocals, vocal samples, ocean or bird recordings, dramatic strings, spa drones, modern EDM drops or cartoon comedy.",
+      "notes": "Κοινό θέμα παραλίας και τελικής καρτ ποστάλ. Στον επίλογο ακούγεται σαν ήρεμη επιστροφή στο ίδιο καλοκαίρι, όχι σαν καινούργιο τραγούδι τίτλων τέλους.",
+      "file": "track2.mp3"
+    },
+    {
+      "id": "hotel-siesta",
+      "title": "Σιέστα στον Παράδεισο",
+      "tempo": "74 BPM · D major",
+      "mood": "Νυσταγμένο, οικείο και διακριτικά κωμικό, με χώρο για παρατήρηση.",
+      "prompt": "Instrumental interior exploration loop for a cosy, hand-painted adventure in a modest Greek island hotel, summer 1988. Intimate Mediterranean chamber pop, 74 BPM, D major. Muted nylon-string guitar, soft felt-like piano, lightly plucked upright bass and occasional mellow clarinet phrases; the smallest hint of brushed percussion. A simple four-note motif with gentle pauses and affectionate dry humour. Sleepy reception desk, ceiling fan, afternoon light, a suitcase and a slightly shabby holiday room. Close, warm recording, small ensemble, low dynamic range, sparse arrangement that supports quiet dialogue. Mild harmonic movement, no suspense or sadness, no busy solos. Loop-friendly A/B texture with an open ending, no grand introduction or final cadence. No vocals, snoring, fan recordings, ticking clocks, slapstick stings, accordion clichés or orchestral swells.",
+      "notes": "Το ίδιο κομμάτι σε ρεσεψιόν και δωμάτιο 23. Η Ζωζώ που ξυπνά αλλάζει την κατάσταση της σκηνής, όχι ολόκληρο το μουσικό θέμα. Δεν ενσωματώνουμε ήχο ανεμιστήρα στη μουσική.",
+      "file": "track3.mp3"
+    },
+    {
+      "id": "zefyr-88",
+      "title": "Ζεφύρ ’88",
+      "tempo": "118 BPM · D major",
+      "mood": "Ζεστή νησιώτικη ντίσκο, χαρούμενη και χορευτική, με αυθεντική υφή εποχής.",
+      "prompt": "Instrumental 1988 Mediterranean disco-funk loop for a small Greek island nightclub in a hand-painted comedy adventure. 118 BPM, D major, buoyant four-on-the-floor drums, dry snare and claps, syncopated fingerstyle electric bass, clean muted rhythm guitar, warm analogue synth chords, short string-synth stabs and a modest melodic synth hook. A simple four-note motif, cheerful and slightly cheeky. Mirror ball, coloured lamps, cassette decks and an amateur summer dance contest. Period-sized drum-machine sound and tape warmth, tight small-band mix, energetic but not aggressive. Keep the lead hook sparse enough for dialogue; subtle eight-bar variations, stable groove and loop-friendly open ending. No singing, vocal chops, crowd samples, modern sidechain pumping, EDM risers or drops, arena drums, epic brass or cinematic victory fanfare.",
+      "notes": "Συνεχές θέμα της ντίσκο και του διαγωνισμού. Η βλάβη της κασέτας χρειάζεται παύση/διακοπή του ίδιου κομματιού και η επισκευή επαναφορά του, όχι νέο τραγούδι.",
+      "file": "track4.mp3"
+    }
+  ],
+  "screens": [
+    {
+      "id": "port",
+      "name": "Λιμάνι",
+      "scene": "port",
+      "track": "village-day",
+      "kind": "Τοποθεσία",
+      "brief": "Άφιξη στο νησί, περίπτερο, γάτα και καθημερινή κίνηση. Το βασικό μοτίβο παρουσιάζει τον κόσμο με χιούμορ και ζεστασιά.",
+      "transition": "Συνέχεια του ίδιου κομματιού όταν περνάς στην πλατεία."
+    },
+    {
+      "id": "square",
+      "name": "Πλατεία / μαγαζιά",
+      "scene": "square",
+      "track": "village-day",
+      "kind": "Τοποθεσία",
+      "brief": "Κοινό θέμα με το λιμάνι: κουβέντες, αγορές και συντριβάνι. Ο ήχος του νερού παραμένει ανεξάρτητο περιβαλλοντικό εφέ.",
+      "transition": "Χωρίς μουσική επανεκκίνηση ανάμεσα σε λιμάνι και πλατεία."
+    },
+    {
+      "id": "beach",
+      "name": "Παραλία",
+      "scene": "beach",
+      "track": "beach-breeze",
+      "kind": "Τοποθεσία",
+      "brief": "Πιο αργή ανάσα, φλερτ με τη Δανάη και απογευματινή ανεμελιά. Ήπιος ρυθμός που δεν σκεπάζει ατάκες και κυματισμούς.",
+      "transition": "Ήπια μετάβαση από το θέμα του χωριού. Το ίδιο κομμάτι επιστρέφει στον επίλογο."
+    },
+    {
+      "id": "lobby",
+      "name": "Ρεσεψιόν ξενοδοχείου",
+      "scene": "lobby",
+      "track": "hotel-siesta",
+      "kind": "Τοποθεσία",
+      "brief": "Νυσταγμένη ρεσεψιόν, ανεμιστήρας και η Ζωζώ πίσω από τον πάγκο. Οι μουσικές παύσεις υπηρετούν το χιούμορ χωρίς ηχητικά καρτούν.",
+      "transition": "Κοινό θέμα με το δωμάτιο, χωρίς επανεκκίνηση στη σκάλα."
+    },
+    {
+      "id": "room",
+      "name": "Δωμάτιο 23",
+      "scene": "room",
+      "track": "hotel-siesta",
+      "kind": "Τοποθεσία",
+      "brief": "Ησυχία, βαλίτσα, καθρέφτης και προετοιμασία για τη βραδιά. Η ίδια ξενοδοχειακή μουσική κρατά τον χώρο οικείο.",
+      "transition": "Συνέχεια από τη ρεσεψιόν. Επιστροφή στο θέμα του χωριού όταν βγαίνεις στην πλατεία."
+    },
+    {
+      "id": "disco",
+      "name": "Ντίσκο Ζεφύρ",
+      "scene": "disco",
+      "track": "zefyr-88",
+      "kind": "Τοποθεσία",
+      "brief": "Η μουσική είναι μέρος του χώρου και του γρίφου της κασέτας. Χορευτικό groove του 1988, με χώρο για τις κουβέντες με τον DJ.",
+      "transition": "Στη μασημένη κασέτα σταματά· μετά την επισκευή επιστρέφει το ίδιο θέμα."
+    },
+    {
+      "id": "title",
+      "name": "Αρχική οθόνη",
+      "scene": "port",
+      "track": "village-day",
+      "kind": "Παρουσίαση",
+      "brief": "Το βασικό θέμα συστήνει το καλοκαίρι πριν αρχίσει η περιπέτεια. Δεν απαιτείται πέμπτο κομμάτι για το μενού.",
+      "transition": "Το βασικό θέμα μπορεί να συνεχιστεί στην εισαγωγή."
+    },
+    {
+      "id": "intro",
+      "name": "Εισαγωγή / άφιξη",
+      "scene": "port",
+      "track": "village-day",
+      "kind": "Παρουσίαση",
+      "brief": "Ίδιο μουσικό λεξιλόγιο με το λιμάνι. Χαμηλότερη ένταση στα αφηγηματικά καρέ και στις λεζάντες.",
+      "transition": "Ομαλή συνέχεια προς το λιμάνι, χωρίς επιπλέον εισαγωγή ή μουσική κορύφωση."
+    },
+    {
+      "id": "dusk",
+      "name": "Μετάβαση στη βραδιά",
+      "scene": "beach",
+      "track": "beach-breeze",
+      "kind": "Παρουσίαση",
+      "brief": "Το ήρεμο θέμα της παραλίας συνοδεύει τη δύση. Η αλλαγή σε ντίσκο αποκτά νόημα όταν εμφανίζεται ο εσωτερικός χώρος.",
+      "transition": "Σβήσιμο της παραλίας και είσοδος του Ζεφύρ ’88 στη ντίσκο."
+    },
+    {
+      "id": "finale",
+      "name": "Διαγωνισμός / τελικός χορός",
+      "scene": "disco",
+      "track": "zefyr-88",
+      "kind": "Παρουσίαση",
+      "brief": "Το ίδιο χορευτικό κομμάτι στηρίζει τον διαγωνισμό. Η νίκη αναδεικνύεται από τη σκηνή και το χιούμορ, χωρίς επική φανφάρα.",
+      "transition": "Διατήρηση του groove στον χορό· ήπια μετάβαση στην παραλία για την τελική κάρτα."
+    },
+    {
+      "id": "ending",
+      "name": "Επίλογος / καρτ ποστάλ",
+      "scene": "beach",
+      "track": "beach-breeze",
+      "kind": "Παρουσίαση",
+      "brief": "Επιστροφή στο ήρεμο θέμα της παραλίας για τον Τάκη και τη Δανάη. Ζεστή ανάμνηση, με χώρο για την τελευταία ατάκα του αφηγητή.",
+      "transition": "Χαμηλή, σταθερή ένταση όσο διαβάζεται ο επίλογος. Δεν χρειάζεται ξεχωριστό τραγούδι τέλους."
+    }
+  ],
+  "folder": "assets/music/"
+}
